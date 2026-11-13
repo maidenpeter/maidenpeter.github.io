@@ -1,3 +1,7 @@
 .DS_Store
 Thumbs.db
 __pycache__/
+# local paths to private case study outputs, read by tools/check_figures.py
+tools/local_paths.json
+# screenshot output, if written inside the repo by mistake
+screenshots/
