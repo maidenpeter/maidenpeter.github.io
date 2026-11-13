@@ -1,128 +1,180 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kenya Insurance, Rebuilt</title><meta name="description" content="Kenya's general insurers and reinsurers, every quarter from Q4 2016 to Q1 2026, rebuilt from IRA's returns: profitability, market structure, a reinsurer's scorecard and a data explorer.">
-<meta property="og:title" content="Kenya Insurance, Rebuilt"><meta property="og:description" content="Kenya's general insurers and reinsurers, every quarter from Q4 2016 to Q1 2026, rebuilt from IRA's returns: profitability, market structure, a reinsurer's scorecard and a data explorer."><meta property="og:type" content="website">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap"><style>
-:root{--ground:#f4f6f3;--surface:#ffffff;--ink:#15202b;--ink-2:#4f5a64;--muted:#6d7780;--rule:#d9dfdb;--rule-soft:#e8ece9;--accent:#184f95;--accent-soft:#e3ecf8;--gain:#2a78d6;--loss:#e0612e;
---serif:"EB Garamond",Garamond,"Adobe Garamond Pro",Georgia,serif;--ui:"IBM Plex Sans Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif}
-@media (prefers-color-scheme:dark){:root{color-scheme:dark;--ground:#10161c;--surface:#172029;--ink:#e7ebee;--ink-2:#b4bdc5;--muted:#8f99a3;--rule:#2b3640;--rule-soft:#222c35;--accent:#86b6ef;--accent-soft:#1d2a3a;--gain:#4a97ee;--loss:#ee7a45}}
-*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--serif);font-size:18px;line-height:1.5}
-a{color:var(--accent)}a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.wrap{max-width:1140px;margin:0 auto;padding-inline:22px;padding-block:28px 56px;display:flex;flex-direction:column;gap:56px}
-.eyebrow{font-family:var(--ui);font-size:12.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
-h1{font-size:clamp(36px,5.4vw,60px);font-weight:500;line-height:1.03;margin:8px 0 14px;letter-spacing:-.01em;text-wrap:balance}
-h2{font-size:clamp(26px,3.2vw,34px);font-weight:500;line-height:1.1;margin:4px 0 0;text-wrap:balance}
-h3{font-size:22px;font-weight:500;margin:0;line-height:1.15}
-p{margin:0}.lede{font-size:clamp(19px,2vw,22px);color:var(--ink-2);max-width:60ch}
-.small{font-family:var(--ui);font-size:13.5px;color:var(--muted)}
-nav.top{display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:var(--ui);font-size:14px;border-bottom:1px solid var(--rule);padding-bottom:14px;flex-wrap:wrap}
-nav.top .me{font-family:var(--serif);font-size:21px;font-weight:600;color:var(--ink);text-decoration:none}
-nav.top .links{display:flex;gap:18px;flex-wrap:wrap}nav.top .links a{color:var(--ink-2);text-decoration:none}nav.top .links a:hover{color:var(--accent)}
-.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:36px;align-items:center}
-.big{display:flex;flex-direction:column;gap:14px;margin-top:22px}
-.big div{display:flex;flex-direction:column}
-.big b{font-weight:400;font-size:clamp(42px,5.2vw,58px);line-height:1;font-variant-numeric:tabular-nums lining-nums}
-.big span{font-family:var(--ui);font-size:14.5px;color:var(--ink-2);margin-top:3px}
-.panel{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:20px}
-.chart svg{display:block;width:100%;height:auto}.chart text{font-family:var(--ui);font-size:13px;fill:var(--ink-2)}.chart .v{fill:var(--ink);font-weight:500}.chart .m{fill:var(--ink);font-weight:600}
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:10px;overflow:hidden}
-.stats div{background:var(--surface);padding:16px 18px;display:flex;flex-direction:column;gap:2px}
-.stats b{font-weight:400;font-size:34px;line-height:1.05;font-variant-numeric:tabular-nums lining-nums}
-.stats span{font-family:var(--ui);font-size:13.5px;color:var(--ink-2)}
-.sechead{display:flex;flex-direction:column;gap:8px;max-width:72ch}.sechead p{color:var(--ink-2)}
-.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
-.card{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:22px;display:flex;flex-direction:column;gap:10px;text-decoration:none;color:var(--ink);transition:border-color .15s,transform .15s}
-.card:hover{border-color:var(--accent);transform:translateY(-2px)}
-.card .tag{font-family:var(--ui);font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
-.card .find{font-size:19px;line-height:1.35}.card .find b{font-weight:600}
-.card .go{font-family:var(--ui);font-size:14px;color:var(--accent);margin-top:auto}
-.card.soon{background:transparent;border-style:dashed;cursor:default}.card.soon:hover{transform:none;border-color:var(--rule)}
-.pipe{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;align-items:stretch}
-.step{position:relative;padding:16px 18px 16px 0;border-top:3px solid var(--accent);display:flex;flex-direction:column;gap:6px}
-.step b{font-family:var(--ui);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
-.step p{font-family:var(--ui);font-size:14.5px;color:var(--ink-2);line-height:1.4}
-.step .n{font-family:var(--serif);font-size:26px;color:var(--ink);line-height:1.1}
-.repos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
-.repo{border-top:1px solid var(--rule);padding-top:12px;display:flex;flex-direction:column;gap:6px}
-.repo a{font-family:var(--ui);font-size:15px;font-weight:500}.repo p{font-family:var(--ui);font-size:14px;color:var(--ink-2)}
-footer{border-top:1px solid var(--rule);padding-top:16px;display:flex;flex-direction:column;gap:6px;font-family:var(--ui);font-size:13.5px;color:var(--muted)}footer p{max-width:110ch}
-@media (max-width:860px){.hero,.cards,.repos{grid-template-columns:minmax(0,1fr)}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.pipe{grid-template-columns:minmax(0,1fr);gap:14px}.step{padding-right:0}}
-@media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
-</style></head><body><div class="wrap">
-<nav class="top"><a class="me" href="https://maidenpeter.github.io/">Marion Peter</a><div class="links"><a href="#work">The work</a><a href="#method">Method</a><a href="#code">Code</a><a href="https://github.com/maidenpeter">GitHub</a></div></nav>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marion Peter | Actuarial analyst, Nairobi</title>
+<meta name="description" content="Kenya&#x27;s general insurance market rebuilt from the regulator&#x27;s returns and checked 42,246 times: where insurers lose money, what premiums would need to do, and which cedants a reinsurer should worry about.">
+<link rel="canonical" href="https://maidenpeter.github.io/">
+<meta name="author" content="Marion Peter">
+<meta name="theme-color" content="#f4f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#10161c" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Marion Peter">
+<meta property="og:title" content="Marion Peter, actuarial analyst">
+<meta property="og:description" content="Kenya&#x27;s general insurance market rebuilt from the regulator&#x27;s returns and checked 42,246 times: where insurers lose money, what premiums would need to do, and which cedants a reinsurer should worry about.">
+<meta property="og:url" content="https://maidenpeter.github.io/">
+<meta property="og:image" content="https://maidenpeter.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kenya general insurance underwriting result by class, 2018 to 2025: motor KSh -52.6bn, every other class together KSh +19.6bn.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<script>try{var t=localStorage.getItem('mp-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/">Marion Peter<span>Actuarial analyst, Nairobi</span></a>
+<nav class="main" aria-label="Main"><a href="/#work">Work</a><a href="/kenya-insurance/">Kenya series</a><a href="/about/">About</a><a href="/#contact">Contact</a><button class="theme" type="button" hidden>Dark theme</button></nav>
+</div></header>
+<main id="main" class="wrap">
 <section class="hero" aria-labelledby="h1">
-  <div>
-    <div class="eyebrow">Kenya's insurance market, rebuilt from the regulator's own returns</div>
-    <h1 id="h1">Where Kenyan insurers make money, and where they lose it</h1>
-    <p class="lede">Every general insurer and reinsurer, every quarter from Q4 2016 to Q1 2026, extracted from the Insurance Regulatory Authority's statistics, checked against itself and turned into analysis a reinsurer or an insurer's board could use.</p>
-    <div class="big">
-      <div><b style="color:var(--loss)">-52.6bn</b><span>KSh lost on motor underwriting, 2018 to 2025</span></div>
-      <div><b style="color:var(--gain)">+19.6bn</b><span>earned back by every other class together</span></div>
-    </div>
-  </div>
-  <div class="panel">
-    <h3>Underwriting result by class, 2018 to 2025</h3>
-    <p class="small" style="margin:3px 0 12px">KSh billions. The market's net result: KSh -33.1bn. Motor commercial includes PSV.</p>
-    <div class="chart"><svg viewBox="0 0 560 361" role="img" aria-label="Underwriting result by class, 2018 to 2025, KSh billions"><line x1="388.3" x2="388.3" y1="0" y2="361" stroke="var(--muted)" stroke-width="1"/><text x="141" y="22.0" text-anchor="end" class="m">Motor private</text><rect x="189.7" y="9" width="198.6" height="17" rx="2" fill="var(--loss)"><title>Motor private: KSh -29.3bn</title></rect><text x="184.7" y="22.0" text-anchor="end" class="v">-29.3</text><text x="141" y="49.0" text-anchor="end" class="m">Motor commercial</text><rect x="229.6" y="36" width="158.7" height="17" rx="2" fill="var(--loss)"><title>Motor commercial: KSh -23.4bn</title></rect><text x="224.6" y="49.0" text-anchor="end" class="v">-23.4</text><text x="141" y="76.0" text-anchor="end" class="">Medical</text><rect x="371.1" y="63" width="17.2" height="17" rx="2" fill="var(--loss)"><title>Medical: KSh -2.5bn</title></rect><text x="366.1" y="76.0" text-anchor="end" class="v">-2.5</text><text x="141" y="103.0" text-anchor="end" class="">Engineering</text><rect x="382.5" y="90" width="5.8" height="17" rx="2" fill="var(--loss)"><title>Engineering: KSh -0.9bn</title></rect><text x="377.5" y="103.0" text-anchor="end" class="v">-0.9</text><text x="141" y="130.0" text-anchor="end" class="">Aviation</text><rect x="383.7" y="117" width="4.6" height="17" rx="2" fill="var(--loss)"><title>Aviation: KSh -0.7bn</title></rect><text x="378.7" y="130.0" text-anchor="end" class="v">-0.7</text><text x="141" y="157.0" text-anchor="end" class="">Personal accident</text><rect x="388.3" y="144" width="3.5" height="17" rx="2" fill="var(--gain)"><title>Personal accident: KSh +0.5bn</title></rect><text x="396.8" y="157.0" text-anchor="start" class="v">+0.5</text><text x="141" y="184.0" text-anchor="end" class="">Liability</text><rect x="388.3" y="171" width="6.1" height="17" rx="2" fill="var(--gain)"><title>Liability: KSh +0.9bn</title></rect><text x="399.4" y="184.0" text-anchor="start" class="v">+0.9</text><text x="141" y="211.0" text-anchor="end" class="">Fire industrial</text><rect x="388.3" y="198" width="6.4" height="17" rx="2" fill="var(--gain)"><title>Fire industrial: KSh +1.0bn</title></rect><text x="399.7" y="211.0" text-anchor="start" class="v">+1.0</text><text x="141" y="238.0" text-anchor="end" class="">Fire domestic</text><rect x="388.3" y="225" width="6.5" height="17" rx="2" fill="var(--gain)"><title>Fire domestic: KSh +1.0bn</title></rect><text x="399.8" y="238.0" text-anchor="start" class="v">+1.0</text><text x="141" y="265.0" text-anchor="end" class="">Miscellaneous</text><rect x="388.3" y="252" width="6.7" height="17" rx="2" fill="var(--gain)"><title>Miscellaneous: KSh +1.0bn</title></rect><text x="400.0" y="265.0" text-anchor="start" class="v">+1.0</text><text x="141" y="292.0" text-anchor="end" class="">Theft</text><rect x="388.3" y="279" width="18.5" height="17" rx="2" fill="var(--gain)"><title>Theft: KSh +2.7bn</title></rect><text x="411.8" y="292.0" text-anchor="start" class="v">+2.7</text><text x="141" y="319.0" text-anchor="end" class="">Marine</text><rect x="388.3" y="306" width="24.0" height="17" rx="2" fill="var(--gain)"><title>Marine: KSh +3.5bn</title></rect><text x="417.3" y="319.0" text-anchor="start" class="v">+3.5</text><text x="141" y="346.0" text-anchor="end" class="">Workmen's comp.</text><rect x="388.3" y="333" width="88.7" height="17" rx="2" fill="var(--gain)"><title>Workmen's comp.: KSh +13.1bn</title></rect><text x="482.0" y="346.0" text-anchor="start" class="v">+13.1</text></svg></div>
-  </div>
+<div class="hero-text">
+<span class="eyebrow">Insurance and reinsurance analysis</span>
+<h1 id="h1">I take messy regulatory data, check it properly and turn it into decisions</h1>
+<p class="lede">From 2022 to 2025 I worked in data, actuarial and reserving roles at an insurance group in Kenya and Mauritius. The work below rebuilds Kenya's general insurance market from the regulator's own returns, checks it 42,246 times, and answers the questions an insurer's board or a reinsurer would ask of it.</p>
+<div class="cta"><a class="btn primary" href="#work">See the Kenya series</a><a class="btn quiet" href="https://github.com/maidenpeter">Code on GitHub</a></div>
+</div>
+<figure class="panel" style="margin:0">
+<h3>Underwriting result by class, 2018 to 2025</h3>
+<p class="small">KSh billions, every general insurer in Kenya. Market total KSh -33.1bn. Motor lost money in all 8 years.</p>
+<div class="bars" role="img" aria-label="Underwriting result by class, 2018 to 2025, KSh billions. Motor private -29.3, motor commercial -23.4, workmen&#x27;s compensation +13.1, market total -33.1."><span class="lab em">Motor private</span><span class="track" style="--zero:69.13%;--w:69.13%"><span class="bar neg"></span><span class="val neg in">-29.3</span></span><span class="lab em">Motor commercial</span><span class="track" style="--zero:69.13%;--w:55.26%"><span class="bar neg"></span><span class="val neg in">-23.4</span></span><span class="lab">Medical</span><span class="track" style="--zero:69.13%;--w:6.00%"><span class="bar neg"></span><span class="val neg">-2.5</span></span><span class="lab">Engineering</span><span class="track" style="--zero:69.13%;--w:2.01%"><span class="bar neg"></span><span class="val neg">-0.9</span></span><span class="lab">Aviation</span><span class="track" style="--zero:69.13%;--w:1.61%"><span class="bar neg"></span><span class="val neg">-0.7</span></span><span class="lab">Personal accident</span><span class="track" style="--zero:69.13%;--w:1.23%"><span class="bar pos"></span><span class="val pos">+0.5</span></span><span class="lab">Liability</span><span class="track" style="--zero:69.13%;--w:2.13%"><span class="bar pos"></span><span class="val pos">+0.9</span></span><span class="lab">Fire industrial</span><span class="track" style="--zero:69.13%;--w:2.25%"><span class="bar pos"></span><span class="val pos">+1.0</span></span><span class="lab">Fire domestic</span><span class="track" style="--zero:69.13%;--w:2.27%"><span class="bar pos"></span><span class="val pos">+1.0</span></span><span class="lab">Miscellaneous</span><span class="track" style="--zero:69.13%;--w:2.32%"><span class="bar pos"></span><span class="val pos">+1.0</span></span><span class="lab">Theft</span><span class="track" style="--zero:69.13%;--w:6.43%"><span class="bar pos"></span><span class="val pos">+2.7</span></span><span class="lab">Marine</span><span class="track" style="--zero:69.13%;--w:8.37%"><span class="bar pos"></span><span class="val pos">+3.5</span></span><span class="lab">Workmen&#x27;s compensation</span><span class="track" style="--zero:69.13%;--w:30.87%"><span class="bar pos"></span><span class="val pos">+13.1</span></span></div>
+<div class="foot"><span class="small">Source: IRA quarterly returns, full years. Net of reinsurance. Motor commercial includes PSV.</span><a class="more" href="https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-insurance-loss-map.html">Open the Loss Map</a></div>
+</figure>
 </section>
 
-<section class="stats" aria-label="The data in numbers">
-  <div><b>35</b><span>quarters, Q4 2016 to Q1 2026</span></div>
-  <div><b>52</b><span>insurers and reinsurers on stable ids</span></div>
-  <div><b>42,246</b><span>consistency checks, none unexplained</span></div>
-  <div><b>12 of 12</b><span>figures match IRA's own PDF releases</span></div>
+<section class="proof" aria-label="The data in numbers"><div><b>35</b><span>quarters of returns, Q4 2016 to Q1 2026</span></div><div><b>52</b><span>insurers and reinsurers, every one, on stable ids</span></div><div><b>42,246</b><span>consistency checks, none unexplained</span></div><div><b>12 of 12</b><span>figures match IRA's own PDF releases</span></div><div><b>3 repos</b><span>public code, tests run on every push</span></div></section>
+
+<section id="work" aria-labelledby="h-work">
+<div class="sechead"><span class="eyebrow">Featured work</span>
+<h2 id="h-work">Kenya insurance series</h2>
+<p>Every general insurer and reinsurer in Kenya, every quarter from Q4 2016 to Q1 2026, extracted from the Insurance Regulatory Authority's statistics and checked against itself. Four pages, one validated dataset, three public repositories.</p>
+<a class="more" href="/kenya-insurance/">How the series is built</a></div>
+<div class="grid2"><article class="card">
+<span class="tag">Profitability</span>
+<h3>Kenya Insurance Loss Map</h3>
+<p class="find">Motor lost <b>KSh 52.6bn</b> on underwriting from 2018 to 2025, in every one of the eight years. On 2023 to 2025 experience, motor commercial premiums would need to rise <b>15.6%</b> to break even.</p>
+<dl class="meta"><dt>Data</dt><dd>IRA quarterly returns, full years 2018 to 2025, 14 classes, every general insurer.</dd><dt>Method</dt><dd>Class results by year; break-even rate change by the loss ratio method; Fisher's exact test on motor books that look too good.</dd></dl>
+<div class="links"><a href="https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-insurance-loss-map.html">Open the page</a><a href="https://github.com/maidenpeter/ira-kenya-insurance">Code: ira-kenya-insurance</a></div>
+</article><article class="card">
+<span class="tag">Reinsurance</span>
+<h3>Kenya Cedant Scorecard</h3>
+<p class="find">Every insurer graded A to E each year the way a reinsurer screens a cedant. <b>3 of the 5</b> insurers placed under statutory management or liquidation since 2022 were in the bottom fifth a year before the regulator acted.</p>
+<dl class="meta"><dt>Data</dt><dd>IRA balance sheets, revenue accounts and return-quality flags, 2016 to 2025.</dd><dt>Method</dt><dd>Peer percentiles on four pillars (balance sheet, operations, business profile, return quality), a capital cap, a back-test and weight sensitivity.</dd></dl>
+<div class="links"><a href="https://maidenpeter.github.io/ira-kenya-reinsurance/page/kenya-cedant-scorecard.html">Open the page</a><a href="https://github.com/maidenpeter/ira-kenya-reinsurance">Code: ira-kenya-reinsurance</a></div>
+</article><article class="card">
+<span class="tag">Market structure</span>
+<h3>Kenya Insurance Market Structure</h3>
+<p class="find">In 2020, two insurers wrote over KSh 10bn a year and held 16% of the market. By 2025, <b>seven</b> did, holding 53%. The ten insurers losing share ran a median combined ratio of <b>112.0%</b>.</p>
+<dl class="meta"><dt>Data</dt><dd>Written premium and results for every general insurer, 2016 to 2025, pro forma for mergers.</dd><dt>Method</dt><dd>Herfindahl-Hirschman index, share shifts, growth against combined ratio, and expense rates measured class for class against the five largest insurers.</dd></dl>
+<div class="links"><a href="https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-insurance-market-structure.html">Open the page</a><a href="https://github.com/maidenpeter/ira-kenya-insurance">Code: ira-kenya-insurance</a></div>
+</article><article class="card">
+<span class="tag">Data</span>
+<h3>Kenya Insurer Explorer</h3>
+<p class="find">Any insurer, any year: premium, ratios, single quarters, class mix, balance sheet and every return-quality flag, including the <b>12 returns</b> that add up on their own but cannot be right.</p>
+<dl class="meta"><dt>Data</dt><dd>21,900 revenue-account rows and 211,785 class rows from 165 IRA files catalogued back to 2008.</dd><dt>Method</dt><dd>Extraction from shifting workbook layouts, a name crosswalk across renames and mergers, single quarters from year-to-date figures, 42,246 checks.</dd></dl>
+<div class="links"><a href="https://maidenpeter.github.io/ira-kenya-data/explorer/kenya-insurer-explorer.html">Open the page</a><a href="https://github.com/maidenpeter/ira-kenya-data">Code: ira-kenya-data</a></div>
+</article></div>
 </section>
 
-<section id="work" aria-labelledby="h-work" style="display:flex;flex-direction:column;gap:20px">
-  <div class="sechead"><div class="eyebrow">The work</div><h2 id="h-work">Four ways into the same data</h2>
-  <p>Each page is a single file built from the validated tables, with the method and caveats on the page.</p></div>
-  <div class="cards">
-    <a class="card" href="https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-insurance-loss-map.html"><span class="tag">Profitability</span><h3>Kenya Insurance Loss Map</h3>
-      <p class="find">Motor lost money in every year from 2018 to 2025. On 2023 to 2025 experience, motor commercial premiums would need to rise <b>15.6%</b> just to break even.</p>
-      <span class="go">Open the loss map</span></a>
-    <a class="card" href="https://maidenpeter.github.io/ira-kenya-reinsurance/page/kenya-cedant-scorecard.html"><span class="tag">Reinsurance</span><h3>Kenya Cedant Scorecard</h3>
-      <p class="find">Every insurer graded A to E the way a reinsurer screens a cedant. <b>Three of the five</b> insurers placed under statutory management or liquidation since 2022 sat in the bottom fifth a year before.</p>
-      <span class="go">Open the scorecard</span></a>
-    <a class="card" href="https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-insurance-market-structure.html"><span class="tag">Market structure</span><h3>Kenya Insurance Market Structure</h3>
-      <p class="find">In 2020 two insurers wrote over KSh 10bn and held 16% of the market. By 2025 <b>seven</b> did, holding 53%. Insurers losing share ran a median combined ratio of 112%.</p>
-      <span class="go">Open market structure</span></a>
-    <a class="card" href="https://maidenpeter.github.io/ira-kenya-data/explorer/kenya-insurer-explorer.html"><span class="tag">Data</span><h3>Kenya Insurer Explorer</h3>
-      <p class="find">Any insurer, any year: premium, ratios, every quarter on its own, class mix, balance sheet and every return-quality flag, including the returns that add up but cannot be right.</p>
-      <span class="go">Open the explorer</span></a>
-  </div>
-  <div class="cards">
-    <div class="card soon"><span class="tag">Coming next</span><h3>Reserving tool</h3><p class="find" style="color:var(--ink-2)">Chain ladder and Bornhuetter-Ferguson on published claims development tables, with IBNR set against the reserves insurers booked.</p></div>
-    <div class="card soon"><span class="tag">Coming next</span><h3>IFRS 17 and reinsurance flows</h3><p class="find" style="color:var(--ink-2)">What the 2024 switch to IFRS 17 changed in reported results, and how much risk Kenyan insurers cede, by class and company.</p></div>
-  </div>
+<section id="signals" aria-labelledby="h-signals">
+<div class="sechead"><span class="eyebrow">What a reinsurer would act on</span>
+<h2 id="h-signals">The warnings were in the public returns</h2>
+<p>Three results from the series that change a decision. Insurer names stay inside the analysis pages, next to the method and caveats.</p></div>
+<div class="signals">
+<div class="panel">
+<span class="tag">Cedant Scorecard back-test</span>
+<p class="big">3 <small>of 5</small></p>
+<p>insurers the regulator stepped into since 2022 sat in the bottom fifth of the table a year before it acted.</p>
+<div class="rank" role="img" aria-label="Last scorecard rank before the regulator acted, for five insurers: 33 of 35, 29 of 33, 33 of 33, 20 of 33, 28 of 35. Three in the bottom fifth.">
+<span class="zl">Bottom fifth</span><span class="line"></span><span class="zone"></span><span class="dot" style="left:92.9%" title="Rank 33 of 35, regulator acted 2022"></span><span class="dot" style="left:86.4%" title="Rank 29 of 33, regulator acted 2023"></span><span class="dot" style="left:98.5%" title="Rank 33 of 33, regulator acted 2023"></span><span class="dot out" style="left:59.1%" title="Rank 20 of 33, regulator acted 2026"></span><span class="dot out" style="left:78.6%" title="Rank 28 of 35, regulator acted 2026"></span>
+<span class="end" style="left:0">Top of the table</span><span class="end" style="right:0">Bottom</span></div>
+<div class="legend"><span><i></i>bottom fifth</span><span><i class="out"></i>mid-table, but had stopped filing complete returns</span></div>
+<p class="small">Five cases is a small sample, and the test cannot show how many low-graded insurers carried on without trouble.</p>
+</div>
+<div class="panel">
+<span class="tag">Motor books that look too good</span>
+<p class="big">8 <small>of 10</small></p>
+<p>insurers that booked a motor loss ratio under 40% in some year had negative equity, a capital shortfall or regulator action at some point since 2018, against 7 of the other 28 motor insurers.</p>
+<div class="share" aria-hidden="true"><span class="l">Booked a motor loss ratio under 40%</span><span class="t"><i class="" style="width:80%"></i></span><span>80%</span><span class="l">Every other motor insurer</span><span class="t"><i class="g" style="width:25%"></i></span><span>25%</span></div>
+<p class="small">Fisher's exact test, p = 0.006. A low loss ratio is often a reserving question, not a pricing success.</p>
+</div>
+<div class="panel">
+<span class="tag">Underwriting profit is getting rarer</span>
+<p class="big">9 <small>of 34</small></p>
+<p>insurers made an underwriting profit in 2025, down from 19 of 35 in 2016.</p>
+<div class="share" aria-hidden="true"><span class="l">2016</span><span class="t"><i class="b" style="width:54%"></i></span><span>54%</span><span class="l">2025</span><span class="t"><i class="b" style="width:26%"></i></span><span>26%</span></div>
+<p class="small">In 2025 the market's KSh 7.0bn underwriting loss was covered by KSh 21.3bn of investment income.</p>
+</div>
+</div>
 </section>
 
-<section id="method" aria-labelledby="h-method" style="display:flex;flex-direction:column;gap:20px">
-  <div class="sechead"><div class="eyebrow">Method</div><h2 id="h-method">From the regulator's files to a finding</h2>
-  <p>A return can add up on its own and still be wrong, so every company is also read across its quarters. Errors in the official tables are documented, not hidden.</p></div>
-  <div class="pipe">
-    <div class="step"><b>Collect</b><span class="n">165 files</span><p>Every IRA statistical publication online from 2008, catalogued with source links and hashes.</p></div>
-    <div class="step"><b>Extract</b><span class="n">233,685 rows</span><p>Revenue accounts and class tables from workbooks whose layouts and company names shift every year.</p></div>
-    <div class="step"><b>Validate</b><span class="n">42,246 checks</span><p>Identities, class totals, IRA's printed totals and a cross-check against the PDF releases.</p></div>
-    <div class="step"><b>Flag</b><span class="n">12 returns</span><p>Returns that add up but cannot be right, such as year-to-date premium that falls, kept out of quarterly totals.</p></div>
-    <div class="step"><b>Analyse</b><span class="n">4 pages</span><p>Profitability, market structure, a reinsurer's scorecard and an explorer, each reproducible with one command.</p></div>
-  </div>
+<section id="cases" aria-labelledby="h-cases">
+<div class="sechead"><span class="eyebrow">Earlier case studies</span>
+<h2 id="h-cases">The same standard on other data</h2>
+<p>The first is Kenyan work, published without client identifiers. The other two use public US data sets with the long claims and price histories the methods need.</p></div>
+<div class="cases"><article class="case">
+<div class="left"><span class="tag">Kenyan motor dealer group, anonymised</span><h3><a href="/work/dealer-revenue/">Revenue was being reported 61% higher than it was earned</a></h3>
+<a class="more" href="/work/dealer-revenue/">Read the case study</a></div>
+<dl class="meta"><dt>Data</dt><dd>Three system extracts: 347,852 rows of parts invoices, service jobs and workshop consumption, January 2022 to August 2026.</dd><dt>Method</dt><dd>Joins tested before any total, every unmatched invoice accounted for, bad rows flagged rather than deleted, every figure built in pandas and in Excel and reconciled cell by cell (5,189 of 5,189).</dd></dl>
+</article><article class="case">
+<div class="left"><span class="tag">US industry reserves, IFRS 17</span><h3><a href="/work/ifrs17-measurement/">Discounting makes a reserve smaller. On one line, IFRS 17 makes it bigger</a></h3>
+<a class="more" href="/work/ifrs17-measurement/">Read the case study</a></div>
+<dl class="meta"><dt>Data</dt><dd>CAS Loss Reserving Database: NAIC Schedule P paid triangles for six US lines, accident years 1988 to 1997.</dd><dt>Method</dt><dd>Chain ladder to the payment pattern, discounting, and a risk adjustment from 5,000 over-dispersed Poisson bootstrap simulations, checked against the point estimate first.</dd></dl>
+</article><article class="case">
+<div class="left"><span class="tag">US vehicle auctions, valuation adequacy</span><h3><a href="/work/valuation-adequacy/">An estimate that is unbiased in total and biased in every condition band</a></h3>
+<a class="more" href="/work/valuation-adequacy/">Read the case study</a></div>
+<dl class="meta"><dt>Data</dt><dd>476,882 US wholesale auctions with the market's pre-sale estimate and the price paid, 2014 to 2015 (Kaggle).</dd><dt>Method</dt><dd>Run as a reserve adequacy test: profile every field, check the aggregate, then segment by condition and try to break the result with value, mileage and seller checks.</dd></dl>
+</article></div>
 </section>
 
-<section id="code" aria-labelledby="h-code" style="display:flex;flex-direction:column;gap:20px">
-  <div class="sechead"><div class="eyebrow">Code</div><h2 id="h-code">Three repositories, one pipeline</h2>
-  <p>Python and pandas, tests run on every push, and every published number rebuilt from the raw files.</p></div>
-  <div class="repos">
-    <div class="repo"><a href="https://github.com/maidenpeter/ira-kenya-data">ira-kenya-data</a><p>The data layer: extraction, company crosswalk, single-quarter panels, quality flags and validation.</p></div>
-    <div class="repo"><a href="https://github.com/maidenpeter/ira-kenya-insurance">ira-kenya-insurance</a><p>The insurer's view: class profitability, rate adequacy, reserving warnings and market structure.</p></div>
-    <div class="repo"><a href="https://github.com/maidenpeter/ira-kenya-reinsurance">ira-kenya-reinsurance</a><p>The reinsurer's view: a cedant scorecard on four pillars, with a back-test and sensitivity tests.</p></div>
-  </div>
+<section id="products" aria-labelledby="h-products">
+<div class="sechead"><span class="eyebrow">Products</span><h2 id="h-products">Things I have built</h2>
+<p>Screenshots from each product's own repository. They show what was built; the analysis above is where the checked numbers are.</p></div>
+<div class="shots"><figure class="shot">
+<div class="frame"><img src="/assets/products/agroshield.jpg" alt="AgroShield underwriter portfolio page for a fictional demo insurer: policies written, sum insured, gross premium, exposure by ward and payout events." width="1280" height="800" loading="lazy" decoding="async"></div>
+<figcaption><b>AgroShield</b><span>Parametric maize insurance for Kenyan smallholders, sold through SACCOs: a rainfall index triggers payouts and every pricing run can be reproduced. Shown on a fictional insurer with illustrative pricing; M-Pesa payment is simulated in the demo.</span></figcaption>
+</figure><figure class="shot">
+<div class="frame"><img src="/assets/products/mapema.jpg" alt="Mapema early action clock for Marsabit in July 2016: a 32 percent chance of severe drought within three months, the advice to prepare, and the SMS a herder receives." width="1280" height="800" loading="lazy" decoding="async"></div>
+<figcaption><b>Mapema</b><span>Forecasts severe pastoral drought one to three months ahead for Kenya&#x27;s northern pastoral counties, and turns the forecast into a household decision in shillings and an SMS in Kiswahili.</span></figcaption>
+</figure><figure class="shot">
+<div class="frame"><img src="/assets/products/matchday-model.jpg" alt="Matchday Model output slide: home win 63 percent, draw 22 percent, away win 15 percent, most likely scoreline 2-0 in 11 percent of simulations." width="1280" height="800" loading="lazy" decoding="async"></div>
+<figcaption><b>Matchday Model</b><span>A Dixon-Coles football model and the pipeline that turns real match data into pre-match probabilities, a most likely scoreline and an accuracy scorecard after the game.</span></figcaption>
+</figure></div>
 </section>
 
-<footer>
-  <p>Source: Insurance Regulatory Authority, Kenya, quarterly industry statistics (unaudited returns). Everything here is public data; nothing comes from inside any insurer. Grades and rankings are relative screening measures, not credit ratings.</p>
-  <p>Marion Peter</p>
-</footer>
+<section id="method" aria-labelledby="h-method">
+<div class="sechead"><span class="eyebrow">How I work</span>
+<h2 id="h-method">A total that balances is the first thing I check</h2>
+<p>The habit from actuarial training that stuck: distrust a clean number until it survives being split apart.</p></div>
+<ul class="principles"><li><b>Rebuild before analysing</b><span>A regulator's table is a secondary source. Every IRA table was rebuilt from its parts and matched to the printed total before any finding was drawn from it.</span></li><li><b>Read across quarters as well as down the page</b><span>A return can add up and still be wrong. Twelve IRA returns pass every identity but fail when read against the same insurer's other quarters, so they are flagged and kept out of quarterly totals.</span></li><li><b>Flag, never delete</b><span>Excluded rows stay in the data with a flag, so any exclusion can be reversed and audited by someone else.</span></li><li><b>Say what it cannot tell you</b><span>Each page names its data and method before its first finding and ends with its limits. Grades and rankings are screening measures, not credit ratings.</span></li><li><b>Make it rerun</b><span>One command rebuilds each repository from the raw files, and GitHub Actions runs the tests on every push.</span></li><li><b>Show my own errors</b><span>When a check catches a mistake of mine, the fix and what it changed are written up, not quietly patched.</span></li></ul>
+<div class="next"><span class="tag">Next</span><p>A reserving tool in Streamlit: chain ladder and Bornhuetter-Ferguson on the claims development tables Kenyan insurers publish under IFRS 17, with the reserve each method implies set against what was booked. It will be linked here when it is live.</p></div>
+</section>
 
-</div></body></html>
+<section id="contact" class="contact" aria-labelledby="h-contact">
+<div class="sechead"><span class="eyebrow">Contact</span><h2 id="h-contact">Get in touch</h2>
+<p>If you are hiring for an actuarial, pricing, reserving or data role at an insurer or reinsurer, write to me. I am in Nairobi.</p></div>
+<ul>
+<li><a href="mailto:marionpeter@nuruops.com"><span>Email</span><b>marionpeter@nuruops.com</b></a></li>
+<li><a href="https://www.linkedin.com/in/marion-peter"><span>LinkedIn</span><b>in/marion-peter</b></a></li>
+<li><a href="https://github.com/maidenpeter"><span>GitHub</span><b>github.com/maidenpeter</b></a></li>
+</ul>
+</section>
+</main>
+<footer class="site-foot"><div class="wrap">
+<p>Marion Peter, Nairobi. Everything on this site uses public data or anonymised work; no employer data is used. Kenya figures come from the Insurance Regulatory Authority's quarterly returns, which are unaudited.</p>
+<p><a href="https://github.com/maidenpeter/maidenpeter.github.io">Source for this site</a> &nbsp; <a href="https://github.com/maidenpeter">GitHub</a> &nbsp; <a href="mailto:marionpeter@nuruops.com">Email</a></p>
+</div></footer>
+<script>(function(){var b=document.querySelector('.theme');if(!b)return;var d=document.documentElement;
+function cur(){return d.getAttribute('data-theme')||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+function lab(){var c=cur();b.textContent=c==='dark'?'Light theme':'Dark theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'light':'dark')+' theme')}
+b.hidden=false;b.addEventListener('click',function(){var x=cur()==='dark'?'light':'dark';d.setAttribute('data-theme',x);try{localStorage.setItem('mp-theme',x)}catch(e){}lab()});lab()})();</script>
+</body>
+</html>

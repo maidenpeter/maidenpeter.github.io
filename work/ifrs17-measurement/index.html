@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Discounting makes a reserve smaller. On one line, IFRS 17 makes it bigger | Marion Peter</title>
+<meta name="description" content="US$25.16bn of claims reserves remeasured under IFRS 17: discounting, a bootstrapped risk adjustment, and the one line the standard makes larger.">
+<link rel="canonical" href="https://maidenpeter.github.io/work/ifrs17-measurement/">
+<meta name="author" content="Marion Peter">
+<meta name="theme-color" content="#f4f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#10161c" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Marion Peter">
+<meta property="og:title" content="Discounting makes a reserve smaller. On one line, IFRS 17 makes it bigger">
+<meta property="og:description" content="US$25.16bn of claims reserves remeasured under IFRS 17: discounting, a bootstrapped risk adjustment, and the one line the standard makes larger.">
+<meta property="og:url" content="https://maidenpeter.github.io/work/ifrs17-measurement/">
+<meta property="og:image" content="https://maidenpeter.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kenya general insurance underwriting result by class, 2018 to 2025: motor KSh -52.6bn, every other class together KSh +19.6bn.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<script>try{var t=localStorage.getItem('mp-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/">Marion Peter<span>Actuarial analyst, Nairobi</span></a>
+<nav class="main" aria-label="Main"><a href="/#work">Work</a><a href="/kenya-insurance/">Kenya series</a><a href="/about/">About</a><a href="/#contact">Contact</a><button class="theme" type="button" hidden>Dark theme</button></nav>
+</div></header>
+<main id="main" class="wrap">
+<section aria-labelledby="h1">
+<a class="more" href="/#cases">All case studies</a>
+<span class="eyebrow">US industry reserves, IFRS 17</span>
+<h1 id="h1" style="font-size:clamp(34px,5vw,54px);max-width:22ch">Discounting makes a reserve smaller. On one line, IFRS 17 makes it bigger</h1>
+<p class="lede">US$25.16bn of US industry claims reserves remeasured the way IFRS 17 requires: discounted for the time until payment, then loaded with an explicit risk adjustment. Five of six lines fall. Product liability rises 1.8%, because its uncertainty costs more than its waiting time saves.</p>
+<div class="facts"><div><span>Reserve</span><b>US$25.16bn</b></div><div><span>Lines</span><b>6</b></div><div><span>Valued at</span><b>31 December 1997</b></div><div><span>Tools</span><b>Python, numpy</b></div></div>
+<div class="dm"><div><span class="tag">Data</span><p>CAS Loss Reserving Database, the triangles bundled with the chainladder Python package: NAIC Schedule P cumulative paid losses for all reporting US insurers, summed by line, accident years 1988 to 1997.</p></div><div><span class="tag">Method</span><p>Volume-weighted chain ladder to ultimate and the future payment pattern; present value at a flat rate, mid-year; risk adjustment from an over-dispersed Poisson bootstrap of the same triangle (5,000 simulations with process variance), taken as a percentile less the mean and discounted on the same pattern.</p></div></div>
+</section>
+<section aria-labelledby="h-s1">
+<div class="sechead"><span class="eyebrow">Why it matters</span><h2 id="h-s1">A claims reserve used to be one number</h2></div>
+<div class="prose">
+<p>Under the old basis an insurer carried outstanding claims at what it expected to pay, undiscounted, with any prudence inside the estimate. IFRS 17 splits that into the present value of future cash flows plus a risk adjustment for non-financial risk. Two of those pieces are choices as much as calculations: the discount rate, and what uncertainty is worth. So the useful output is not one number but how far the number moves across defensible choices, and on which line.</p>
+</div>
+</section>
+<section aria-labelledby="h-s2">
+<div class="sechead"><span class="eyebrow">Step one</span><h2 id="h-s2">Discounting is a question of the payment pattern</h2></div>
+<div class="prose">
+<p>At a flat 5.7% with a mid-year convention, the six lines fall from US$25.16bn to US$23.02bn: <b>US$2.14bn</b> comes off before any judgement is applied. The mean time to payment runs from 1.47 years for private motor to 2.29 years for medical malpractice, and that alone sets the order in which discounting shrinks the lines.</p>
+</div>
+</section>
+<section aria-labelledby="h-s3">
+<div class="sechead"><span class="eyebrow">Step two</span><h2 id="h-s3">The same three words are worth US$819m or US$2.07bn</h2></div>
+<div class="prose">
+<p>IFRS 17 does not prescribe the risk adjustment; it requires the confidence level to be disclosed. Here the uncertainty comes from bootstrapping the same triangles: 5,000 resampled refits with process variance. At the 75th percentile the six lines need <b>US$819m</b>; at the 95th, <b>US$2.07bn</b>. Both are defensible, so the confidence level is the number, not a footnote.</p>
+<p>The spread differs by line. Private motor's simulated reserve has a coefficient of variation of 3.8%; product liability's is 24.6%, with a long right tail.</p>
+<p>Adding the six risk adjustments assumes every line goes wrong at once. Treating them as independent gives US$485m instead of US$819m at the 75th percentile. That one assumption is worth US$334m, 41% of the risk adjustment, and belongs in the disclosure.</p>
+</div>
+</section>
+<section aria-labelledby="h-s4">
+<div class="sechead"><span class="eyebrow">Step three</span><h2 id="h-s4">Five lines fall. One rises</h2></div>
+<div class="pair">
+<figure class="panel" style="margin:0"><h3>IFRS 17 liability against the undiscounted reserve</h3>
+<p class="small">Percent change. Discounted at 5.7%, 75th percentile risk adjustment.</p>
+<div class="bars" role="img" aria-label="Change by line: Private motor -5.2%, Commercial motor -6.9%, Workers&#x27; compensation -7.0%, General liability -7.0%, Medical malpractice -6.5%, Product liability +1.8%"><span class="lab">Private motor</span><span class="track" style="--zero:79.55%;--w:59.09%"><span class="bar neg"></span><span class="val neg">-5.2%</span></span><span class="lab">Commercial motor</span><span class="track" style="--zero:79.55%;--w:78.41%"><span class="bar neg"></span><span class="val neg">-6.9%</span></span><span class="lab">Workers&#x27; compensation</span><span class="track" style="--zero:79.55%;--w:79.55%"><span class="bar neg"></span><span class="val neg">-7.0%</span></span><span class="lab">General liability</span><span class="track" style="--zero:79.55%;--w:79.55%"><span class="bar neg"></span><span class="val neg">-7.0%</span></span><span class="lab">Medical malpractice</span><span class="track" style="--zero:79.55%;--w:73.86%"><span class="bar neg"></span><span class="val neg">-6.5%</span></span><span class="lab em">Product liability</span><span class="track" style="--zero:79.55%;--w:20.45%"><span class="bar pos"></span><span class="val pos">+1.8%</span></span></div></figure>
+<div class="prose"><p>Product liability is the exception: its risk adjustment is 15.0% of the reserve while discounting saves only 11.5%. Every other line's uncertainty is cheaper than its waiting time.</p>
+<p>The book as a whole comes down 5.5%. Reported alone, that says IFRS 17 releases reserves. On one line it does the opposite, and it is the line where the estimate is least reliable.</p></div>
+</div>
+<ul class="checks"><li><span class="mk ok" aria-label="Passed">&#10003;</span><p><b>The bootstrap reproduces the reserve it measures.</b> The mean of the simulations is within 0.35% of the chain ladder reserve on 5 of the 6 lines. If it were not, the spread would describe the simulation rather than the risk.</p></li><li><span class="mk warn" aria-label="Caveat">!</span><p><b>Product liability is 2.4% high, and that is reported rather than smoothed.</b> Its triangle has negative incremental payments from recoveries, and its simulated distribution is strongly skewed. The line is flagged as the least reliable of the six.</p></li><li><span class="mk ok" aria-label="Passed">&#10003;</span><p><b>Residuals are scaled and centred, with over-dispersion fitted per line.</b> A single shared parameter would have made motor look riskier and product liability safer than either is.</p></li></ul>
+</section>
+<section aria-labelledby="h-limits">
+<div class="sechead"><span class="eyebrow">Limits</span><h2 id="h-limits">What this analysis cannot tell you</h2></div>
+<ul class="limits"><li><b>No tail beyond development year 10.</b> Durations, reserves and the discount effect are all understated, most of all for the liability lines.</li><li><b>A flat discount rate, not a yield curve.</b> IFRS 17 asks for rates consistent with the cash flows; the flat rate is a stated simplification.</li><li><b>One risk adjustment technique.</b> A bootstrap percentile is common, not required. Cost of capital or a stress approach would give other answers from the same data.</li><li><b>Paid data only.</b> No case estimates, claims handling costs, reinsurance or expenses in the fulfilment cash flows.</li><li><b>US industry data from 1997.</b> The point is the measurement mechanics on real claims development, not a statement about any insurer.</li></ul>
+<p class="note">The code is not on GitHub yet. The same triangles feed the reserve back-test listed on the About page.</p>
+</section>
+</main>
+<footer class="site-foot"><div class="wrap">
+<p>Marion Peter, Nairobi. Everything on this site uses public data or anonymised work; no employer data is used. Kenya figures come from the Insurance Regulatory Authority's quarterly returns, which are unaudited.</p>
+<p><a href="https://github.com/maidenpeter/maidenpeter.github.io">Source for this site</a> &nbsp; <a href="https://github.com/maidenpeter">GitHub</a> &nbsp; <a href="mailto:marionpeter@nuruops.com">Email</a></p>
+</div></footer>
+<script>(function(){var b=document.querySelector('.theme');if(!b)return;var d=document.documentElement;
+function cur(){return d.getAttribute('data-theme')||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+function lab(){var c=cur();b.textContent=c==='dark'?'Light theme':'Dark theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'light':'dark')+' theme')}
+b.hidden=false;b.addEventListener('click',function(){var x=cur()==='dark'?'light':'dark';d.setAttribute('data-theme',x);try{localStorage.setItem('mp-theme',x)}catch(e){}lab()});lab()})();</script>
+</body>
+</html>

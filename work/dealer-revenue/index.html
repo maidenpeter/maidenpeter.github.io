@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revenue was being reported 61% higher than it was earned | Marion Peter</title>
+<meta name="description" content="A dealer group&#x27;s revenue counted the same money twice. Finding it before answering the brief on growth and margin.">
+<link rel="canonical" href="https://maidenpeter.github.io/work/dealer-revenue/">
+<meta name="author" content="Marion Peter">
+<meta name="theme-color" content="#f4f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#10161c" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Marion Peter">
+<meta property="og:title" content="Revenue was being reported 61% higher than it was earned">
+<meta property="og:description" content="A dealer group&#x27;s revenue counted the same money twice. Finding it before answering the brief on growth and margin.">
+<meta property="og:url" content="https://maidenpeter.github.io/work/dealer-revenue/">
+<meta property="og:image" content="https://maidenpeter.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kenya general insurance underwriting result by class, 2018 to 2025: motor KSh -52.6bn, every other class together KSh +19.6bn.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<script>try{var t=localStorage.getItem('mp-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/">Marion Peter<span>Actuarial analyst, Nairobi</span></a>
+<nav class="main" aria-label="Main"><a href="/#work">Work</a><a href="/kenya-insurance/">Kenya series</a><a href="/about/">About</a><a href="/#contact">Contact</a><button class="theme" type="button" hidden>Dark theme</button></nav>
+</div></header>
+<main id="main" class="wrap">
+<section aria-labelledby="h1">
+<a class="more" href="/#cases">All case studies</a>
+<span class="eyebrow">Kenyan motor dealer group, anonymised</span>
+<h1 id="h1" style="font-size:clamp(34px,5vw,54px);max-width:22ch">Revenue was being reported 61% higher than it was earned</h1>
+<p class="lede">Three system extracts from a Kenyan vehicle dealer group, 347,852 rows from January 2022 to August 2026. The brief was growth and margin. The first finding was that the revenue figure everyone was using counted the same money twice.</p>
+<div class="facts"><div><span>Rows</span><b>347,852</b></div><div><span>Period</span><b>Jan 2022 to Aug 2026</b></div><div><span>Sources</span><b>3 system extracts</b></div><div><span>Tools</span><b>Python, pandas, Excel</b></div></div>
+<div class="dm"><div><span class="tag">Data</span><p>Parts invoice lines, service job invoices and workshop consumption rows exported from the dealer's systems. The dealer, its branches, brand and counterparties are not named, and none of its data is published.</p></div><div><span class="tag">Method</span><p>Invoice-level matching across ledgers before any total; every unmatched invoice and the residual gap accounted for; bad rows flagged, not deleted; every figure produced in pandas and in Excel formulas and reconciled cell by cell.</p></div></div>
+</section>
+<section aria-labelledby="h-s1">
+<div class="sechead"><span class="eyebrow">Step one</span><h2 id="h-s1">Test the joins before adding the ledgers</h2></div>
+<div class="pair">
+<div class="prose">
+<p>The brief assumed three independent sources: a parts invoice ledger (185,699 lines), a service job ledger (30,787 rows) and a workshop consumption log (131,366 rows). Adding the two ledgers gave the revenue figure in use.</p>
+<p>Before adding anything I matched invoice numbers across them. 28,666 of 30,779 job invoices, <b>93.1%</b>, also appear as workshop sales on the parts ledger: the same parts, reaching the books by two routes. Each ledger is right on its own. Treating them as additive counted <b>KSh 1.07bn</b> twice.</p>
+<p>Revenue was KSh 1.76bn, not KSh 2.83bn. Growth rates, branch shares and margin had all been measured against a base that did not exist.</p>
+</div>
+<figure class="panel" style="margin:0"><h3>Revenue, KSh billions</h3>
+<div role="img" aria-label="Revenue as reported KSh 2.83bn against KSh 1.76bn after removing the double count"><div class="colbars"><div><b>2.83</b><i style="height:calc((200px - 34px) * 1.000);background:var(--loss)"></i></div><div><b>1.76</b><i style="height:calc((200px - 34px) * 0.622);background:var(--gain)"></i></div></div><div class="collabels"><span>As reported</span><span>After removing the double count</span></div></div>
+<p class="small">January 2022 to August 2026.</p></figure>
+</div>
+<ul class="checks"><li><span class="mk ok" aria-label="Passed">&#10003;</span><p><b>The 2,113 unmatched job invoices are labour only.</b> None of them carries parts, so removing the overlap drops nothing.</p></li><li><span class="mk ok" aria-label="Passed">&#10003;</span><p><b>The KSh 27.3m residual between the ledgers is a price basis, not missing money.</b> KSh 26.6m of it is 2022, when the job ledger carried parts at 1.25 times the parts ledger price; from 2023 the two agree to within rounding.</p></li></ul>
+</section><section aria-labelledby="h-s2">
+<div class="sechead"><span class="eyebrow">Step two</span><h2 id="h-s2">A few hundred bad rows decided the margin story</h2></div>
+<div class="pair">
+<div class="prose">
+<p>Margin is measured only on lines with a valid cost, from 2024 onward. The 2022 and 2023 lines are left unmeasured rather than estimated.</p>
+<p>The later data had its own trap. <b>447 credit-sale lines</b> in 2026 carried costs far above the normal level for the same items, about KSh 52m of excess cost. Left in, they put 2026 gross margin at 6.7% and the story becomes a collapse in profitability. Flagged and excluded, 2026 margin is <b>23.4%</b>, in line with the 23.9% across all lines with valid cost.</p>
+<p>A meeting held on the first number would have been about a crisis that was not happening.</p>
+</div>
+<figure class="panel" style="margin:0"><h3>2026 gross margin</h3>
+<div role="img" aria-label="2026 gross margin 6.7% with the bad lines and 23.4% with them flagged"><div class="colbars"><div><b>6.7%</b><i style="height:calc((200px - 34px) * 0.258);background:var(--loss)"></i></div><div><b>23.4%</b><i style="height:calc((200px - 34px) * 0.900);background:var(--gain)"></i></div></div><div class="collabels"><span>With the bad lines</span><span>Bad lines flagged</span></div></div>
+<p class="small">January to August 2026.</p></figure>
+</div>
+</section><section aria-labelledby="h-s3">
+<div class="sechead"><span class="eyebrow">Step three</span><h2 id="h-s3">Then answer the brief, on the corrected base</h2></div>
+<div class="grid3">
+<div class="panel"><p class="big">27%</p><p>a year compound revenue growth, 2022 to 2025.</p></div>
+<div class="panel"><p class="big">32%</p><p>of job value came from accident repair, which was 3% of jobs: a commercial opportunity and a capacity risk in one number.</p></div>
+<div class="panel"><p class="big">26%</p><p>of revenue came from 50 insurers as customers. Growth that leans on so few counterparties is growth with more concentration risk.</p></div>
+</div>
+</section>
+<section aria-labelledby="h-s4">
+<div class="sechead"><span class="eyebrow">How it was checked</span><h2 id="h-s4">Every figure built twice</h2></div>
+<ul class="checks"><li><span class="mk ok" aria-label="Passed">&#10003;</span><p><b>5,189 of 5,189 headline cells match.</b> Each figure was produced once in pandas and once as live Excel formulas, then compared cell by cell, so the client could open the workbook, change an assumption and watch the number move.</p></li><li><span class="mk ok" aria-label="Passed">&#10003;</span><p><b>Flags, never deletions.</b> Every excluded row stays in the data with a flag column, so any exclusion can be reversed.</p></li><li><span class="mk ok" aria-label="Passed">&#10003;</span><p><b>Assumptions first.</b> Every judgement call is one editable cell, stated before any result that depends on it.</p></li></ul>
+</section>
+<section aria-labelledby="h-limits">
+<div class="sechead"><span class="eyebrow">Limits</span><h2 id="h-limits">What this analysis cannot tell you</h2></div>
+<ul class="limits"><li><b>Margin before 2024 is not reported.</b> An estimate was possible, but not one that could be checked.</li><li><b>The 447 bad cost lines were flagged, not repaired.</b> Their true cost is unknown, and imputing it would invent margin.</li><li><b>The 1.25 price ratio in 2022 is inferred from the data,</b> not from documentation. It is consistent across the year and explains the gap, but the pricing policy behind it was not seen.</li><li><b>This is one dealer group in one market.</b> The double-count pattern is common where a parts ledger and a job ledger sit side by side, but nothing here shows how common.</li></ul>
+<p class="note">Client work. The data and the code stay with the client; this page shows only counts, percentages and the method.</p>
+</section>
+</main>
+<footer class="site-foot"><div class="wrap">
+<p>Marion Peter, Nairobi. Everything on this site uses public data or anonymised work; no employer data is used. Kenya figures come from the Insurance Regulatory Authority's quarterly returns, which are unaudited.</p>
+<p><a href="https://github.com/maidenpeter/maidenpeter.github.io">Source for this site</a> &nbsp; <a href="https://github.com/maidenpeter">GitHub</a> &nbsp; <a href="mailto:marionpeter@nuruops.com">Email</a></p>
+</div></footer>
+<script>(function(){var b=document.querySelector('.theme');if(!b)return;var d=document.documentElement;
+function cur(){return d.getAttribute('data-theme')||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+function lab(){var c=cur();b.textContent=c==='dark'?'Light theme':'Dark theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'light':'dark')+' theme')}
+b.hidden=false;b.addEventListener('click',function(){var x=cur()==='dark'?'light':'dark';d.setAttribute('data-theme',x);try{localStorage.setItem('mp-theme',x)}catch(e){}lab()});lab()})();</script>
+</body>
+</html>

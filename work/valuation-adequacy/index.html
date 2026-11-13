@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>An estimate that is unbiased in total and biased in every condition band | Marion Peter</title>
+<meta name="description" content="A reserve adequacy test on 476,882 car auctions: clean in aggregate, biased in every condition band, with 78% of the error cancelling in the total.">
+<link rel="canonical" href="https://maidenpeter.github.io/work/valuation-adequacy/">
+<meta name="author" content="Marion Peter">
+<meta name="theme-color" content="#f4f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#10161c" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Marion Peter">
+<meta property="og:title" content="An estimate that is unbiased in total and biased in every condition band">
+<meta property="og:description" content="A reserve adequacy test on 476,882 car auctions: clean in aggregate, biased in every condition band, with 78% of the error cancelling in the total.">
+<meta property="og:url" content="https://maidenpeter.github.io/work/valuation-adequacy/">
+<meta property="og:image" content="https://maidenpeter.github.io/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kenya general insurance underwriting result by class, 2018 to 2025: motor KSh -52.6bn, every other class together KSh +19.6bn.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<script>try{var t=localStorage.getItem('mp-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="/">Marion Peter<span>Actuarial analyst, Nairobi</span></a>
+<nav class="main" aria-label="Main"><a href="/#work">Work</a><a href="/kenya-insurance/">Kenya series</a><a href="/about/">About</a><a href="/#contact">Contact</a><button class="theme" type="button" hidden>Dark theme</button></nav>
+</div></header>
+<main id="main" class="wrap">
+<section aria-labelledby="h1">
+<a class="more" href="/#cases">All case studies</a>
+<span class="eyebrow">US vehicle auctions, valuation adequacy</span>
+<h1 id="h1" style="font-size:clamp(34px,5vw,54px);max-width:22ch">An estimate that is unbiased in total and biased in every condition band</h1>
+<p class="lede">476,882 US wholesale car auctions, each with the market's pre-sale estimate (the Manheim Market Report value) and the price paid. Across the book the estimate is off by 0.59%. Split by condition it is 12.7% too high on the poorest cars and 2.3% too low on the best, and 78% of the gross error cancels before it reaches the total.</p>
+<div class="facts"><div><span>Rows analysed</span><b>476,882</b></div><div><span>Period</span><b>Jan 2014 to Jul 2015</b></div><div><span>Appraised</span><b>US$6.66bn</b></div><div><span>Tools</span><b>Python, pandas</b></div></div>
+<div class="dm"><div><span class="tag">Data</span><p>Kaggle Vehicle Sales Data: 558,837 US wholesale auction records with make, model, year, odometer, seller, a condition grade, the pre-sale estimate and the selling price. 476,882 rows analysed after excluding the incompatible grading scale and incomplete records.</p></div><div><span class="tag">Method</span><p>The estimate treated as a reserve and the selling price as the settled amount. Every field profiled first, then aggregate bias, error by condition, condition within value and mileage bands, and gross overvaluation set against gross undervaluation.</p></div></div>
+</section>
+<section aria-labelledby="h-s1">
+<div class="sechead"><span class="eyebrow">Step one</span><h2 id="h-s1">Profile before you trust: one column, two scales</h2></div>
+<div class="prose">
+<p>Condition is the variable that matters most here, and it holds two grading scales stacked in one column with nothing to mark which is which: 70,101 rows graded 1 to 5 and 476,916 graded on a scale that runs to 49. A grade 5 car sells for a median $22,100, a grade 49 for $20,600 and a grade 17 for $2,600. Treated as one variable, the best cars in the file sort below the worst.</p>
+<p>There is no defensible mapping between the scales, so the short-scale rows are excluded and the exclusion is stated. Inventing a conversion would put an unverifiable assumption under every number that follows.</p>
+</div>
+</section>
+<section aria-labelledby="h-s2">
+<div class="sechead"><span class="eyebrow">Step two</span><h2 id="h-s2">In aggregate the estimate looks excellent</h2></div>
+<div class="grid3">
+<div class="panel"><p class="big">$0</p><p>median gap between price and estimate.</p></div>
+<div class="panel"><p class="big">50.0%</p><p>of cars sold below their estimate: a coin flip.</p></div>
+<div class="panel"><p class="big">-0.59%</p><p>net across the book, US$39.3m against US$6.66bn appraised.</p></div>
+</div>
+<p class="prose">A reviewer would sign this off. The figure that should stop them is the mean absolute error: $1,039 per car, 11.9% of the estimate. Errors that large that average to nothing are going somewhere in an organised way.</p>
+</section>
+<section aria-labelledby="h-s3">
+<div class="sechead"><span class="eyebrow">Step three</span><h2 id="h-s3">Segmented, it overvalues poor cars and undervalues good ones</h2></div>
+<div class="pair">
+<figure class="panel" style="margin:0"><h3>Average gap between price and estimate, by condition decile</h3>
+<p class="small">Percent of the estimate. Negative means the car sold for less, so the estimate was too high.</p>
+<div class="bars" role="img" aria-label="Gap by condition decile, poorest to best, from -12.2% to +3.3%"><span class="lab">Decile 1</span><span class="track" style="--zero:78.45%;--w:78.45%"><span class="bar neg"></span><span class="val neg in">-12.2%</span></span><span class="lab">Decile 2</span><span class="track" style="--zero:78.45%;--w:20.77%"><span class="bar neg"></span><span class="val neg">-3.2%</span></span><span class="lab">Decile 3</span><span class="track" style="--zero:78.45%;--w:1.16%"><span class="bar pos"></span><span class="val pos">+0.2%</span></span><span class="lab">Decile 4</span><span class="track" style="--zero:78.45%;--w:15.29%"><span class="bar pos"></span><span class="val pos">+2.4%</span></span><span class="lab">Decile 5</span><span class="track" style="--zero:78.45%;--w:18.58%"><span class="bar pos"></span><span class="val pos">+2.9%</span></span><span class="lab">Decile 6</span><span class="track" style="--zero:78.45%;--w:18.45%"><span class="bar pos"></span><span class="val pos">+2.9%</span></span><span class="lab">Decile 7</span><span class="track" style="--zero:78.45%;--w:19.68%"><span class="bar pos"></span><span class="val pos">+3.1%</span></span><span class="lab">Decile 8</span><span class="track" style="--zero:78.45%;--w:20.26%"><span class="bar pos"></span><span class="val pos">+3.1%</span></span><span class="lab">Decile 9</span><span class="track" style="--zero:78.45%;--w:19.87%"><span class="bar pos"></span><span class="val pos">+3.1%</span></span><span class="lab">Decile 10</span><span class="track" style="--zero:78.45%;--w:21.55%"><span class="bar pos"></span><span class="val pos">+3.3%</span></span></div></figure>
+<div class="prose"><p>The poorest tenth sells 12.2% below its estimate; the best sells 3.3% above. Above the middle the curve flattens near +3%, so the bias sits mostly in the bottom third of the scale.</p>
+<p>By condition band, the estimate is 12.7% too high on the poorest cars and 2.3% too low on the best. Those errors run in opposite directions on comparable sums of money, which is why the total looked clean: <b>US$176.5m</b> of gross misvaluation nets to US$39.3m, and <b>78%</b> of it cancels.</p></div>
+</div>
+</section>
+<section aria-labelledby="h-s4">
+<div class="sechead"><span class="eyebrow">Step four</span><h2 id="h-s4">Trying to break it</h2></div>
+<ul class="checks"><li><span class="mk ok" aria-label="Passed">&#10003;</span><p><b>Is condition standing in for price?</b> Holding appraised value constant, the gradient runs the same way in every value band.</p></li><li><span class="mk ok" aria-label="Passed">&#10003;</span><p><b>Is it mileage?</b> It holds inside each odometer band too.</p></li><li><span class="mk ok" aria-label="Passed">&#10003;</span><p><b>Is it a few outliers?</b> Medians and 1 to 99 percentile trimmed means show the same ordering as the means.</p></li><li><span class="mk warn" aria-label="Caveat">!</span><p><b>Is it a handful of large sellers?</b> Without the 20 largest sellers (166,636 rows) the poorest band still sells 8.9% below its estimate and the best 3.4% above, but the middle bands reorder slightly, so the gradient is not strictly monotonic there.</p></li><li><span class="mk warn" aria-label="Caveat">!</span><p><b>Are the deciles monotonic?</b> Not quite: two of the upper deciles dip by less than 0.1 points. The finding is the gap between the bottom and the rest, not a smooth line.</p></li></ul>
+</section>
+<section aria-labelledby="h-s5">
+<div class="sechead"><span class="eyebrow">So what</span><h2 id="h-s5">Who pays for an error that nets to zero</h2></div>
+<div class="prose">
+<p>An estimate that is unbiased in total but biased by segment costs nothing until the segments are treated differently, and they always are. Settle total-loss claims at this estimate and you overpay on the worst cars and underpay owners of the best, the customers least likely to accept it. Lend against it and advance rates on poor-condition stock rest on a number that is too high on exactly the collateral most likely to default.</p>
+<p>The fix is not a new model. It is to stop testing this one only in aggregate: one adequacy test by condition band, run monthly, would have shown this.</p>
+</div>
+</section>
+<section aria-labelledby="h-limits">
+<div class="sechead"><span class="eyebrow">Limits</span><h2 id="h-limits">What this analysis cannot tell you</h2></div>
+<ul class="limits"><li><b>The data is public and it is not Kenyan.</b> US wholesale auctions sold between January 2014 and July 2015, most of them from December 2014 to June 2015. The method transfers; the numbers do not.</li><li><b>70,101 short-scale rows were excluded.</b> They may behave differently, and checking that would need the mapping this analysis declined to invent.</li><li><b>Grades are assigned by inspectors.</b> Some of what reads as valuation bias could be grading bias; the data has no inspector or site field to separate them.</li><li><b>Association, not causation.</b> The estimate is biased with respect to condition. This does not show why.</li></ul>
+<p class="note">The code and its six tests are ready to publish but are not on GitHub yet. The data is Kaggle's and is not redistributed.</p>
+</section>
+</main>
+<footer class="site-foot"><div class="wrap">
+<p>Marion Peter, Nairobi. Everything on this site uses public data or anonymised work; no employer data is used. Kenya figures come from the Insurance Regulatory Authority's quarterly returns, which are unaudited.</p>
+<p><a href="https://github.com/maidenpeter/maidenpeter.github.io">Source for this site</a> &nbsp; <a href="https://github.com/maidenpeter">GitHub</a> &nbsp; <a href="mailto:marionpeter@nuruops.com">Email</a></p>
+</div></footer>
+<script>(function(){var b=document.querySelector('.theme');if(!b)return;var d=document.documentElement;
+function cur(){return d.getAttribute('data-theme')||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+function lab(){var c=cur();b.textContent=c==='dark'?'Light theme':'Dark theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'light':'dark')+' theme')}
+b.hidden=false;b.addEventListener('click',function(){var x=cur()==='dark'?'light':'dark';d.setAttribute('data-theme',x);try{localStorage.setItem('mp-theme',x)}catch(e){}lab()});lab()})();</script>
+</body>
+</html>

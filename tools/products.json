@@ -1,0 +1,26 @@
+[
+  {
+    "name": "AgroShield",
+    "line": "Parametric maize insurance for Kenyan smallholders, sold through SACCOs: a rainfall index triggers payouts and every pricing run can be reproduced. Shown on a fictional insurer with illustrative pricing; M-Pesa payment is simulated in the demo.",
+    "image": "agroshield.jpg",
+    "alt": "AgroShield underwriter portfolio page for a fictional demo insurer: policies written, sum insured, gross premium, exposure by ward and payout events.",
+    "source": "agroshield repo, src/agroshield_platform/web/static/img/shots/shot-uw-portfolio-1600.jpg",
+    "repo": ""
+  },
+  {
+    "name": "Mapema",
+    "line": "Forecasts severe pastoral drought one to three months ahead for Kenya's northern pastoral counties, and turns the forecast into a household decision in shillings and an SMS in Kiswahili.",
+    "image": "mapema.jpg",
+    "alt": "Mapema early action clock for Marsabit in July 2016: a 32 percent chance of severe drought within three months, the advice to prepare, and the SMS a herder receives.",
+    "source": "mapema repo, evidence/1_mapema_clock_and_replay_jul2016.png",
+    "repo": ""
+  },
+  {
+    "name": "Matchday Model",
+    "line": "A Dixon-Coles football model and the pipeline that turns real match data into pre-match probabilities, a most likely scoreline and an accuracy scorecard after the game.",
+    "image": "matchday-model.jpg",
+    "alt": "Matchday Model output slide: home win 63 percent, draw 22 percent, away win 15 percent, most likely scoreline 2-0 in 11 percent of simulations.",
+    "source": "Football Hub/nuruops, output/arsenal_liverpool_2026_03_08/matchday_model_slides/4_output.png",
+    "repo": ""
+  }
+]
