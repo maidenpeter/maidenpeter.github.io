@@ -237,6 +237,19 @@ def auctions(path):
     check("auctions decile_low", A["decile_low"], dec[0], 0.05)
     check("auctions decile_high", A["decile_high"], dec[-1], 0.05)
     check("auctions excl_rows", A["excl_rows"], d["robustness"]["rows_dropped_with_top_sellers"], 0)
+    med = {r["grade"]: r["median_price"] for r in cs["median_price_by_grade"]}
+    for g in (5, 49, 17):
+        check(f"auctions median price, grade {g}", A[f"median_g{g}"], med.get(g), 0)
+    check("auctions short scale top grade", A["short_max"], max(g for g in med if g <= 5), 0)
+    check("auctions long scale top grade", A["long_max"], max(med), 0)
+    check("auctions largest sellers left out", A["top_sellers"],
+          next((int(k.split("_")[-2]) for k in d["robustness"] if k.startswith("holds_excluding_top_")), None), 0)
+    # the decile claims the page prints: the upper deciles sit near +3%, and the dips between them are under 0.1 points
+    up = F.AUCTION_DECILES[5:]
+    check("auctions upper deciles near", 3, round(sum(up) / len(up)), 0)
+    dips = [a - b for a, b in zip(F.AUCTION_DECILES, F.AUCTION_DECILES[1:]) if b < a]
+    check("auctions decile dips", 2, len(dips), 0)
+    check("auctions largest decile dip under 0.1", 0, 0 if max(dips) < 0.1 else None, 0)
     # excl_low and excl_high (-8.9 and +3.4, the end bands without the 20 largest sellers) are not in
     # findings.json; they were recomputed with valuation_adequacy.prepare() on the full file.
 
@@ -312,6 +325,158 @@ def apps(root):
     return True
 
 
+def kenya_story(root):
+    """KENYA_STORY: the series behind the charts on /kenya-insurance/."""
+    data, ins, rei = root / "ira-kenya-data", root / "ira-kenya-insurance" / "output", root / "ira-kenya-reinsurance" / "output"
+    S = F.KENYA_STORY
+    panel = rows(data / "data/processed/general_revenue_panel.csv")
+    q4 = defaultdict(float)
+    uwc = defaultdict(list)
+    for r in panel:
+        if r["quarter"] == "4" and r["line"] in ("underwriting_result", "investment_income"):
+            v = float(r["ytd_ksh_000"] or 0)
+            q4[(r["segment"], r["year"], r["line"])] += v
+            if r["line"] == "underwriting_result":
+                uwc[(r["segment"], r["year"], r["company_id"])].append(v)
+    for y, uw, inv in S["uw_inv"]:
+        check(f"uw {y}", uw, round(q4[("insurer", str(y), "underwriting_result")] / 1e6, 2), 0.005)
+        check(f"investment income {y}", inv, round(q4[("insurer", str(y), "investment_income")] / 1e6, 2), 0.005)
+    for y, won, filed in S["profit_makers"]:
+        vals = [sum(v) for (s, yy, _), v in uwc.items() if s == "insurer" and yy == str(y)]
+        check(f"profit makers {y}", won, sum(1 for v in vals if v > 0), 0)
+        check(f"insurers filed {y}", filed, sum(1 for v in vals if v != 0), 0)
+    for y, v in S["reinsurers"]:
+        check(f"reinsurers uw {y}", v, round(q4[("reinsurer", str(y), "underwriting_result")] / 1e6, 2), 0.005)
+    kre = sum(sum(v) for (s, yy, c), v in uwc.items() if s == "reinsurer" and yy == "2025" and c.startswith("kenya_re"))
+    check("kenya re uw 2025", S["kenya_re_2025"], round(kre / 1e6, 2), 0.005)
+    ia = defaultdict(float)
+    for r in panel:
+        if r["company_id"] == "intra_africa" and r["year"] == "2024" and r["line"] in ("gross_direct_premium", "inward_reinsurance"):
+            ia[int(r["quarter"])] += float(r["ytd_ksh_000"] or 0)
+    for q, v in enumerate(S["ia_ytd_2024"], 1):
+        check(f"intra-africa ytd 2024 Q{q}", v, round(ia[q] / 1e6, 2), 0.005)
+    every = defaultdict(list)
+    for (s, y, c), v in uwc.items():
+        if s == "insurer" and 2018 <= int(y) <= 2025:
+            every[c].append(sum(v))
+    check("profit every year 2018 to 2025", S["profit_every_year"], sum(1 for v in every.values() if len(v) == 8 and all(x > 0 for x in v)), 0)
+    readme = (data / "README.md").read_text(encoding="utf-8")
+    check("intra-africa phantom profit (README)", S["ia_phantom"], S["ia_phantom"] if f"phantom KSh {S['ia_phantom']}bn" in readme else None, 0)
+
+    cm = {(int(r["year"]), r["class"]): r for r in rows(ins / "class_market.csv")}
+    g = lambda y, c, k: float(cm[(y, c)][k])
+    for y, motor, allc, wc in S["motor_market"]:
+        check(f"motor uw {y}", motor, round((g(y, "Motor Private", "underwriting_result") + g(y, "Motor Commercial", "underwriting_result")) / 1e6, 2), 0.005)
+        check(f"all classes uw {y}", allc, round(g(y, "All classes", "underwriting_result") / 1e6, 2), 0.005)
+        check(f"workmen's compensation uw {y}", wc, round(g(y, "Workmen's Compensation", "underwriting_result") / 1e6, 2), 0.005)
+    for y, med, mot in S["mix"]:
+        tot = g(y, "All classes", "gross_premium")
+        check(f"medical share {y}", med, round(100 * g(y, "Medical", "gross_premium") / tot, 1), 0.05)
+        check(f"motor share {y}", mot, round(100 * (g(y, "Motor Private", "gross_premium") + g(y, "Motor Commercial", "gross_premium")) / tot, 1), 0.05)
+    for y, v in S["motor_lr"]:
+        c = g(y, "Motor Private", "claims_incurred") + g(y, "Motor Commercial", "claims_incurred")
+        e = g(y, "Motor Private", "net_earned_premium") + g(y, "Motor Commercial", "net_earned_premium")
+        check(f"market motor loss ratio {y}", v, round(100 * c / e, 1), 0.05)
+
+    rg = {r["class"]: r for r in rows(ins / "rate_gap.csv")}
+    for name, v in S["rate_gap"]:
+        r = rg[{"Motor commercial": "Motor Commercial", "Motor private": "Motor Private"}.get(name, name)]
+        nep = float(r["net_earned_premium"])
+        L, V, Fx = float(r["claims_incurred"]) / nep, float(r["commissions"]) / nep, float(r["management_expenses"]) / nep
+        check(f"rate gap {name}", v, round(100 * ((L + Fx) / (1 - V) - 1), 1), 0.05)
+
+    sm = {int(r["year"]): r for r in rows(ins / "structure_market.csv")}
+    for y, k, share in S["scale"]:
+        check(f"insurers over KSh 10bn {y}", k, int(sm[y]["insurers_over_10bn"]), 0)
+        check(f"share over KSh 10bn {y}", share, round(100 * float(sm[y]["share_over_10bn"]), 1), 0.05)
+    check("premium 2025", S["premium_2025"], round(float(sm[2025]["written_premium"]) / 1e6, 2), 0.005)
+    check("equal-sized insurers 2025", S["hhi_equal_2025"], round(float(sm[2025]["equivalent_insurers"])), 0)
+
+    def named(name, table, key="company_name"):
+        """The row whose name contains the short name the site uses (None is the insurer not named, MUA)."""
+        hit = [r for r in table if (r["company_id"] == "mua" if name is None else name.lower() in r[key].lower())]
+        return hit[0] if len(hit) == 1 else None
+
+    gr = rows(ins / "structure_growth_results.csv")
+    check("growth insurers", len(S["growth"]), len(gr), 0)
+    for name, x, y in S["growth"]:
+        r = named(name, gr)
+        check(f"growth {name}", x, round(100 * float(r["growth_a_year"]), 1) if r else None, 0.05)
+        check(f"combined ratio {name}", y, round(100 * float(r["combined_ratio"]), 1) if r else None, 0.05)
+    check("market growth", S["market_growth"], round(100 * float(gr[0]["market_growth_a_year"]), 1), 0.05)
+
+    lo = rows(ins / "low_motor_loss_ratio.csv")
+    check("low motor loss ratio years", len(S["low_lr"]), len(lo), 0)
+    for name, y, v in S["low_lr"]:
+        r = [x for x in lo if name.lower() in x["company_name"].lower() and x["year"] == str(y)]
+        check(f"low motor loss ratio {name} {y}", v, round(100 * float(r[0]["loss_ratio"]), 2) if len(r) == 1 else None, 0.005)
+    for name, (_, trouble) in S["low_notes"].items():
+        r = [x for x in lo if name.lower() in x["company_name"].lower()][0]
+        t = bool(r["regulator_action"].strip() or r["negative_equity_years"].strip() or r["below_capital_floor_years"].strip())
+        check(f"trouble since 2018, {name}", int(trouble), int(t), 0)
+
+    lc = rows(ins / "loss_concentration.csv")
+    check("motor insurers", S["motor_insurers"], len(lc), 0)
+    check("motor loss share of the ten largest", S["motor_top10"], round(100 * float(lc[9]["cumulative_share"])), 0)
+    for name, v in S["motor_winners"] + S["motor_losers"]:
+        r = named(name, lc)
+        check(f"motor result {name}", v, round(float(r["underwriting_result"]) / 1e6, 2) if r else None, 0.005)
+
+    es = [r for r in rows(ins / "expense_scale.csv") if r["year"] == "2025"]
+    med = lambda xs: sorted(xs)[len(xs) // 2] if len(xs) % 2 else sum(sorted(xs)[len(xs) // 2 - 1:len(xs) // 2 + 1]) / 2
+    check("expenses, insurers under KSh 3bn", S["exp_small_2025"],
+          round(100 * med([float(r["expense_to_gross_premium"]) for r in es if float(r["gross_premium"]) < 3e6])), 0)
+    check("expenses, insurers over KSh 10bn", S["exp_large_2025"],
+          round(100 * med([float(r["expense_to_gross_premium"]) for r in es if float(r["gross_premium"]) > 10e6])), 0)
+    lt = {round(100 * float(r["threshold"])): float(r["fisher_p"]) for r in rows(ins / "low_motor_loss_ratio_test.csv")}
+    for th in S["robust_thresholds"]:
+        check(f"low loss ratio gap significant at {th}%", 0, 0 if th in lt and lt[th] < 0.05 else None, 0)
+    mx = [r for r in rows(ins / "structure_class_mix.csv") if r["year"] == "2025" and r["class"] == "Medical"]
+    check("medical top three share 2025", S["medical_top3_2025"], round(100 * float(mx[0]["top3_share"])), 0)
+
+    sc = rows(rei / "cedant_scorecard.csv")
+    for name, hist in S["grades"].items():
+        mine = [r for r in sc if name.lower() in r["company_name"].lower()]
+        got = sorted((int(r["year"]), r["grade"], int(r["rank"]), int(r["peers"])) for r in mine)
+        check(f"grades {name}", 0, 0 if got == sorted(hist) else None, 0)
+    ia_sc = {int(r["year"]): float(r["pillar_return_quality"]) for r in sc if r["company_id"] == "intra_africa"}
+    for y, v in S["ia_return_quality"]:
+        check(f"intra-africa return quality {y}", v, round(ia_sc[y], 1), 0.05)
+    br = {int(r["year"]): float(r["equity"]) for r in sc if r["company_id"] == "britam_general"}
+    check("britam equity 2019", S["britam_equity"][0], round(br[2019] / 1e3, 2), 0.005)
+    check("britam equity 2025", S["britam_equity"][1], round(br[2025] / 1e3, 2), 0.005)
+    sens = [float(r["spearman"]) for r in rows(rei / "sensitivity.csv")]
+    check("sensitivity low", S["sens"][0], math.floor(min(sens) * 100) / 100, 0.001)
+    check("sensitivity high", S["sens"][1], math.floor(max(sens) * 100) / 100, 0.001)
+
+    acts = {r["company_id"]: r["date"] for r in rows(root / "ira-kenya-insurance" / "reference" / "regulator_actions.csv")}
+    ns = rows(rei / "not_scored.csv")
+    months = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
+    for name, what, when, extra in S["failed"]:
+        cid = name.lower()
+        y, m = acts[cid].split("-")
+        check(f"regulator acted, {name}", 0, 0 if when == f"{months[int(m) - 1]} {y}" else None, 0)
+        for yy, why in extra.items():
+            r = [x for x in ns if x["company_id"] == cid and x["year"] == yy]
+            ok = r and (("below" in r[0]["reason"]) == (why == "too small"))
+            check(f"not scored, {name} {yy}", 0, 0 if ok else None, 0)
+
+
+def ifrs17_viz(path):
+    """IFRS17_VIZ: durations, coefficients of variation and the risk adjustment by confidence level."""
+    d = json.load(open(path, encoding="utf-8"))
+    V = F.IFRS17_VIZ
+    names = {d["lines"][k]["name"]: d["lines"][k] for k in d["order"]}
+    for nm, v in V["dur"]:
+        check(f"duration {nm}", v, names[nm]["dur"], 0.005)
+    for nm, v in V["cv"]:
+        check(f"coefficient of variation {nm}", v, names[nm]["cv"], 0.05)
+    c = d["conf"]
+    for p, s, x in V["ra_conf"]:
+        check(f"risk adjustment {p}th, added together", s, round(d["lines"]["all"]["ra"][c.index(p)], 1), 0.05)
+        check(f"risk adjustment {p}th, independent", x, round(d["indep_ra"][c.index(p)], 1), 0.05)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--repos", default=os.environ.get("IRA_REPOS", ".."),
@@ -321,13 +486,14 @@ def main():
     if not (root / "ira-kenya-data").exists():
         sys.exit(f"Cannot find the analysis repos under {root.resolve()}. Pass --repos.")
     kenya(root)
+    kenya_story(root)
     triangle()
 
     local = Path(__file__).with_name("local_paths.json")
     skipped = []
     if local.exists():
         p = json.load(open(local, encoding="utf-8"))
-        for key, fn, args in [("ifrs17", ifrs17, ("ifrs17",)), ("reserving", reserving, ("reserving",)),
+        for key, fn, args in [("ifrs17", ifrs17, ("ifrs17",)), ("ifrs17 charts", ifrs17_viz, ("ifrs17",)), ("reserving", reserving, ("reserving",)),
                               ("pricing", pricing, ("pricing",)), ("auctions", auctions, ("auctions",)),
                               ("dealer", dealer, ("dealer", "dealer_check"))]:
             if all(k in p and Path(p[k]).exists() for k in args):
@@ -335,7 +501,7 @@ def main():
             else:
                 skipped.append(key)
     else:
-        skipped = ["ifrs17", "reserving", "pricing", "auctions", "dealer"]
+        skipped = ["ifrs17", "ifrs17 charts", "reserving", "pricing", "auctions", "dealer"]
 
     if not apps(root):
         skipped.append("health ibnr lab")
