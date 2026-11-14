@@ -379,3 +379,37 @@ section > .sechead::before,section > .kenya-head::before{top:-3px;border-top-wid
 
 @media (max-width:420px){.brand span{display:block;margin:0;font-size:21px}}
 @media print{body::before{display:none}body{background-image:none}}
+
+
+/* ---------------------------------------------------------- navigation */
+/* the header stays on screen; --head-h is its measured height, so anchors land below it */
+:root{--head-h:76px}
+html{scroll-padding-top:calc(var(--head-h) + 16px);scroll-behavior:smooth}
+.site-head{position:sticky;top:0;z-index:20;background-color:var(--ground);background-image:var(--grain);transition:box-shadow .2s ease-out}
+.site-head.stuck{box-shadow:0 10px 24px -14px rgba(0,0,0,.7)}
+:root[data-theme="light"] .site-head.stuck{box-shadow:0 10px 24px -16px rgba(43,33,24,.55)}
+nav.main a[aria-current],nav.main a.here{color:var(--ink);box-shadow:inset 0 -2px 0 var(--accent)}
+.menu{display:none;font-family:var(--label);font-size:14px;letter-spacing:.06em;color:var(--ink);background:transparent;border:1px solid var(--rule-strong);border-radius:2px;padding:6px 14px;min-height:40px;cursor:pointer;align-items:center;gap:9px}
+.menu::before{content:"";width:16px;height:10px;border-block:1.5px solid currentColor;background:linear-gradient(currentColor,currentColor) center/100% 1.5px no-repeat}
+.site-head.open .menu::before{border:0;height:2px;background:currentColor;width:14px}
+.menu:hover{border-color:var(--accent)}
+@media (max-width:860px){
+  .js .menu{display:inline-flex}
+  .js nav.main{display:none}
+  .js .site-head.open nav.main{display:flex;flex-direction:column;align-items:stretch;width:100%;gap:0;padding:4px 0 6px;border-top:1px solid var(--rule)}
+  .js .site-head.open nav.main a{padding:13px 4px;border-bottom:1px solid var(--rule-soft);font-size:17px}
+  .js .site-head.open nav.main a[aria-current],.js .site-head.open nav.main a.here{box-shadow:inset 3px 0 0 var(--accent);padding-left:14px}
+  .js .site-head.open .theme{align-self:flex-start;margin-top:14px;min-height:40px}
+}
+@media (max-width:420px){.site-head .wrap{padding-block:10px}}
+
+/* previous and next case study */
+.pager{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;border-top:3px double var(--rule-strong);padding-top:22px}
+.pager a{display:flex;flex-direction:column;gap:6px;padding:16px 20px;border:1px solid var(--rule-strong);outline:1px solid var(--rule);outline-offset:-6px;text-decoration:none;color:var(--ink)}
+.pager a:hover{border-color:var(--accent)}
+.pager a:hover b{color:var(--accent)}
+.pager span{font-family:var(--label);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.pager b{font-family:var(--serif);font-weight:500;font-size:19px;line-height:1.3}
+.pager .nx{text-align:right}
+@media (max-width:640px){.pager{grid-template-columns:minmax(0,1fr)}.pager .nx{text-align:left}}
+@media print{.site-head{position:static;box-shadow:none}.menu,.pager{display:none}}

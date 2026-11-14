@@ -21,7 +21,7 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-<script>try{var t=localStorage.getItem('mp-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('mp-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Pinyon+Script&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap">
@@ -31,7 +31,8 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-head"><div class="wrap">
 <a class="brand" href="/">Marion Peter<span>Actuarial Engineer</span></a>
-<nav class="main" aria-label="Main"><a href="/#work">Work</a><a href="/#apps">Apps</a><a href="/kenya-insurance/">Kenya series</a><a href="/about/">About</a><a href="/#contact">Contact</a><button class="theme" type="button" hidden>Paper theme</button></nav>
+<button class="menu" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+<nav class="main" id="site-nav" aria-label="Main"><a href="/kenya-insurance/" data-spy="work signals">Kenya series</a><a href="/#cases" aria-current="true" data-spy="cases">Case studies</a><a href="/#apps" data-spy="apps products">Apps</a><a href="/about/" data-spy="">About</a><a href="/#contact" data-spy="contact">Contact</a><button class="theme" type="button" hidden>Paper theme</button></nav>
 </div></header>
 <main id="main" class="wrap">
 <section aria-labelledby="h1">
@@ -84,6 +85,10 @@
 <ul class="limits"><li><b>Margin before 2024 is not reported.</b> An estimate was possible, but not one that could be checked.</li><li><b>The 447 bad cost lines were flagged, not repaired.</b> Their true cost is unknown, and imputing it would invent margin.</li><li><b>The 1.25 price ratio in 2022 is inferred from the data,</b> not from documentation. It is consistent across the year and explains the gap, but the pricing policy behind it was not seen.</li><li><b>This is one dealer group in one market.</b> The double-count pattern is common where a parts ledger and a job ledger sit side by side, but nothing here shows how common.</li></ul>
 <p class="note">Client work. The data and the code stay with the client; this page shows only counts, percentages and the method.</p>
 </section>
+<nav class="pager" aria-label="More case studies">
+<a href="/work/valuation-adequacy/" rel="prev"><span>Previous case study</span><b>An estimate that is unbiased in total and biased in every condition band</b></a>
+<a class="nx" href="/work/ifrs17-measurement/" rel="next"><span>Next case study</span><b>Discounting makes a reserve smaller. On one line, IFRS 17 makes it bigger</b></a>
+</nav>
 </main>
 <footer class="site-foot"><div class="wrap">
 <p>Marion Peter, Actuarial Engineer. Everything on this site uses public data or anonymised work; no employer data is used. Kenya figures come from the Insurance Regulatory Authority's quarterly returns, which are unaudited.</p>
@@ -93,5 +98,25 @@
 function cur(){return d.getAttribute('data-theme')||'dark'}
 function lab(){var c=cur();b.textContent=c==='dark'?'Paper theme':'Ink theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'light':'dark')+' theme')}
 b.hidden=false;b.addEventListener('click',function(){var x=cur()==='dark'?'light':'dark';d.setAttribute('data-theme',x);try{localStorage.setItem('mp-theme',x)}catch(e){}lab()});lab()})();</script>
+<script>(function(){var d=document.documentElement,h=document.querySelector('.site-head');if(!h)return;
+var m=h.querySelector('.menu'),nav=h.querySelector('nav.main'),wide=window.matchMedia('(min-width:861px)');
+function open(){return h.classList.contains('open')}
+function size(){if(!open())d.style.setProperty('--head-h',h.offsetHeight+'px')}
+function set(o){h.classList.toggle('open',o);m.setAttribute('aria-expanded',o?'true':'false');m.textContent=o?'Close':'Menu'}
+if(m){m.addEventListener('click',function(){set(!open())});
+nav.addEventListener('click',function(e){if(e.target.closest('a'))set(false)});
+document.addEventListener('click',function(e){if(open()&&!h.contains(e.target))set(false)});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&open()){set(false);m.focus()}});}
+var home=location.pathname==='/'||location.pathname==='/index.html',
+secs=home?[].slice.call(document.querySelectorAll('main section[id]')):[],
+links=[].slice.call(nav.querySelectorAll('a[data-spy]'));
+function spy(){h.classList.toggle('stuck',window.scrollY>4);if(!secs.length)return;
+var y=parseFloat(getComputedStyle(d).getPropertyValue('--head-h'))+60,cur='';
+for(var i=0;i<secs.length;i++)if(secs[i].getBoundingClientRect().top<=y)cur=secs[i].id;
+if(window.innerHeight+window.scrollY>=d.scrollHeight-2)cur=secs[secs.length-1].id;
+links.forEach(function(a){a.classList.toggle('here',!!cur&&a.getAttribute('data-spy').split(' ').indexOf(cur)>-1)})}
+var q=0;window.addEventListener('scroll',function(){if(!q)q=requestAnimationFrame(function(){q=0;spy()})},{passive:true});
+window.addEventListener('resize',function(){if(m&&wide.matches&&open())set(false);size();spy()});
+if(window.ResizeObserver)new ResizeObserver(size).observe(h);size();spy()})();</script>
 </body>
 </html>

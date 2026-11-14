@@ -67,11 +67,35 @@ def ksh(v):
 
 
 # ----------------------------------------------------------------- layout
-NAV = [("/#work", "Work", "home"), ("/#apps", "Apps", None), ("/kenya-insurance/", "Kenya series", "kenya"),
-       ("/about/", "About", "about"), ("/#contact", "Contact", None)]
+# (href, label, section the link belongs to, home page sections that light it up while scrolling)
+NAV = [("/kenya-insurance/", "Kenya series", "kenya", "work signals"), ("/#cases", "Case studies", "work", "cases"),
+       ("/#apps", "Apps", None, "apps products"), ("/about/", "About", "about", ""),
+       ("/#contact", "Contact", None, "contact")]
 
-THEME_HEAD = ("<script>try{var t=localStorage.getItem('mp-theme');"
+THEME_HEAD = ("<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('mp-theme');"
               "if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>")
+# Sticky header: keeps anchor targets clear of it, opens and closes the phone menu,
+# and on the home page underlines the nav item for the section being read.
+NAV_JS = """<script>(function(){var d=document.documentElement,h=document.querySelector('.site-head');if(!h)return;
+var m=h.querySelector('.menu'),nav=h.querySelector('nav.main'),wide=window.matchMedia('(min-width:861px)');
+function open(){return h.classList.contains('open')}
+function size(){if(!open())d.style.setProperty('--head-h',h.offsetHeight+'px')}
+function set(o){h.classList.toggle('open',o);m.setAttribute('aria-expanded',o?'true':'false');m.textContent=o?'Close':'Menu'}
+if(m){m.addEventListener('click',function(){set(!open())});
+nav.addEventListener('click',function(e){if(e.target.closest('a'))set(false)});
+document.addEventListener('click',function(e){if(open()&&!h.contains(e.target))set(false)});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&open()){set(false);m.focus()}});}
+var home=location.pathname==='/'||location.pathname==='/index.html',
+secs=home?[].slice.call(document.querySelectorAll('main section[id]')):[],
+links=[].slice.call(nav.querySelectorAll('a[data-spy]'));
+function spy(){h.classList.toggle('stuck',window.scrollY>4);if(!secs.length)return;
+var y=parseFloat(getComputedStyle(d).getPropertyValue('--head-h'))+60,cur='';
+for(var i=0;i<secs.length;i++)if(secs[i].getBoundingClientRect().top<=y)cur=secs[i].id;
+if(window.innerHeight+window.scrollY>=d.scrollHeight-2)cur=secs[secs.length-1].id;
+links.forEach(function(a){a.classList.toggle('here',!!cur&&a.getAttribute('data-spy').split(' ').indexOf(cur)>-1)})}
+var q=0;window.addEventListener('scroll',function(){if(!q)q=requestAnimationFrame(function(){q=0;spy()})},{passive:true});
+window.addEventListener('resize',function(){if(m&&wide.matches&&open())set(false);size();spy()});
+if(window.ResizeObserver)new ResizeObserver(size).observe(h);size();spy()})();</script>"""
 THEME_JS = """<script>(function(){var b=document.querySelector('.theme');if(!b)return;var d=document.documentElement;
 function cur(){return d.getAttribute('data-theme')||'dark'}
 function lab(){var c=cur();b.textContent=c==='dark'?'Paper theme':'Ink theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'light':'dark')+' theme')}
@@ -83,8 +107,11 @@ CUR = ' aria-current="page"'
 
 def layout(path, title, desc, body, section=None, og_title=None):
     url = BASE + path
-    nav = "".join(
-        f'<a href="{h}"{CUR if s and s == section and not h.startswith("/#") else ""}>{t}</a>' for h, t, s in NAV)
+    def cur(h, s):
+        if h == path:
+            return CUR
+        return ' aria-current="true"' if s and s == section else ""
+    nav = "".join(f'<a href="{h}"{cur(h, s)} data-spy="{spy}">{t}</a>' for h, t, s, spy in NAV)
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -118,7 +145,8 @@ def layout(path, title, desc, body, section=None, og_title=None):
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-head"><div class="wrap">
 <a class="brand" href="/">Marion Peter<span>{ROLE}</span></a>
-<nav class="main" aria-label="Main">{nav}<button class="theme" type="button" hidden>Paper theme</button></nav>
+<button class="menu" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+<nav class="main" id="site-nav" aria-label="Main">{nav}<button class="theme" type="button" hidden>Paper theme</button></nav>
 </div></header>
 <main id="main" class="wrap">
 {body}
@@ -128,6 +156,7 @@ def layout(path, title, desc, body, section=None, og_title=None):
 <p><a href="{SITE_REPO}">Source for this site</a> &nbsp; <a href="{GH}">GitHub</a> &nbsp; <a href="mailto:{EMAIL}">Email</a></p>
 </div></footer>
 {THEME_JS}
+{NAV_JS}
 </body>
 </html>
 """
@@ -611,6 +640,16 @@ def limits(items):
     return '<ul class="limits">' + "".join(f"<li><b>{t}</b> {d}</li>" for t, d in items) + "</ul>"
 
 
+def pager(c):
+    """Previous and next case study, wrapping round, so a reader can move through them without going home."""
+    i = next(k for k, x in enumerate(CASES) if x["slug"] == c["slug"])
+    prev, nxt = CASES[i - 1], CASES[(i + 1) % len(CASES)]
+    return f"""<nav class="pager" aria-label="More case studies">
+<a href="/work/{prev['slug']}/" rel="prev"><span>Previous case study</span><b>{prev['title']}</b></a>
+<a class="nx" href="/work/{nxt['slug']}/" rel="next"><span>Next case study</span><b>{nxt['title']}</b></a>
+</nav>"""
+
+
 def case_page(c, eyebrow, lede, fact_items, data, method, sections, lim, code_note):
     body = f"""<section aria-labelledby="h1">
 <a class="more" href="/#cases">All case studies</a>
@@ -625,8 +664,9 @@ def case_page(c, eyebrow, lede, fact_items, data, method, sections, lim, code_no
 <div class="sechead"><span class="eyebrow">Limits</span><h2 id="h-limits">What this analysis cannot tell you</h2></div>
 {limits(lim)}
 <p class="note">{code_note}</p>
-</section>"""
-    return layout(f"/work/{c['slug']}/", f"{c['title']} | Marion Peter", c["desc"], body, "home",
+</section>
+{pager(c)}"""
+    return layout(f"/work/{c['slug']}/", f"{c['title']} | Marion Peter", c["desc"], body, "work",
                   og_title=c["title"])
 
 

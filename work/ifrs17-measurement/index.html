@@ -21,7 +21,7 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-<script>try{var t=localStorage.getItem('mp-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('mp-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Pinyon+Script&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap">
@@ -31,7 +31,8 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-head"><div class="wrap">
 <a class="brand" href="/">Marion Peter<span>Actuarial Engineer</span></a>
-<nav class="main" aria-label="Main"><a href="/#work">Work</a><a href="/#apps">Apps</a><a href="/kenya-insurance/">Kenya series</a><a href="/about/">About</a><a href="/#contact">Contact</a><button class="theme" type="button" hidden>Paper theme</button></nav>
+<button class="menu" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+<nav class="main" id="site-nav" aria-label="Main"><a href="/kenya-insurance/" data-spy="work signals">Kenya series</a><a href="/#cases" aria-current="true" data-spy="cases">Case studies</a><a href="/#apps" data-spy="apps products">Apps</a><a href="/about/" data-spy="">About</a><a href="/#contact" data-spy="contact">Contact</a><button class="theme" type="button" hidden>Paper theme</button></nav>
 </div></header>
 <main id="main" class="wrap">
 <section aria-labelledby="h1">
@@ -78,6 +79,10 @@
 <ul class="limits"><li><b>No tail beyond development year 10.</b> Durations, reserves and the discount effect are all understated, most of all for the liability lines.</li><li><b>A flat discount rate, not a yield curve.</b> IFRS 17 asks for rates consistent with the cash flows; the flat rate is a stated simplification.</li><li><b>One risk adjustment technique.</b> A bootstrap percentile is common, not required. Cost of capital or a stress approach would give other answers from the same data.</li><li><b>Paid data only.</b> No case estimates, claims handling costs, reinsurance or expenses in the fulfilment cash flows.</li><li><b>US industry data from 1997.</b> The point is the measurement mechanics on real claims development, not a statement about any insurer.</li></ul>
 <p class="note">The code is not on GitHub yet. The same triangles feed the reserve back-test listed on the About page.</p>
 </section>
+<nav class="pager" aria-label="More case studies">
+<a href="/work/dealer-revenue/" rel="prev"><span>Previous case study</span><b>Revenue was being reported 61% higher than it was earned</b></a>
+<a class="nx" href="/work/valuation-adequacy/" rel="next"><span>Next case study</span><b>An estimate that is unbiased in total and biased in every condition band</b></a>
+</nav>
 </main>
 <footer class="site-foot"><div class="wrap">
 <p>Marion Peter, Actuarial Engineer. Everything on this site uses public data or anonymised work; no employer data is used. Kenya figures come from the Insurance Regulatory Authority's quarterly returns, which are unaudited.</p>
@@ -87,5 +92,25 @@
 function cur(){return d.getAttribute('data-theme')||'dark'}
 function lab(){var c=cur();b.textContent=c==='dark'?'Paper theme':'Ink theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'light':'dark')+' theme')}
 b.hidden=false;b.addEventListener('click',function(){var x=cur()==='dark'?'light':'dark';d.setAttribute('data-theme',x);try{localStorage.setItem('mp-theme',x)}catch(e){}lab()});lab()})();</script>
+<script>(function(){var d=document.documentElement,h=document.querySelector('.site-head');if(!h)return;
+var m=h.querySelector('.menu'),nav=h.querySelector('nav.main'),wide=window.matchMedia('(min-width:861px)');
+function open(){return h.classList.contains('open')}
+function size(){if(!open())d.style.setProperty('--head-h',h.offsetHeight+'px')}
+function set(o){h.classList.toggle('open',o);m.setAttribute('aria-expanded',o?'true':'false');m.textContent=o?'Close':'Menu'}
+if(m){m.addEventListener('click',function(){set(!open())});
+nav.addEventListener('click',function(e){if(e.target.closest('a'))set(false)});
+document.addEventListener('click',function(e){if(open()&&!h.contains(e.target))set(false)});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&open()){set(false);m.focus()}});}
+var home=location.pathname==='/'||location.pathname==='/index.html',
+secs=home?[].slice.call(document.querySelectorAll('main section[id]')):[],
+links=[].slice.call(nav.querySelectorAll('a[data-spy]'));
+function spy(){h.classList.toggle('stuck',window.scrollY>4);if(!secs.length)return;
+var y=parseFloat(getComputedStyle(d).getPropertyValue('--head-h'))+60,cur='';
+for(var i=0;i<secs.length;i++)if(secs[i].getBoundingClientRect().top<=y)cur=secs[i].id;
+if(window.innerHeight+window.scrollY>=d.scrollHeight-2)cur=secs[secs.length-1].id;
+links.forEach(function(a){a.classList.toggle('here',!!cur&&a.getAttribute('data-spy').split(' ').indexOf(cur)>-1)})}
+var q=0;window.addEventListener('scroll',function(){if(!q)q=requestAnimationFrame(function(){q=0;spy()})},{passive:true});
+window.addEventListener('resize',function(){if(m&&wide.matches&&open())set(false);size();spy()});
+if(window.ResizeObserver)new ResizeObserver(size).observe(h);size();spy()})();</script>
 </body>
 </html>
