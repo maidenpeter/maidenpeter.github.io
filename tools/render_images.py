@@ -32,7 +32,7 @@ body{{margin:0;width:1200px;height:630px;overflow:hidden;background:var(--ground
 <div><span class="eyebrow">Kenya general insurance, 2018 to 2025</span>
 <h1>Motor lost {build.ksh(-K['uw_motor'])}. Every other class made {build.ksh(K['uw_other'])}.</h1>
 <p class="lede">Every insurer, every quarter, rebuilt from the regulator's returns and checked {build.n(K['checks'])} times.</p>
-<p class="who">Marion Peter, {build.ROLE}</p></div>
+<p class="who">Marion Peter, {build.esc(build.ROLE)}</p></div>
 <div class="panel"><h3>Underwriting result by class, KSh bn</h3>{build.class_chart()}</div>
 </div></body></html>"""
 

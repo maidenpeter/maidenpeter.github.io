@@ -12,7 +12,7 @@ The home page leads with the Kenya insurance series, built from the Insurance Re
 
 | Path | What it is |
 |---|---|
-| `/` | Home: a chain ladder calculated in the page, the Kenya series, three findings, apps, case studies, products, how I work, contact |
+| `/` | Home: a chain ladder calculated in the page, then Part I Data analysis (the Kenya series, what a reinsurer would act on, the dealer audit and two forecasting products) and Part II Actuarial analysis (the two reserving and persistency apps, AgroShield pricing, the IFRS 17 and reserve adequacy case studies), how I work, contact |
 | `/kenya-insurance/` | Front page of the Kenya insurance series (its permanent address) |
 | `/work/dealer-revenue/` | Case study: a Kenyan dealer group's revenue double count (anonymised) |
 | `/work/ifrs17-measurement/` | Case study: IFRS 17 discounting and risk adjustment on US industry triangles |
@@ -24,12 +24,18 @@ The home page leads with the Kenya insurance series, built from the Insurance Re
 
 Static HTML, no framework. `tools/build.py` writes every page from one layout, so the head, header, footer and theme script are written once; `assets/site.css` holds the tokens for the two themes: ink (dark, the default) and paper (light), with gold for emphasis, teal for gain and oxblood for loss. Its copperplate layer matches the Kenya series plates: a grained, foxed ground, IM Fell English for headings, Old Standard TT for labels, Pinyon Script in the name line, double-ruled frames and hatched bars.
 
+The navigation is written once in `tools/nav.py`: a side bar headed by the MP seal, the name and the role, then the two chapters (I Data analysis, II Actuarial analysis) with their pages, About and Contact, and a Back link that returns to the previous page on the site or goes up a level. On phones the seal and name stay pinned at the top and the links sit in a bar along the bottom, each chapter opening as a sheet. The build writes its CSS to `assets/nav.css`; `tools/kenya_nav.py` writes the same side bar and the Kenya series strip into the four analysis pages in the Kenya repositories, inline, between `mp-nav` markers, so it can be run again whenever `nav.py` changes.
+
+Every card that links somewhere carries a screenshot from `assets/shots/`, made by `tools/render_shots.py`. Work with no public link yet opens a pop-out (the `popover` attribute, so no script is needed) with a larger screenshot and the explanation.
+
 The home page triangle is a volume-weighted chain ladder on the six NAIC Schedule P paid triangles in `tools/cas_triangles.json`, the same data as the IFRS 17 case study. The build computes it in Python so the page reads correctly without JavaScript; the page then recomputes it in the browser and fills the projected corner one calendar year at a time.
 
 ```
 python tools/build.py                      # write the pages into the repo root
 python tools/build.py --repo-index OUT     # also write the index page of each Kenya repo into OUT/<repo>/index.html
 python tools/render_images.py              # share image, favicon.ico, Apple touch icon (needs Playwright and Chrome)
+python tools/render_shots.py               # card screenshots of the Kenya pages, case studies and apps (Playwright, Chrome, Pillow)
+python tools/kenya_nav.py --repos ..       # write the side bar into the Kenya analysis pages and their templates
 ```
 
 Every number on the site lives in `tools/figures.py`. Nothing is typed into a page by hand.

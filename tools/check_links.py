@@ -2,9 +2,13 @@
 
     python tools/check_links.py              # internal links, assets and #anchors
     python tools/check_links.py --external   # also request every external URL once
+    python tools/check_links.py --repos ..   # also check links into, and inside, the three Kenya repos
 
 Internal links are resolved against the repo root the way GitHub Pages serves it
 (/path/ -> path/index.html). Anchors must exist as an id on the target page.
+Without --repos, pages served from the analysis repos are treated as external URLs (CI has
+only this repo). With --repos, /ira-kenya-*/ paths are resolved in the sibling repositories,
+and their index pages and analysis pages are crawled as well.
 """
 import argparse, sys, urllib.request, urllib.error
 from html.parser import HTMLParser
@@ -13,8 +17,9 @@ from urllib.parse import urlparse, urldefrag
 
 ROOT = Path(__file__).resolve().parent.parent
 BASES = ("https://maidenpeter.github.io", "https://marionpeter.nuruops.com")
-# Pages served from the analysis repos, not this one: checked as external URLs.
+# Pages served from the analysis repos, not this one.
 OTHER_REPOS = ("/ira-kenya-data/", "/ira-kenya-insurance/", "/ira-kenya-reinsurance/")
+REPO_PAGES = ("index.html", "page/*.html", "explorer/*.html")
 
 
 class Links(HTMLParser):
@@ -39,22 +44,49 @@ def parse(p):
     return x
 
 
-def target(path):
-    p = ROOT / path.lstrip("/")
-    if path.endswith("/"):
+def resolve(url, page, repos):
+    """The file a reference points at, or None when it is outside what can be checked here."""
+    if url == "":
+        return page
+    if url.startswith("/"):
+        p = None
+        for r in OTHER_REPOS:
+            if url.startswith(r):
+                if not repos:
+                    return None
+                p = repos / r.strip("/") / url[len(r):]
+        if p is None:
+            p = ROOT / url.lstrip("/")
+    else:
+        p = page.parent / url
+    if url.endswith("/") or p.is_dir():
         p = p / "index.html"
-    return p
+    return p.resolve()
+
+
+def show(p):
+    for base in (ROOT, ROOT.parent):
+        try:
+            return p.relative_to(base).as_posix()
+        except ValueError:
+            pass
+    return str(p)
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--external", action="store_true")
+    ap.add_argument("--repos", help="folder holding the ira-kenya-* repositories")
     a = ap.parse_args()
-    pages = [p for p in ROOT.rglob("*.html") if ".git" not in p.parts and "tools" not in p.parts]
+    repos = Path(a.repos).resolve() if a.repos else None
+    pages = [p.resolve() for p in ROOT.rglob("*.html") if ".git" not in p.parts and "tools" not in p.parts]
+    if repos:
+        for r in OTHER_REPOS:
+            for pattern in REPO_PAGES:
+                pages += [p.resolve() for p in (repos / r.strip("/")).glob(pattern) if "template" not in p.name]
     parsed = {p: parse(p) for p in pages}
     bad, external = [], set()
     for page, x in parsed.items():
-        rel = page.relative_to(ROOT).as_posix()
         for ref in x.refs:
             if ref.startswith(("mailto:", "tel:", "data:")):
                 continue
@@ -62,20 +94,20 @@ def main():
             for b in BASES:
                 if url.startswith(b):
                     url = url[len(b):] or "/"
-            if url.startswith(("http://", "https://")) or url.startswith(OTHER_REPOS):
-                external.add(url if url.startswith("http") else BASES[0] + url)
+            if url.startswith(("http://", "https://")):
+                external.add(url)
                 continue
-            if url == "":
-                t = page
-            elif url.startswith("/"):
-                t = target(url)
-            else:
-                t = target((page.parent / url).relative_to(ROOT).as_posix() + ("/" if url.endswith("/") else ""))
+            t = resolve(url, page, repos)
+            if t is None:
+                external.add(BASES[0] + url)
+                continue
             if not t.exists():
-                bad.append(f"{rel}: {ref} -> missing {t.relative_to(ROOT).as_posix()}")
+                bad.append(f"{show(page)}: {ref} -> missing {show(t)}")
                 continue
-            if frag and t.suffix == ".html" and frag not in parsed.get(t, parse(t)).ids:
-                bad.append(f"{rel}: {ref} -> no id '{frag}'")
+            if frag and t.suffix == ".html":
+                ids = parsed[t].ids if t in parsed else parse(t).ids
+                if frag not in ids:
+                    bad.append(f"{show(page)}: {ref} -> no id '{frag}'")
     print(f"{len(pages)} pages, {sum(len(x.refs) for x in parsed.values())} references, {len(external)} distinct external URLs.")
     if a.external:
         for u in sorted(external):
