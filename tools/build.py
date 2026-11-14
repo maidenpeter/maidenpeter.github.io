@@ -12,13 +12,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from figures import (KENYA as K, CLASS_RESULTS, BACKTEST, DEALER as D, IFRS17 as I, IFRS17_LINES,
-                     BACKTEST_AE, CREDIBILITY, AUCTIONS as A, AUCTION_DECILES)
+                     BACKTEST_AE, CREDIBILITY, AUCTIONS as A, AUCTION_DECILES, APPS as AP, IPL_URL, HACKATHONS)
 
 ROOT = Path(__file__).resolve().parent.parent
 BASE = "https://maidenpeter.github.io"   # change to https://marionpeter.nuruops.com once the custom domain is live
 GH = "https://github.com/maidenpeter"
 SITE_REPO = f"{GH}/maidenpeter.github.io"
 EMAIL = "marionpeter@nuruops.com"
+ROLE = "Actuarial Engineer"
 LINKEDIN = "https://www.linkedin.com/in/marion-peter"
 FONTS = ("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400"
          "&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap")
@@ -64,14 +65,14 @@ def ksh(v):
 
 
 # ----------------------------------------------------------------- layout
-NAV = [("/#work", "Work", "home"), ("/kenya-insurance/", "Kenya series", "kenya"),
+NAV = [("/#work", "Work", "home"), ("/#apps", "Apps", None), ("/kenya-insurance/", "Kenya series", "kenya"),
        ("/about/", "About", "about"), ("/#contact", "Contact", None)]
 
 THEME_HEAD = ("<script>try{var t=localStorage.getItem('mp-theme');"
               "if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>")
 THEME_JS = """<script>(function(){var b=document.querySelector('.theme');if(!b)return;var d=document.documentElement;
-function cur(){return d.getAttribute('data-theme')||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
-function lab(){var c=cur();b.textContent=c==='dark'?'Light theme':'Dark theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'light':'dark')+' theme')}
+function cur(){return d.getAttribute('data-theme')||'dark'}
+function lab(){var c=cur();b.textContent=c==='dark'?'Paper theme':'Ink theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'light':'dark')+' theme')}
 b.hidden=false;b.addEventListener('click',function(){var x=cur()==='dark'?'light':'dark';d.setAttribute('data-theme',x);try{localStorage.setItem('mp-theme',x)}catch(e){}lab()});lab()})();</script>"""
 
 
@@ -91,8 +92,7 @@ def layout(path, title, desc, body, section=None, og_title=None):
 <meta name="description" content="{esc(desc)}">
 <link rel="canonical" href="{url}">
 <meta name="author" content="Marion Peter">
-<meta name="theme-color" content="#f4f6f3" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#10161c" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#0f1b2d">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Marion Peter">
 <meta property="og:title" content="{esc(og_title or title)}">
@@ -115,14 +115,14 @@ def layout(path, title, desc, body, section=None, og_title=None):
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-head"><div class="wrap">
-<a class="brand" href="/">Marion Peter<span>Actuarial analyst, Nairobi</span></a>
-<nav class="main" aria-label="Main">{nav}<button class="theme" type="button" hidden>Dark theme</button></nav>
+<a class="brand" href="/">Marion Peter<span>{ROLE}</span></a>
+<nav class="main" aria-label="Main">{nav}<button class="theme" type="button" hidden>Paper theme</button></nav>
 </div></header>
 <main id="main" class="wrap">
 {body}
 </main>
 <footer class="site-foot"><div class="wrap">
-<p>Marion Peter, Nairobi. Everything on this site uses public data or anonymised work; no employer data is used. Kenya figures come from the Insurance Regulatory Authority's quarterly returns, which are unaudited.</p>
+<p>Marion Peter, {ROLE}. Everything on this site uses public data or anonymised work; no employer data is used. Kenya figures come from the Insurance Regulatory Authority's quarterly returns, which are unaudited.</p>
 <p><a href="{SITE_REPO}">Source for this site</a> &nbsp; <a href="{GH}">GitHub</a> &nbsp; <a href="mailto:{EMAIL}">Email</a></p>
 </div></footer>
 {THEME_JS}
@@ -234,12 +234,12 @@ def share_bars(items, unit=""):
     return f'<div class="share" aria-hidden="true">{out}</div>'
 
 
-def signals():
+def signals(num=None):
     k = K
     lr_low = k["low_lr_trouble"] / k["low_lr_insurers"] * 100
     lr_oth = k["other_trouble"] / k["other_insurers"] * 100
     return f"""<section id="signals" aria-labelledby="h-signals">
-<div class="sechead"><span class="eyebrow">What a reinsurer would act on</span>
+<div class="sechead">{eb(num, "What a reinsurer would act on") if num else '<span class="eyebrow">What a reinsurer would act on</span>'}
 <h2 id="h-signals">The warnings were in the public returns</h2>
 <p>Three results from the series that change a decision. Insurer names stay inside the analysis pages, next to the method and caveats.</p></div>
 <div class="signals">
@@ -269,15 +269,144 @@ def signals():
 </section>"""
 
 
-def contact_block(heading="Get in touch", hid="h-contact"):
+def contact_block(heading="Get in touch", hid="h-contact", num=None):
     return f"""<section id="contact" class="contact" aria-labelledby="{hid}">
-<div class="sechead"><span class="eyebrow">Contact</span><h2 id="{hid}">{heading}</h2>
-<p>If you are hiring for an actuarial, pricing, reserving or data role at an insurer or reinsurer, write to me. I am in Nairobi.</p></div>
+<div class="sechead">{eb(num, "Contact") if num else '<span class="eyebrow">Contact</span>'}<h2 id="{hid}">{heading}</h2>
+<p>If you are hiring for an actuarial, pricing, reserving or data role at an insurer or reinsurer, write to me.</p></div>
 <ul>
 <li><a href="mailto:{EMAIL}"><span>Email</span><b>{EMAIL}</b></a></li>
 <li><a href="{LINKEDIN}"><span>LinkedIn</span><b>in/marion-peter</b></a></li>
 <li><a href="{GH}"><span>GitHub</span><b>github.com/maidenpeter</b></a></li>
 </ul>
+</section>"""
+
+
+
+# ------------------------------------------------------------- run-off triangle
+def load_triangles():
+    return json.load(open(ROOT / "tools" / "cas_triangles.json", encoding="utf-8"))
+
+
+def chain_ladder(t):
+    """Volume-weighted chain ladder. Returns factors, the completed square and reserve (same units as t)."""
+    n = len(t)
+    f = []
+    for j in range(n - 1):
+        r = [i for i in range(n) if t[i][j + 1] is not None]
+        f.append(sum(t[i][j + 1] for i in r) / sum(t[i][j] for i in r))
+    sq, reserve, paid = [], 0.0, 0.0
+    for i in range(n):
+        row = list(t[i])
+        last = max(j for j in range(n) if row[j] is not None)
+        for j in range(last + 1, n):
+            row[j] = row[j - 1] * f[j - 1]
+        sq.append(row)
+        reserve += row[-1] - t[i][last]
+        paid += t[i][last]
+    return f, sq, reserve, paid
+
+
+def usm(v):
+    """US$ thousands to a US$m label, one decimal."""
+    return f"US${d1(v / 1000, sign=False)}m".replace(".0m", ".0m")
+
+
+def money_m(v):
+    q = Decimal(str(v / 1000)).quantize(Decimal("0.1"), ROUND_HALF_UP)
+    return f"{q:,}"
+
+
+TRI_JS = r"""<script>(function(){
+var el=document.getElementById('tri');if(!el)return;
+var D=JSON.parse(document.getElementById('tri-data').textContent),body=el.querySelector('tbody');
+var outU=document.getElementById('tri-ult'),outP=document.getElementById('tri-paid'),outR=document.getElementById('tri-res'),cap=document.getElementById('tri-cap');
+var still=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches,timer=null;
+function fmt(v){return (Math.round(v/100)/10).toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1})}
+function cl(t){var n=t.length,f=[],j,i;for(j=0;j<n-1;j++){var a=0,b=0;for(i=0;i<n;i++){if(t[i][j+1]!=null){a+=t[i][j+1];b+=t[i][j]}}f.push(a/b)}
+var sq=[],res=0,paid=0,last=[];for(i=0;i<n;i++){var r=t[i].slice(),l=0;for(j=0;j<n;j++)if(r[j]!=null)l=j;for(j=l+1;j<n;j++)r[j]=r[j-1]*f[j-1];sq.push(r);last.push(l);res+=r[n-1]-t[i][l];paid+=t[i][l]}
+return{sq:sq,res:res,paid:paid,last:last}}
+function draw(k){var L=D.lines[k],t=L.paid,n=t.length,c=cl(t),h='',i,j;
+for(i=0;i<n;i++){h+='<tr><th scope="row">'+(D.ay0+i)+'</th>';var u=c.sq[i][n-1];
+for(j=0;j<n;j++){var v=c.sq[i][j],a=(0.10+0.72*v/u).toFixed(3),p=j>c.last[i];
+h+='<td class="'+(p?'p':'')+'" style="--a:'+a+'" data-d="'+(i+j)+'" title="'+(D.ay0+i)+', year '+(j+1)+(p?' projected':' paid')+': US$'+fmt(v)+'m"></td>'}h+='</tr>'}
+body.innerHTML=h;cap.textContent=L.name;outU.textContent=fmt(c.paid+c.res);outP.textContent=fmt(c.paid);
+var cells=body.querySelectorAll('td.p');if(timer)clearInterval(timer);
+if(still){cells.forEach(function(x){x.classList.add('on')});outR.textContent=fmt(c.res);return}
+var d=n,shown=0;outR.textContent='0.0';
+timer=setInterval(function(){var add=0;cells.forEach(function(x){if(+x.dataset.d===d)x.classList.add('on')});
+for(var ii=0;ii<n;ii++){for(var jj=c.last[ii]+1;jj<n;jj++){if(ii+jj===d)add+=c.sq[ii][jj]-c.sq[ii][jj-1]}}
+shown+=add;d++;outR.textContent=fmt(d>2*n-2?c.res:shown);if(d>2*n-2){clearInterval(timer);outR.textContent=fmt(c.res)}},170)}
+var btns=document.querySelectorAll('.tri-tabs button');btns.forEach(function(b){b.addEventListener('click',function(){btns.forEach(function(x){x.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed','true');draw(+b.dataset.k)})});
+draw(0)})();</script>"""
+
+
+def triangle_panel():
+    """Hero: a chain ladder on real paid triangles, computed in the page. The static table is the same
+    calculation done here, so the page reads correctly without JavaScript."""
+    d = load_triangles()
+    lines = d["lines"]
+    total = sum(chain_ladder(L["paid"])[2] for L in lines)
+    L0 = lines[0]
+    f, sq, res, paid = chain_ladder(L0["paid"])
+    n = len(sq)
+    rows = []
+    for i in range(n):
+        last = max(j for j in range(n) if L0["paid"][i][j] is not None)
+        u = sq[i][-1]
+        cells = "".join(
+            f'<td class="{"p on" if j > last else ""}" style="--a:{0.10 + 0.72 * sq[i][j] / u:.3f}"></td>' for j in range(n))
+        rows.append(f'<tr><th scope="row">{1988 + i}</th>{cells}</tr>')
+    head = "".join(f'<th scope="col">{j + 1}</th>' for j in range(n))
+    tabs = "".join(f'<button type="button" data-k="{k}" aria-pressed="{"true" if k == 0 else "false"}">{esc(L["name"])}</button>'
+                   for k, L in enumerate(lines))
+    data = json.dumps({"ay0": 1988, "lines": [{"name": L["name"], "paid": L["paid"]} for L in lines]}, separators=(",", ":"))
+    return f"""<figure class="tri-panel" aria-labelledby="tri-h">
+<span class="eyebrow">Calculated on this page</span>
+<h2 id="tri-h">A claims reserve, worked out in front of you</h2>
+<p class="small">Ten years of US industry paid claims for one line. The page fits a chain ladder on the known cells and fills the empty corner one calendar year at a time.</p>
+<div class="tri-tabs" role="group" aria-label="Line of business">{tabs}</div>
+<table class="tri" id="tri" aria-describedby="tri-sum">
+<caption class="sr-only" id="tri-cap">{esc(L0['name'])}</caption>
+<thead><tr><th scope="col"><span class="sr-only">Accident year</span></th>{head}</tr></thead>
+<tbody>{''.join(rows)}</tbody></table>
+<ul class="tri-key"><li><i style="background:rgba(var(--cell),.6)"></i>Paid to date</li><li><i style="background:var(--mark)"></i>Projected</li><li>Rows: accident year. Columns: development year.</li></ul>
+<div class="tri-read" aria-live="polite"><div><span>Paid, US$m</span><b id="tri-paid">{money_m(paid)}</b></div><div><span>Ultimate, US$m</span><b id="tri-ult">{money_m(paid + res)}</b></div><div><span>Reserve, US$m</span><b id="tri-res">{money_m(res)}</b></div></div>
+<p class="small" id="tri-sum">NAIC Schedule P, all US insurers, accident years 1988 to 1997. The six lines need US${d1(total / 1e6, sign=False)}bn, the reserve the <a href="/work/ifrs17-measurement/">IFRS 17 case study</a> starts from.</p>
+<script type="application/json" id="tri-data">{data}</script>
+</figure>"""
+
+
+def contents(items):
+    return '<nav aria-label="Contents"><ol class="contents">' + "".join(
+        f'<li><a href="#{a}"><i>{i:02d}</i>{t}</a></li>' for i, (a, t) in enumerate(items, 1)) + "</ol></nav>"
+
+
+def eb(num, text):
+    return f'<span class="eyebrow"><i>{num:02d}</i>{text}</span>'
+
+
+def apps_section(num):
+    a = AP
+    hil = f"""<article class="card">
+<span class="badge">Live link to follow</span>
+<span class="tag">Health reserving, R and Shiny</span>
+<h3>Health IBNR Lab</h3>
+<p class="find">A synthetic medical book of {n(a['hil_claims'])} claims. Best estimate outstanding KES {n(a['hil_be_kes'])}, Mack CV {d1(a['hil_cv'], False)}%. Then the test that matters: <b>a {a['hil_backlog_months']}-month, {a['hil_backlog_pct']}% payment slowdown makes chain ladder under-reserve by {d1(a['hil_backlog_err_pct'], False)}%</b>.</p>
+<dl class="meta"><dt>Method</dt><dd>Paid and received triangles, chain ladder, Mack, Bornhuetter-Ferguson, an ODP bootstrap and an IFRS 17 liability for incurred claims view.</dd><dt>Data</dt><dd>Seeded synthetic portfolio. Illustrative only.</dd></dl>
+</article>"""
+    ipl = f"""<article class="card">
+<span class="badge live">Live</span>
+<span class="tag">Health product design, SQL, Python and R</span>
+<h3>Instalment Persistency Lab</h3>
+<p class="find">Pay-as-you-go health cover on a synthetic book of {n(a['ipl_policies'])} policies. {d1(a['ipl_inforce_10'], False)}% are still in force after the 10th instalment, and members who lapse are paid <b>KES {a['ipl_lapsed_ratio']:.2f} in claims for every KES 1</b> they paid in, against KES {a['ipl_stayed_ratio']:.2f} for members who stay.</p>
+<dl class="meta"><dt>Method</dt><dd>Decrement tables in SQL (DuckDB), survival checks in R, an early warning model and a product levers simulator.</dd><dt>Data</dt><dd>Seeded synthetic portfolio. Illustrative only.</dd></dl>
+<div class="links"><a href="{IPL_URL}">Open the app</a><a href="{GH}/instalment-persistency-lab">Code: instalment-persistency-lab</a></div>
+</article>"""
+    return f"""<section id="apps" aria-labelledby="h-apps">
+<div class="sechead">{eb(num, "Apps")}
+<h2 id="h-apps">Reserving and product questions, as tools you can use</h2>
+<p>Built on synthetic books so every number can be published, with the assumptions on the page and tests behind them.</p></div>
+<div class="apps">{hil}{ipl}</div>
 </section>"""
 
 
@@ -317,7 +446,7 @@ def load_products():
     return json.load(open(p, encoding="utf-8")) if p.exists() else []
 
 
-def products_section():
+def products_section(num=None):
     items = load_products()
     if not items:
         return ""
@@ -329,8 +458,8 @@ def products_section():
 <figcaption><b>{esc(it['name'])}</b><span>{esc(it['line'])}{link}</span></figcaption>
 </figure>""")
     return f"""<section id="products" aria-labelledby="h-products">
-<div class="sechead"><span class="eyebrow">Products</span><h2 id="h-products">Things I have built</h2>
-<p>Screenshots from each product's own repository. They show what was built; the analysis above is where the checked numbers are.</p></div>
+<div class="sechead">{eb(num, "Products") if num else '<span class="eyebrow">Products</span>'}<h2 id="h-products">Things I have built</h2>
+<p>Products built outside the day job, where pricing and risk meet a real user. Screenshots from each product's own repository; the analysis above is where the checked numbers are.</p></div>
 <div class="shots">{''.join(figs)}</div>
 </section>"""
 
@@ -347,49 +476,62 @@ PRINCIPLES = [
 
 def home():
     principles = "".join(f"<li><b>{t}</b><span>{d}</span></li>" for t, d in PRINCIPLES)
+    plac = "".join(f"<span><b>{t.split(',')[0]}</b>, {t.split(', ', 1)[1]} {y}</span>" for y, t, _ in HACKATHONS)
+    toc = contents([("work", "Kenya insurance series"), ("signals", "What a reinsurer would act on"), ("apps", "Apps"),
+                    ("cases", "Case studies"), ("products", "Products"), ("method", "How I work"), ("contact", "Contact")])
     body = f"""<section class="hero" aria-labelledby="h1">
 <div class="hero-text">
 <span class="eyebrow">Insurance and reinsurance analysis</span>
 <h1 id="h1">I take messy regulatory data, check it properly and turn it into decisions</h1>
 <p class="lede">From 2022 to 2025 I worked in data, actuarial and reserving roles at an insurance group in Kenya and Mauritius. The work below rebuilds Kenya's general insurance market from the regulator's own returns, checks it {n(K['checks'])} times, and answers the questions an insurer's board or a reinsurer would ask of it.</p>
 <div class="cta"><a class="btn primary" href="#work">See the Kenya series</a><a class="btn quiet" href="{GH}">Code on GitHub</a></div>
+<p class="placings">{plac}</p>
 </div>
-{chart_panel()}
+{triangle_panel()}
 </section>
 
 {proof_strip()}
 
+{toc}
+
 <section id="work" aria-labelledby="h-work">
-<div class="sechead"><span class="eyebrow">Featured work</span>
+<div class="kenya-head">
+<div class="sechead">{eb(1, "Featured work")}
 <h2 id="h-work">Kenya insurance series</h2>
 <p>Every general insurer and reinsurer in Kenya, every quarter from Q4 2016 to Q1 2026, extracted from the Insurance Regulatory Authority's statistics and checked against itself. Four pages, one validated dataset, three public repositories.</p>
+<p>Motor lost money in every one of the eight years from 2018 to 2025. Every other class together made {ksh(K['uw_other'])}.</p>
 <a class="more" href="/kenya-insurance/">How the series is built</a></div>
+{chart_panel()}
+</div>
 <div class="grid2">{kenya_cards()}</div>
 </section>
 
-{signals()}
+{signals(2)}
+
+{apps_section(3)}
 
 <section id="cases" aria-labelledby="h-cases">
-<div class="sechead"><span class="eyebrow">Earlier case studies</span>
+<div class="sechead">{eb(4, "Case studies")}
 <h2 id="h-cases">The same standard on other data</h2>
-<p>The first is Kenyan work, published without client identifiers. The other two use public US data sets with the long claims and price histories the methods need.</p></div>
+<p>The first is Kenyan client work, published without client identifiers. The other two use public US data sets with the long claims and price histories the methods need.</p></div>
 {case_rows()}
 </section>
 
-{products_section()}
+{products_section(5)}
 
 <section id="method" aria-labelledby="h-method">
-<div class="sechead"><span class="eyebrow">How I work</span>
+<div class="sechead">{eb(6, "How I work")}
 <h2 id="h-method">A total that balances is the first thing I check</h2>
 <p>The habit from actuarial training that stuck: distrust a clean number until it survives being split apart.</p></div>
 <ul class="principles">{principles}</ul>
 <div class="next"><span class="tag">Next</span><p>A reserving tool in Streamlit: chain ladder and Bornhuetter-Ferguson on the claims development tables Kenyan insurers publish under IFRS 17, with the reserve each method implies set against what was booked. It will be linked here when it is live.</p></div>
 </section>
 
-{contact_block()}"""
-    return layout("/", "Marion Peter | Actuarial analyst, Nairobi",
+{contact_block(num=7)}
+{TRI_JS}"""
+    return layout("/", f"Marion Peter | {ROLE}",
                   "Kenya's general insurance market rebuilt from the regulator's returns and checked 42,246 times: where insurers lose money, what premiums would need to do, and which cedants a reinsurer should worry about.",
-                  body, "home", og_title="Marion Peter, actuarial analyst")
+                  body, "home", og_title=f"Marion Peter, {ROLE}")
 
 
 def kenya_series():
@@ -689,10 +831,7 @@ def about():
         ("2025", "Software Engineering Certificate", "Moringa School"),
         ("2023", "BSc Actuarial Science", "Strathmore University"),
     ]
-    rec = [
-        ("2026", "Second runners-up, Kenya Re 3rd AI4 Hackathon", "Catastrophe modelling"),
-        ("2025", "Top 5 nationally, Kenya Re National Hackathon", "A decision support tool for triaging facultative reinsurance submissions"),
-    ]
+    rec = HACKATHONS
     rows = lambda items: "".join(f'<div class="role"><div class="when">{w}</div><div class="what"><h3>{t}</h3><p class="small" style="font-size:15px">{d}</p></div></div>' for w, t, d in items)
     prods = load_products()
     built = ""
@@ -702,7 +841,7 @@ def about():
     body = f"""<section aria-labelledby="h1">
 <span class="eyebrow">About</span>
 <h1 id="h1">Marion Peter</h1>
-<p class="lede">Actuarial analyst in Nairobi. I studied actuarial science at Strathmore, worked in data, pricing and reserving roles in Kenya and Mauritius, and am now completing an MSc in data science. The work I like best starts by checking whether the data can be trusted.</p>
+<p class="lede">{ROLE}. I studied actuarial science at Strathmore, worked in data, pricing and reserving roles in Kenya and Mauritius, and am now completing an MSc in data science. The work I like best starts by checking whether the data can be trusted.</p>
 </section>
 <section aria-labelledby="h-exp">
 <div class="sechead"><span class="eyebrow">Experience</span><h2 id="h-exp">Roles</h2>
@@ -722,14 +861,10 @@ def about():
 <div class="sechead"><span class="eyebrow">Tools</span><h2 id="h-tools">What the work is built with</h2>
 <p>Python (pandas, numpy, chainladder, pytest), Excel, Power BI, pdftotext for regulator PDFs, Git and GitHub Actions.</p></div>
 </section>
-<section aria-labelledby="h-note">
-<div class="sechead"><span class="eyebrow">A note on public data</span><h2 id="h-note">My former employer is in the scorecard</h2></div>
-<p class="note">The <a href="{PAGE['scorecard']}">Kenya Cedant Scorecard</a> grades every Kenyan general insurer from the Insurance Regulatory Authority's public returns, with the same rules for each. That includes MUA Insurance (Kenya), where I worked from 2022 to 2024; in 2025 the scorecard ranks it last of {K['scored_2025']}. Every page on this site uses public data only; no employer data was used.</p>
-</section>
 {contact_block()}"""
     return layout("/about/", "About | Marion Peter",
-                  "Marion Peter, actuarial analyst in Nairobi: reserving, pricing and data roles in Kenya and Mauritius, BSc Actuarial Science, MSc Data Science and Analytics in progress.",
-                  body, "about", og_title="Marion Peter, actuarial analyst")
+                  f"Marion Peter, {ROLE}: reserving, pricing and data roles in Kenya and Mauritius, BSc Actuarial Science, MSc Data Science and Analytics in progress.",
+                  body, "about", og_title=f"Marion Peter, {ROLE}")
 
 
 def not_found():

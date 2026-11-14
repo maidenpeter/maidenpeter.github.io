@@ -5,7 +5,7 @@
 Needs Python Playwright and a local Chrome (it uses the installed Chrome, not a downloaded one).
 The share image uses the same chart component and stylesheet as the home page.
 """
-import io, sys, tempfile
+import io, os, sys, tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -17,7 +17,7 @@ from PIL import Image
 ROOT = build.ROOT
 CSS = (ROOT / "assets" / "site.css").as_uri()
 
-OG = f"""<!doctype html><html data-theme="light"><head><meta charset="utf-8">
+OG = f"""<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="{build.FONTS}"><link rel="stylesheet" href="{CSS}">
 <style>
 body{{margin:0;width:1200px;height:630px;overflow:hidden;background:var(--ground)}}
@@ -32,7 +32,7 @@ body{{margin:0;width:1200px;height:630px;overflow:hidden;background:var(--ground
 <div><span class="eyebrow">Kenya general insurance, 2018 to 2025</span>
 <h1>Motor lost {build.ksh(-K['uw_motor'])}. Every other class made {build.ksh(K['uw_other'])}.</h1>
 <p class="lede">Every insurer, every quarter, rebuilt from the regulator's returns and checked {build.n(K['checks'])} times.</p>
-<p class="who">Marion Peter, actuarial analyst, Nairobi</p></div>
+<p class="who">Marion Peter, {build.ROLE}</p></div>
 <div class="panel"><h3>Underwriting result by class, KSh bn</h3>{build.class_chart()}</div>
 </div></body></html>"""
 
@@ -43,8 +43,13 @@ ICON = f"""<!doctype html><html><head><style>html,body{{margin:0;background:tran
 def main():
     tmp = Path(tempfile.mkdtemp())
     with sync_playwright() as p:
-        b = p.chromium.launch(channel="chrome")
-        pg = b.new_page(viewport={"width": 1200, "height": 630})
+        b = (p.chromium.launch(executable_path=os.environ["CHROME"]) if os.environ.get("CHROME")
+             else p.chromium.launch(channel="chrome"))
+        ctx = b.new_context(viewport={"width": 1200, "height": 630})
+        if os.environ.get("FONTS_DIR"):
+            from screenshots import local_fonts
+            local_fonts(ctx, Path(os.environ["FONTS_DIR"]))
+        pg = ctx.new_page()
         (tmp / "og.html").write_text(OG, encoding="utf-8")
         pg.goto((tmp / "og.html").as_uri())
         pg.wait_for_load_state("networkidle")

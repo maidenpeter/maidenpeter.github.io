@@ -7,8 +7,7 @@
 <meta name="description" content="A dealer group&#x27;s revenue counted the same money twice. Finding it before answering the brief on growth and margin.">
 <link rel="canonical" href="https://maidenpeter.github.io/work/dealer-revenue/">
 <meta name="author" content="Marion Peter">
-<meta name="theme-color" content="#f4f6f3" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#10161c" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#0f1b2d">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Marion Peter">
 <meta property="og:title" content="Revenue was being reported 61% higher than it was earned">
@@ -31,8 +30,8 @@
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-head"><div class="wrap">
-<a class="brand" href="/">Marion Peter<span>Actuarial analyst, Nairobi</span></a>
-<nav class="main" aria-label="Main"><a href="/#work">Work</a><a href="/kenya-insurance/">Kenya series</a><a href="/about/">About</a><a href="/#contact">Contact</a><button class="theme" type="button" hidden>Dark theme</button></nav>
+<a class="brand" href="/">Marion Peter<span>Actuarial Engineer</span></a>
+<nav class="main" aria-label="Main"><a href="/#work">Work</a><a href="/#apps">Apps</a><a href="/kenya-insurance/">Kenya series</a><a href="/about/">About</a><a href="/#contact">Contact</a><button class="theme" type="button" hidden>Paper theme</button></nav>
 </div></header>
 <main id="main" class="wrap">
 <section aria-labelledby="h1">
@@ -87,12 +86,12 @@
 </section>
 </main>
 <footer class="site-foot"><div class="wrap">
-<p>Marion Peter, Nairobi. Everything on this site uses public data or anonymised work; no employer data is used. Kenya figures come from the Insurance Regulatory Authority's quarterly returns, which are unaudited.</p>
+<p>Marion Peter, Actuarial Engineer. Everything on this site uses public data or anonymised work; no employer data is used. Kenya figures come from the Insurance Regulatory Authority's quarterly returns, which are unaudited.</p>
 <p><a href="https://github.com/maidenpeter/maidenpeter.github.io">Source for this site</a> &nbsp; <a href="https://github.com/maidenpeter">GitHub</a> &nbsp; <a href="mailto:marionpeter@nuruops.com">Email</a></p>
 </div></footer>
 <script>(function(){var b=document.querySelector('.theme');if(!b)return;var d=document.documentElement;
-function cur(){return d.getAttribute('data-theme')||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
-function lab(){var c=cur();b.textContent=c==='dark'?'Light theme':'Dark theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'light':'dark')+' theme')}
+function cur(){return d.getAttribute('data-theme')||'dark'}
+function lab(){var c=cur();b.textContent=c==='dark'?'Paper theme':'Ink theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'light':'dark')+' theme')}
 b.hidden=false;b.addEventListener('click',function(){var x=cur()==='dark'?'light':'dark';d.setAttribute('data-theme',x);try{localStorage.setItem('mp-theme',x)}catch(e){}lab()});lab()})();</script>
 </body>
 </html>
