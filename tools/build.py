@@ -67,38 +67,53 @@ def ksh(v):
 
 
 # ----------------------------------------------------------------- layout
-# (href, label, section the link belongs to, home page sections that light it up while scrolling)
-NAV = [("/kenya-insurance/", "Kenya series", "kenya", "work signals"), ("/#cases", "Case studies", "work", "cases"),
-       ("/#apps", "Apps", None, "apps products"), ("/about/", "About", "about", ""),
-       ("/#contact", "Contact", None, "contact")]
+# (href, label, short label for the rail and phone bar, icon, section the link belongs to,
+#  home page sections that light it up while scrolling)
+NAV = [("/", "Home", "Home", "home", "home", ""),
+       ("/kenya-insurance/", "Kenya series", "Kenya", "chart", "kenya", "work signals"),
+       ("/#cases", "Case studies", "Cases", "doc", "work", "cases"),
+       ("/#apps", "Apps", "Apps", "grid", None, "apps products"),
+       ("/about/", "About", "About", "person", "about", ""),
+       ("/#contact", "Contact", "Contact", "mail", None, "contact")]
 
-THEME_HEAD = ("<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('mp-theme');"
+# Line icons on a 24px grid, drawn in the text colour so they follow both themes.
+ICONS = {
+    "home": "M3.5 10.5 12 3.5l8.5 7M6 9v11.5h4.5V15h3v5.5H18V9",
+    "chart": "M3.5 20.5h17M7 17v-5M12 17V6.5M17 17V9.5",
+    "doc": "M6 3.5h8l4 4v13H6zM14 3.5v4h4M9 12h6M9 15.5h6",
+    "grid": "M4 4h6.5v6.5H4zM13.5 4H20v6.5h-6.5zM4 13.5h6.5V20H4zM13.5 13.5H20V20h-6.5z",
+    "person": "M12 11.5a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5zM4.5 20.5c.6-3.9 3.6-6 7.5-6s6.9 2.1 7.5 6",
+    "mail": "M3.5 5.5h17v13h-17zM3.5 6.5l8.5 6.5 8.5-6.5",
+    "code": "M8.5 7 3.5 12l5 5M15.5 7l5 5-5 5M13.5 4.5l-3 15",
+    "theme": "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17z",
+}
+
+
+def icon(name):
+    fill = '<path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" stroke="none"/>' if name == "theme" else ""
+    return (f'<svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" fill="none" '
+            f'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'
+            f'<path d="{ICONS[name]}"/>{fill}</svg>')
+
+
+THEME_HEAD = ("<script>try{var t=localStorage.getItem('mp-theme');"
               "if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>")
-# Sticky header: keeps anchor targets clear of it, opens and closes the phone menu,
-# and on the home page underlines the nav item for the section being read.
-NAV_JS = """<script>(function(){var d=document.documentElement,h=document.querySelector('.site-head');if(!h)return;
-var m=h.querySelector('.menu'),nav=h.querySelector('nav.main'),wide=window.matchMedia('(min-width:861px)');
-function open(){return h.classList.contains('open')}
-function size(){if(!open())d.style.setProperty('--head-h',h.offsetHeight+'px')}
-function set(o){h.classList.toggle('open',o);m.setAttribute('aria-expanded',o?'true':'false');m.textContent=o?'Close':'Menu'}
-if(m){m.addEventListener('click',function(){set(!open())});
-nav.addEventListener('click',function(e){if(e.target.closest('a'))set(false)});
-document.addEventListener('click',function(e){if(open()&&!h.contains(e.target))set(false)});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'&&open()){set(false);m.focus()}});}
+# On the home page, mark the nav item for the section being read. Home keeps its mark only
+# while no other item has it (the hero and the strip of figures above the first section).
+NAV_JS = """<script>(function(){var d=document.documentElement,nav=document.querySelector('nav.main');if(!nav)return;
 var home=location.pathname==='/'||location.pathname==='/index.html',
 secs=home?[].slice.call(document.querySelectorAll('main section[id]')):[],
-links=[].slice.call(nav.querySelectorAll('a[data-spy]'));
-function spy(){h.classList.toggle('stuck',window.scrollY>4);if(!secs.length)return;
-var y=parseFloat(getComputedStyle(d).getPropertyValue('--head-h'))+60,cur='';
+links=[].slice.call(nav.querySelectorAll('a[data-spy]'));if(!secs.length)return;
+function spy(){var y=window.innerHeight*0.3,cur='',any=false;
 for(var i=0;i<secs.length;i++)if(secs[i].getBoundingClientRect().top<=y)cur=secs[i].id;
 if(window.innerHeight+window.scrollY>=d.scrollHeight-2)cur=secs[secs.length-1].id;
-links.forEach(function(a){a.classList.toggle('here',!!cur&&a.getAttribute('data-spy').split(' ').indexOf(cur)>-1)})}
+links.forEach(function(a){var on=!!cur&&a.getAttribute('data-spy').split(' ').indexOf(cur)>-1;a.classList.toggle('here',on);if(on)any=true});
+nav.classList.toggle('spying',any)}
 var q=0;window.addEventListener('scroll',function(){if(!q)q=requestAnimationFrame(function(){q=0;spy()})},{passive:true});
-window.addEventListener('resize',function(){if(m&&wide.matches&&open())set(false);size();spy()});
-if(window.ResizeObserver)new ResizeObserver(size).observe(h);size();spy()})();</script>"""
-THEME_JS = """<script>(function(){var b=document.querySelector('.theme');if(!b)return;var d=document.documentElement;
+window.addEventListener('resize',spy);spy()})();</script>"""
+THEME_JS = """<script>(function(){var b=document.querySelector('.theme');if(!b)return;var d=document.documentElement,l=b.querySelector('.l');
 function cur(){return d.getAttribute('data-theme')||'dark'}
-function lab(){var c=cur();b.textContent=c==='dark'?'Paper theme':'Ink theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'light':'dark')+' theme')}
+function lab(){var c=cur();l.textContent=c==='dark'?'Paper theme':'Ink theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'light':'dark')+' theme')}
 b.hidden=false;b.addEventListener('click',function(){var x=cur()==='dark'?'light':'dark';d.setAttribute('data-theme',x);try{localStorage.setItem('mp-theme',x)}catch(e){}lab()});lab()})();</script>"""
 
 
@@ -111,7 +126,8 @@ def layout(path, title, desc, body, section=None, og_title=None):
         if h == path:
             return CUR
         return ' aria-current="true"' if s and s == section else ""
-    nav = "".join(f'<a href="{h}"{cur(h, s)} data-spy="{spy}">{t}</a>' for h, t, s, spy in NAV)
+    nav = "".join(f'<a href="{h}"{cur(h, s)} data-spy="{spy}">{icon(ic)}<span class="l">{t}</span><span class="s">{st}</span></a>'
+                  for h, t, st, ic, s, spy in NAV)
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -143,11 +159,11 @@ def layout(path, title, desc, body, section=None, og_title=None):
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-head"><div class="wrap">
-<a class="brand" href="/">Marion Peter<span>{ROLE}</span></a>
-<button class="menu" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
-<nav class="main" id="site-nav" aria-label="Main">{nav}<button class="theme" type="button" hidden>Paper theme</button></nav>
-</div></header>
+<header class="site-head">
+<a class="brand" href="/"><i class="mono" aria-hidden="true">MP</i><b class="nm">Marion Peter</b><span>{ROLE}</span></a>
+<nav class="main" aria-label="Main">{nav}</nav>
+<div class="side-foot"><button class="theme" type="button" hidden>{icon("theme")}<span class="l">Paper theme</span></button><a class="gh" href="{GH}">{icon("code")}<span class="l">GitHub</span></a></div>
+</header>
 <main id="main" class="wrap">
 {body}
 </main>

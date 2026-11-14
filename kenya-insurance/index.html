@@ -21,7 +21,7 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('mp-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script>try{var t=localStorage.getItem('mp-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Pinyon+Script&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap">
@@ -29,11 +29,11 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-head"><div class="wrap">
-<a class="brand" href="/">Marion Peter<span>Actuarial Engineer</span></a>
-<button class="menu" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
-<nav class="main" id="site-nav" aria-label="Main"><a href="/kenya-insurance/" aria-current="page" data-spy="work signals">Kenya series</a><a href="/#cases" data-spy="cases">Case studies</a><a href="/#apps" data-spy="apps products">Apps</a><a href="/about/" data-spy="">About</a><a href="/#contact" data-spy="contact">Contact</a><button class="theme" type="button" hidden>Paper theme</button></nav>
-</div></header>
+<header class="site-head">
+<a class="brand" href="/"><i class="mono" aria-hidden="true">MP</i><b class="nm">Marion Peter</b><span>Actuarial Engineer</span></a>
+<nav class="main" aria-label="Main"><a href="/" data-spy=""><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 3.5l8.5 7M6 9v11.5h4.5V15h3v5.5H18V9"/></svg><span class="l">Home</span><span class="s">Home</span></a><a href="/kenya-insurance/" aria-current="page" data-spy="work signals"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5h17M7 17v-5M12 17V6.5M17 17V9.5"/></svg><span class="l">Kenya series</span><span class="s">Kenya</span></a><a href="/#cases" data-spy="cases"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h8l4 4v13H6zM14 3.5v4h4M9 12h6M9 15.5h6"/></svg><span class="l">Case studies</span><span class="s">Cases</span></a><a href="/#apps" data-spy="apps products"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6.5v6.5H4zM13.5 4H20v6.5h-6.5zM4 13.5h6.5V20H4zM13.5 13.5H20V20h-6.5z"/></svg><span class="l">Apps</span><span class="s">Apps</span></a><a href="/about/" data-spy=""><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11.5a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5zM4.5 20.5c.6-3.9 3.6-6 7.5-6s6.9 2.1 7.5 6"/></svg><span class="l">About</span><span class="s">About</span></a><a href="/#contact" data-spy="contact"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 5.5h17v13h-17zM3.5 6.5l8.5 6.5 8.5-6.5"/></svg><span class="l">Contact</span><span class="s">Contact</span></a></nav>
+<div class="side-foot"><button class="theme" type="button" hidden><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17z"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" stroke="none"/></svg><span class="l">Paper theme</span></button><a class="gh" href="https://github.com/maidenpeter"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 7 3.5 12l5 5M15.5 7l5 5-5 5M13.5 4.5l-3 15"/></svg><span class="l">GitHub</span></a></div>
+</header>
 <main id="main" class="wrap">
 <section class="hero" aria-labelledby="h1">
 <div class="hero-text">
@@ -111,29 +111,20 @@
 <p>Marion Peter, Actuarial Engineer. Everything on this site uses public data or anonymised work; no employer data is used. Kenya figures come from the Insurance Regulatory Authority's quarterly returns, which are unaudited.</p>
 <p><a href="https://github.com/maidenpeter/maidenpeter.github.io">Source for this site</a> &nbsp; <a href="https://github.com/maidenpeter">GitHub</a> &nbsp; <a href="mailto:marionpeter@nuruops.com">Email</a></p>
 </div></footer>
-<script>(function(){var b=document.querySelector('.theme');if(!b)return;var d=document.documentElement;
+<script>(function(){var b=document.querySelector('.theme');if(!b)return;var d=document.documentElement,l=b.querySelector('.l');
 function cur(){return d.getAttribute('data-theme')||'dark'}
-function lab(){var c=cur();b.textContent=c==='dark'?'Paper theme':'Ink theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'light':'dark')+' theme')}
+function lab(){var c=cur();l.textContent=c==='dark'?'Paper theme':'Ink theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'light':'dark')+' theme')}
 b.hidden=false;b.addEventListener('click',function(){var x=cur()==='dark'?'light':'dark';d.setAttribute('data-theme',x);try{localStorage.setItem('mp-theme',x)}catch(e){}lab()});lab()})();</script>
-<script>(function(){var d=document.documentElement,h=document.querySelector('.site-head');if(!h)return;
-var m=h.querySelector('.menu'),nav=h.querySelector('nav.main'),wide=window.matchMedia('(min-width:861px)');
-function open(){return h.classList.contains('open')}
-function size(){if(!open())d.style.setProperty('--head-h',h.offsetHeight+'px')}
-function set(o){h.classList.toggle('open',o);m.setAttribute('aria-expanded',o?'true':'false');m.textContent=o?'Close':'Menu'}
-if(m){m.addEventListener('click',function(){set(!open())});
-nav.addEventListener('click',function(e){if(e.target.closest('a'))set(false)});
-document.addEventListener('click',function(e){if(open()&&!h.contains(e.target))set(false)});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'&&open()){set(false);m.focus()}});}
+<script>(function(){var d=document.documentElement,nav=document.querySelector('nav.main');if(!nav)return;
 var home=location.pathname==='/'||location.pathname==='/index.html',
 secs=home?[].slice.call(document.querySelectorAll('main section[id]')):[],
-links=[].slice.call(nav.querySelectorAll('a[data-spy]'));
-function spy(){h.classList.toggle('stuck',window.scrollY>4);if(!secs.length)return;
-var y=parseFloat(getComputedStyle(d).getPropertyValue('--head-h'))+60,cur='';
+links=[].slice.call(nav.querySelectorAll('a[data-spy]'));if(!secs.length)return;
+function spy(){var y=window.innerHeight*0.3,cur='',any=false;
 for(var i=0;i<secs.length;i++)if(secs[i].getBoundingClientRect().top<=y)cur=secs[i].id;
 if(window.innerHeight+window.scrollY>=d.scrollHeight-2)cur=secs[secs.length-1].id;
-links.forEach(function(a){a.classList.toggle('here',!!cur&&a.getAttribute('data-spy').split(' ').indexOf(cur)>-1)})}
+links.forEach(function(a){var on=!!cur&&a.getAttribute('data-spy').split(' ').indexOf(cur)>-1;a.classList.toggle('here',on);if(on)any=true});
+nav.classList.toggle('spying',any)}
 var q=0;window.addEventListener('scroll',function(){if(!q)q=requestAnimationFrame(function(){q=0;spy()})},{passive:true});
-window.addEventListener('resize',function(){if(m&&wide.matches&&open())set(false);size();spy()});
-if(window.ResizeObserver)new ResizeObserver(size).observe(h);size();spy()})();</script>
+window.addEventListener('resize',spy);spy()})();</script>
 </body>
 </html>
