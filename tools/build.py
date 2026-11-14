@@ -12,14 +12,16 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from figures import (KENYA as K, CLASS_RESULTS, BACKTEST, DEALER as D, IFRS17 as I, IFRS17_LINES,
-                     BACKTEST_AE, CREDIBILITY, AUCTIONS as A, AUCTION_DECILES, APPS as AP, IPL_URL, HACKATHONS)
+                     BACKTEST_AE, CREDIBILITY, AUCTIONS as A, AUCTION_DECILES, APPS as AP, IPL_URL, HIL_URL, HACKATHONS)
+from nav import nav_html, series_html, NAV_JS, NAV_CSS, THEME_HEAD, ROLE
+from kenya_story import story
+import case_viz
 
 ROOT = Path(__file__).resolve().parent.parent
 BASE = "https://maidenpeter.github.io"   # change to https://marionpeter.nuruops.com once the custom domain is live
 GH = "https://github.com/maidenpeter"
 SITE_REPO = f"{GH}/maidenpeter.github.io"
 EMAIL = "marionpeter@nuruops.com"
-ROLE = "Actuarial Engineer"
 LINKEDIN = "https://www.linkedin.com/in/marion-peter"
 FONTS = ("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400"
          "&family=IBM+Plex+Sans+Condensed:wght@400;500;600"
@@ -67,67 +69,8 @@ def ksh(v):
 
 
 # ----------------------------------------------------------------- layout
-# (href, label, short label for the rail and phone bar, icon, section the link belongs to,
-#  home page sections that light it up while scrolling)
-NAV = [("/", "Home", "Home", "home", "home", ""),
-       ("/kenya-insurance/", "Kenya series", "Kenya", "chart", "kenya", "work signals"),
-       ("/#cases", "Case studies", "Cases", "doc", "work", "cases"),
-       ("/#apps", "Apps", "Apps", "grid", None, "apps products"),
-       ("/about/", "About", "About", "person", "about", ""),
-       ("/#contact", "Contact", "Contact", "mail", None, "contact")]
-
-# Line icons on a 24px grid, drawn in the text colour so they follow both themes.
-ICONS = {
-    "home": "M3.5 10.5 12 3.5l8.5 7M6 9v11.5h4.5V15h3v5.5H18V9",
-    "chart": "M3.5 20.5h17M7 17v-5M12 17V6.5M17 17V9.5",
-    "doc": "M6 3.5h8l4 4v13H6zM14 3.5v4h4M9 12h6M9 15.5h6",
-    "grid": "M4 4h6.5v6.5H4zM13.5 4H20v6.5h-6.5zM4 13.5h6.5V20H4zM13.5 13.5H20V20h-6.5z",
-    "person": "M12 11.5a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5zM4.5 20.5c.6-3.9 3.6-6 7.5-6s6.9 2.1 7.5 6",
-    "mail": "M3.5 5.5h17v13h-17zM3.5 6.5l8.5 6.5 8.5-6.5",
-    "code": "M8.5 7 3.5 12l5 5M15.5 7l5 5-5 5M13.5 4.5l-3 15",
-    "theme": "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17z",
-}
-
-
-def icon(name):
-    fill = '<path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" stroke="none"/>' if name == "theme" else ""
-    return (f'<svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" fill="none" '
-            f'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'
-            f'<path d="{ICONS[name]}"/>{fill}</svg>')
-
-
-THEME_HEAD = ("<script>try{var t=localStorage.getItem('mp-theme');"
-              "if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>")
-# On the home page, mark the nav item for the section being read. Home keeps its mark only
-# while no other item has it (the hero and the strip of figures above the first section).
-NAV_JS = """<script>(function(){var d=document.documentElement,nav=document.querySelector('nav.main');if(!nav)return;
-var home=location.pathname==='/'||location.pathname==='/index.html',
-secs=home?[].slice.call(document.querySelectorAll('main section[id]')):[],
-links=[].slice.call(nav.querySelectorAll('a[data-spy]'));if(!secs.length)return;
-function spy(){var y=window.innerHeight*0.3,cur='',any=false;
-for(var i=0;i<secs.length;i++)if(secs[i].getBoundingClientRect().top<=y)cur=secs[i].id;
-if(window.innerHeight+window.scrollY>=d.scrollHeight-2)cur=secs[secs.length-1].id;
-links.forEach(function(a){var on=!!cur&&a.getAttribute('data-spy').split(' ').indexOf(cur)>-1;a.classList.toggle('here',on);if(on)any=true});
-nav.classList.toggle('spying',any)}
-var q=0;window.addEventListener('scroll',function(){if(!q)q=requestAnimationFrame(function(){q=0;spy()})},{passive:true});
-window.addEventListener('resize',spy);spy()})();</script>"""
-THEME_JS = """<script>(function(){var b=document.querySelector('.theme');if(!b)return;var d=document.documentElement,l=b.querySelector('.l');
-function cur(){return d.getAttribute('data-theme')||'dark'}
-function lab(){var c=cur();l.textContent=c==='dark'?'Paper theme':'Ink theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'light':'dark')+' theme')}
-b.hidden=false;b.addEventListener('click',function(){var x=cur()==='dark'?'light':'dark';d.setAttribute('data-theme',x);try{localStorage.setItem('mp-theme',x)}catch(e){}lab()});lab()})();</script>"""
-
-
-CUR = ' aria-current="page"'
-
-
-def layout(path, title, desc, body, section=None, og_title=None):
+def layout(path, title, desc, body, section=None, og_title=None, up="/", series=None):
     url = BASE + path
-    def cur(h, s):
-        if h == path:
-            return CUR
-        return ' aria-current="true"' if s and s == section else ""
-    nav = "".join(f'<a href="{h}"{cur(h, s)} data-spy="{spy}">{icon(ic)}<span class="l">{t}</span><span class="s">{st}</span></a>'
-                  for h, t, st, ic, s, spy in NAV)
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -146,7 +89,7 @@ def layout(path, title, desc, body, section=None, og_title=None):
 <meta property="og:image" content="{BASE}/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Kenya general insurance underwriting result by class, 2018 to 2025: motor KSh -52.6bn, every other class together KSh +19.6bn.">
+<meta property="og:image:alt" content="Kenya general insurance underwriting result by class, 2018 to 2025: motor {ksh(K['uw_motor'])}, every other class together KSh {d1(K['uw_other'])}bn.">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
@@ -156,22 +99,20 @@ def layout(path, title, desc, body, section=None, og_title=None):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{FONTS}">
 <link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/nav.css">
+<link rel="stylesheet" href="/assets/viz.css">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-head">
-<a class="brand" href="/"><i class="mono" aria-hidden="true">MP</i><b class="nm">Marion Peter</b><span>{ROLE}</span></a>
-<nav class="main" aria-label="Main">{nav}</nav>
-<div class="side-foot"><button class="theme" type="button" hidden>{icon("theme")}<span class="l">Paper theme</span></button><a class="gh" href="{GH}">{icon("code")}<span class="l">GitHub</span></a></div>
-</header>
+{nav_html(path, section, up=up)}
+{series_html(series) if series is not None else ''}
 <main id="main" class="wrap">
 {body}
 </main>
 <footer class="site-foot"><div class="wrap">
-<p>Marion Peter, {ROLE}. Everything on this site uses public data or anonymised work; no employer data is used. Kenya figures come from the Insurance Regulatory Authority's quarterly returns, which are unaudited.</p>
-<p><a href="{SITE_REPO}">Source for this site</a> &nbsp; <a href="{GH}">GitHub</a> &nbsp; <a href="mailto:{EMAIL}">Email</a></p>
+<p>Marion Peter, {esc(ROLE)}. Everything on this site uses public data or anonymised work; no employer data is used. Kenya figures come from the Insurance Regulatory Authority's quarterly returns, which are unaudited.</p>
+<p><a href="mailto:{EMAIL}">Email</a></p>
 </div></footer>
-{THEME_JS}
 {NAV_JS}
 </body>
 </html>
@@ -220,20 +161,85 @@ def proof_strip():
         (str(K["companies"]), "insurers and reinsurers, every one, on stable ids"),
         (n(K["checks"]), "consistency checks, none unexplained"),
         (f'{K["pdf_match"]} of {K["pdf_total"]}', "figures match IRA's own PDF releases"),
-        ("3 repos", "public code, tests run on every push"),
+        ("Python", "with pandas, numpy and openpyxl; every table tested"),
     ]
     return '<section class="proof" aria-label="The data in numbers">' + "".join(
         f"<div><b>{b}</b><span>{s}</span></div>" for b, s in cells) + "</section>"
 
 
-def work_card(tag, title, finding, data, method, page, code, code_label):
-    return f"""<article class="card">
+def thumb(shot, href=None, pop=None, label=""):
+    """A framed screenshot at the top of a card. With href it opens the page (the card's own link
+    names it, so this one is hidden from screen readers); with pop it opens the card's pop-out."""
+    src = shot if shot.startswith("/") else f"/assets/shots/{shot}.webp"
+    img = f'<img src="{src}" alt="" width="960" height="600" loading="lazy" decoding="async">'
+    if pop:
+        return f'<button class="thumb" type="button" popovertarget="{pop}" aria-label="More about {esc(label)}">{img}<span class="cue">More</span></button>'
+    return f'<a class="thumb" href="{href}" tabindex="-1" aria-hidden="true">{img}<span class="cue">Open</span></a>'
+
+
+def popout(pid, title, tag, body, img, alt):
+    """An explanation that opens over the page, for work with no public link yet. Uses the popover
+    attribute, so it opens, closes on Esc and closes on a click outside without any script."""
+    return f"""<div class="pop" id="{pid}" popover role="dialog" aria-label="{esc(title)}">
+<button class="pop-x" type="button" popovertarget="{pid}" popovertargetaction="hide" aria-label="Close" autofocus>&#215;</button>
+<figure><img src="{img}" alt="" width="1280" height="800" loading="lazy" decoding="async"><figcaption>{esc(alt)}</figcaption></figure>
+<div class="pop-body"><span class="tag">{tag}</span><h3>{esc(title)}</h3>{body}
+<p class="small">No public link yet. Ask me for a walk-through: <a href="#contact">get in touch</a>.</p></div>
+</div>"""
+
+
+PRODUCT_KEYS = {"AgroShield": ("agroshield", "Parametric crop insurance, pricing"),
+                "Mapema": ("mapema", "Drought early warning, forecasting"),
+                "Matchday Model": ("matchday", "Sports statistics, Dixon-Coles model")}
+
+
+def product_card(name):
+    p = next(x for x in load_products() if x["name"] == name)
+    key, tag = PRODUCT_KEYS[name]
+    img = f"/assets/products/{p['image']}"
+    first = p["line"].split(". ")[0].rstrip(".") + "."
+    return f"""<article class="card" id="{key}">
+{thumb(img, pop="pop-" + key, label=name)}
+<span class="badge">No public link yet</span>
 <span class="tag">{tag}</span>
+<h3>{esc(name)}</h3>
+<p class="find">{esc(first)}</p>
+<div class="links"><button class="linkish" type="button" popovertarget="pop-{key}" aria-label="Read more about {esc(name)}">Read more</button></div>
+{popout("pop-" + key, name, tag, f"<p>{esc(p['line'])}</p>", img, p["alt"])}
+</article>"""
+
+
+CASE_SHOT = {"dealer-revenue": "dealer", "ifrs17-measurement": "ifrs17", "valuation-adequacy": "valuation"}
+CASE_PART = {"dealer-revenue": ("data", "/#data-more", "I", "Data analysis"),
+             "ifrs17-measurement": ("actuarial", "/#actuarial-cases", "II", "Actuarial analysis"),
+             "valuation-adequacy": ("actuarial", "/#actuarial-cases", "II", "Actuarial analysis")}
+
+
+def case_card(slug):
+    c = next(x for x in CASES if x["slug"] == slug)
+    href = f"/work/{slug}/"
+    return f"""<article class="card">
+{thumb(CASE_SHOT[slug], href)}<span class="tag">{c['tag']}</span>
+<h3><a class="plain" href="{href}">{c['title']}</a></h3>
+<dl class="meta"><dt>Data</dt><dd>{c['data']}</dd><dt>Method</dt><dd>{c['method']}</dd></dl>
+<div class="links"><a href="{href}">Read the case study</a></div>
+</article>"""
+
+
+def work_card(tag, title, finding, data, method, page, tools, shot=None):
+    return f"""<article class="card">
+{thumb(shot, page) if shot else ""}<span class="tag">{tag}</span>
 <h3>{title}</h3>
 <p class="find">{finding}</p>
-<dl class="meta"><dt>Data</dt><dd>{data}</dd><dt>Method</dt><dd>{method}</dd></dl>
-<div class="links"><a href="{page}">Open the page</a><a href="{code}">Code: {code_label}</a></div>
+<dl class="meta"><dt>Data</dt><dd>{data}</dd><dt>Method</dt><dd>{method}</dd><dt>Tools</dt><dd>{tools}</dd></dl>
+<div class="links"><a href="{page}">Open the page</a></div>
 </article>"""
+
+
+# What each Kenya repo is built with (its imports and tests), shown in place of code links
+TOOLS = dict(data="Python, pandas, numpy and openpyxl; every processed table tested with pytest",
+             insurance="Python, pandas and numpy; class totals tested against IRA's PDF releases with pytest",
+             reinsurance="Python, pandas and numpy; the scoring rules tested with pytest")
 
 
 def kenya_cards():
@@ -241,27 +247,27 @@ def kenya_cards():
         work_card("Profitability", "Kenya Insurance Loss Map",
                   f"Motor lost <b>{ksh(-K['uw_motor'])}</b> on underwriting from 2018 to 2025, in every one of the eight years. "
                   f"On 2023 to 2025 experience, motor commercial premiums would need to rise <b>{d1(K['rate_mc'], False)}%</b> to break even.",
-                  "IRA quarterly returns, full years 2018 to 2025, 14 classes, every general insurer.",
+                  f"IRA quarterly returns, full years 2018 to 2025, {len(CLASS_RESULTS)} classes, every general insurer.",
                   "Class results by year; break-even rate change by the loss ratio method; Fisher's exact test on motor books that look too good.",
-                  PAGE["lossmap"], CODE["insurance"], "ira-kenya-insurance"),
+                  PAGE["lossmap"], TOOLS["insurance"], shot="lossmap"),
         work_card("Reinsurance", "Kenya Cedant Scorecard",
                   f"Every insurer graded A to E each year the way a reinsurer screens a cedant. <b>{K['bt_bottom']} of the {K['bt_total']}</b> insurers placed under "
                   "statutory management or liquidation since 2022 were in the bottom fifth a year before the regulator acted.",
                   "IRA balance sheets, revenue accounts and return-quality flags, 2016 to 2025.",
                   "Peer percentiles on four pillars (balance sheet, operations, business profile, return quality), a capital cap, a back-test and weight sensitivity.",
-                  PAGE["scorecard"], CODE["reinsurance"], "ira-kenya-reinsurance"),
+                  PAGE["scorecard"], TOOLS["reinsurance"], shot="scorecard"),
         work_card("Market structure", "Kenya Insurance Market Structure",
                   f"In 2020, {w(K['over10_2020'])} insurers wrote over KSh 10bn a year and held {K['share10_2020']}% of the market. By 2025, <b>{w(K['over10_2025'])}</b> did, "
                   f"holding {K['share10_2025']}%. The {w(K['losing_n'])} insurers losing share ran a median combined ratio of <b>{d1(K['median_cr_losing'], False)}%</b>.",
                   "Written premium and results for every general insurer, 2016 to 2025, pro forma for mergers.",
                   "Herfindahl-Hirschman index, share shifts, growth against combined ratio, and expense rates measured class for class against the five largest insurers.",
-                  PAGE["structure"], CODE["insurance"], "ira-kenya-insurance"),
+                  PAGE["structure"], TOOLS["insurance"], shot="structure"),
         work_card("Data", "Kenya Insurer Explorer",
                   f"Any insurer, any year: premium, ratios, single quarters, class mix, balance sheet and every return-quality flag, "
                   f"including the <b>{K['error_returns']} returns</b> that add up on their own but cannot be right.",
                   f"{n(K['revenue_rows'])} revenue-account rows and {n(K['class_rows'])} class rows from {K['files']} IRA files catalogued back to {K['first_year']}.",
                   f"Extraction from shifting workbook layouts, a name crosswalk across renames and mergers, single quarters from year-to-date figures, {n(K['checks'])} checks.",
-                  PAGE["explorer"], CODE["data"], "ira-kenya-data"),
+                  PAGE["explorer"], TOOLS["data"], shot="explorer"),
     ])
 
 
@@ -323,7 +329,6 @@ def contact_block(heading="Get in touch", hid="h-contact", num=None):
 <ul>
 <li><a href="mailto:{EMAIL}"><span>Email</span><b>{EMAIL}</b></a></li>
 <li><a href="{LINKEDIN}"><span>LinkedIn</span><b>in/marion-peter</b></a></li>
-<li><a href="{GH}"><span>GitHub</span><b>github.com/maidenpeter</b></a></li>
 </ul>
 </section>"""
 
@@ -423,37 +428,34 @@ def triangle_panel():
 </figure>"""
 
 
-def contents(items):
-    return '<nav aria-label="Contents"><ol class="contents">' + "".join(
-        f'<li><a href="#{a}"><i>{i:02d}</i>{t}</a></li>' for i, (a, t) in enumerate(items, 1)) + "</ol></nav>"
-
-
 def eb(num, text):
-    return f'<span class="eyebrow"><i>{num:02d}</i>{text}</span>'
+    num = f"{num:02d}" if isinstance(num, int) else num
+    return f'<span class="eyebrow"><i>{num}</i>{text}</span>'
 
 
 def apps_section(num):
     a = AP
-    hil = f"""<article class="card">
-<span class="badge">Live link to follow</span>
+    hil = f"""<article class="card" id="hil">
+{thumb("hil", HIL_URL)}<span class="badge live">Live</span>
 <span class="tag">Health reserving, R and Shiny</span>
 <h3>Health IBNR Lab</h3>
 <p class="find">A synthetic medical book of {n(a['hil_claims'])} claims. Best estimate outstanding KES {n(a['hil_be_kes'])}, Mack CV {d1(a['hil_cv'], False)}%. Then the test that matters: <b>a {a['hil_backlog_months']}-month, {a['hil_backlog_pct']}% payment slowdown makes chain ladder under-reserve by {d1(a['hil_backlog_err_pct'], False)}%</b>.</p>
-<dl class="meta"><dt>Method</dt><dd>Paid and received triangles, chain ladder, Mack, Bornhuetter-Ferguson, an ODP bootstrap and an IFRS 17 liability for incurred claims view.</dd><dt>Data</dt><dd>Seeded synthetic portfolio. Illustrative only.</dd></dl>
+<dl class="meta"><dt>Method</dt><dd>Paid and received triangles, chain ladder, Mack, Bornhuetter-Ferguson, an ODP bootstrap and an IFRS 17 liability for incurred claims view.</dd><dt>Data</dt><dd>Seeded synthetic portfolio. Illustrative only.</dd><dt>Built with</dt><dd>R, Shiny, bslib and ChainLadder.</dd></dl>
+<div class="links"><a href="{HIL_URL}">Open the app</a></div>
 </article>"""
-    ipl = f"""<article class="card">
-<span class="badge live">Live</span>
+    ipl = f"""<article class="card" id="ipl">
+{thumb("ipl", IPL_URL)}<span class="badge live">Live</span>
 <span class="tag">Health product design, SQL, Python and R</span>
 <h3>Instalment Persistency Lab</h3>
 <p class="find">Pay-as-you-go health cover on a synthetic book of {n(a['ipl_policies'])} policies. {d1(a['ipl_inforce_10'], False)}% are still in force after the 10th instalment, and members who lapse are paid <b>KES {a['ipl_lapsed_ratio']:.2f} in claims for every KES 1</b> they paid in, against KES {a['ipl_stayed_ratio']:.2f} for members who stay.</p>
-<dl class="meta"><dt>Method</dt><dd>Decrement tables in SQL (DuckDB), survival checks in R, an early warning model and a product levers simulator.</dd><dt>Data</dt><dd>Seeded synthetic portfolio. Illustrative only.</dd></dl>
-<div class="links"><a href="{IPL_URL}">Open the app</a><a href="{GH}/instalment-persistency-lab">Code: instalment-persistency-lab</a></div>
+<dl class="meta"><dt>Method</dt><dd>Decrement tables in SQL (DuckDB), survival checks in R, an early warning model and a product levers simulator.</dd><dt>Data</dt><dd>Seeded synthetic portfolio. Illustrative only.</dd><dt>Built with</dt><dd>DuckDB, Python, R and Streamlit.</dd></dl>
+<div class="links"><a href="{IPL_URL}">Open the app</a></div>
 </article>"""
     return f"""<section id="apps" aria-labelledby="h-apps">
-<div class="sechead">{eb(num, "Apps")}
+<div class="sechead">{eb(num, "Apps and pricing")}
 <h2 id="h-apps">Reserving and product questions, as tools you can use</h2>
 <p>Built on synthetic books so every number can be published, with the assumptions on the page and tests behind them.</p></div>
-<div class="apps">{hil}{ipl}</div>
+<div class="grid3">{hil}{ipl}{product_card("AgroShield")}</div>
 </section>"""
 
 
@@ -466,49 +468,20 @@ CASES = [
          desc="A dealer group's revenue counted the same money twice. Finding it before answering the brief on growth and margin."),
     dict(slug="ifrs17-measurement", tag="US industry reserves, IFRS 17",
          title="Discounting makes a reserve smaller. On one line, IFRS 17 makes it bigger",
-         data="CAS Loss Reserving Database: NAIC Schedule P paid triangles for six US lines, accident years 1988 to 1997.",
+         data=f"CAS Loss Reserving Database: NAIC Schedule P paid triangles for {w(I['lines'])} US lines, accident years 1988 to 1997.",
          method=f"Chain ladder to the payment pattern, discounting, and a risk adjustment from {n(I['sims'])} over-dispersed Poisson bootstrap simulations, checked against the point estimate first.",
-         desc="US$25.16bn of claims reserves remeasured under IFRS 17: discounting, a bootstrapped risk adjustment, and the one line the standard makes larger."),
+         desc=f"US${I['undisc_bn']}bn of claims reserves remeasured under IFRS 17: discounting, a bootstrapped risk adjustment, and the one line the standard makes larger."),
     dict(slug="valuation-adequacy", tag="US vehicle auctions, valuation adequacy",
          title="An estimate that is unbiased in total and biased in every condition band",
          data=f"{n(A['rows'])} US wholesale auctions with the market's pre-sale estimate and the price paid, 2014 to 2015 (Kaggle).",
          method="Run as a reserve adequacy test: profile every field, check the aggregate, then segment by condition and try to break the result with value, mileage and seller checks.",
-         desc="A reserve adequacy test on 476,882 car auctions: clean in aggregate, biased in every condition band, with 78% of the error cancelling in the total."),
+         desc=f"A reserve adequacy test on {n(A['rows'])} car auctions: clean in aggregate, biased in every condition band, with {A['cancel']}% of the error cancelling in the total."),
 ]
-
-
-def case_rows():
-    out = []
-    for c in CASES:
-        out.append(f"""<article class="case">
-<div class="left"><span class="tag">{c['tag']}</span><h3><a href="/work/{c['slug']}/">{c['title']}</a></h3>
-<a class="more" href="/work/{c['slug']}/">Read the case study</a></div>
-<dl class="meta"><dt>Data</dt><dd>{c['data']}</dd><dt>Method</dt><dd>{c['method']}</dd></dl>
-</article>""")
-    return '<div class="cases">' + "".join(out) + "</div>"
 
 
 def load_products():
     p = ROOT / "tools" / "products.json"
     return json.load(open(p, encoding="utf-8")) if p.exists() else []
-
-
-def products_section(num=None):
-    items = load_products()
-    if not items:
-        return ""
-    figs = []
-    for it in items:
-        link = f' <a href="{it["repo"]}">Code</a>' if it.get("repo") else ""
-        figs.append(f"""<figure class="shot">
-<div class="frame"><img src="/assets/products/{it['image']}" alt="{esc(it['alt'])}" width="1280" height="800" loading="lazy" decoding="async"></div>
-<figcaption><b>{esc(it['name'])}</b><span>{esc(it['line'])}{link}</span></figcaption>
-</figure>""")
-    return f"""<section id="products" aria-labelledby="h-products">
-<div class="sechead">{eb(num, "Products") if num else '<span class="eyebrow">Products</span>'}<h2 id="h-products">Things I have built</h2>
-<p>Products built outside the day job, where pricing and risk meet a real user. Screenshots from each product's own repository; the analysis above is where the checked numbers are.</p></div>
-<div class="shots">{''.join(figs)}</div>
-</section>"""
 
 
 PRINCIPLES = [
@@ -521,17 +494,38 @@ PRINCIPLES = [
 ]
 
 
+PARTS = {
+    "data": ("I", "Data analysis", "Kenya's insurance market rebuilt from the regulator's returns: the loss map, market structure, a cedant scorecard and an insurer explorer. Then a dealer group's revenue audit, a drought forecast and a football model.",
+             [("#work", "Kenya series"), ("#signals", "Reinsurer signals"), ("#data-more", "Audit and models")]),
+    "actuarial": ("II", "Actuarial analysis", "Health IBNR reserving, instalment persistency and parametric crop pricing as working tools, then IFRS 17 measurement and a reserve adequacy test on public US data.",
+                  [("#apps", "Apps and pricing"), ("#actuarial-cases", "Case studies")]),
+}
+
+
+def parts_toc():
+    cards = "".join(f"""<a class="part-card" href="#{k}"><span class="part-num" aria-hidden="true">{num}</span><span class="eyebrow">Part {num}</span><b>{t}</b><span class="part-sum">{d}</span></a>"""
+                    for k, (num, t, d, _) in PARTS.items())
+    return f'<nav class="parts" aria-label="Contents">{cards}</nav>'
+
+
+def part_head(key, num, title, story):
+    chips = "".join(f'<a href="{h}">{t}</a>' for h, t in PARTS[key][3])
+    return f"""<section id="{key}" class="part" aria-labelledby="h-{key}">
+<span class="part-num" aria-hidden="true">{num}</span>
+<div class="part-text"><span class="eyebrow">Part {num}</span><h2 id="h-{key}">{title}</h2><p>{story}</p><p class="part-chips">{chips}</p></div>
+</section>"""
+
+
 def home():
     principles = "".join(f"<li><b>{t}</b><span>{d}</span></li>" for t, d in PRINCIPLES)
     plac = "".join(f"<span><b>{t.split(',')[0]}</b>, {t.split(', ', 1)[1]} {y}</span>" for y, t, _ in HACKATHONS)
-    toc = contents([("work", "Kenya insurance series"), ("signals", "What a reinsurer would act on"), ("apps", "Apps"),
-                    ("cases", "Case studies"), ("products", "Products"), ("method", "How I work"), ("contact", "Contact")])
+    toc = parts_toc()
     body = f"""<section class="hero" aria-labelledby="h1">
 <div class="hero-text">
 <span class="eyebrow">Insurance and reinsurance analysis</span>
 <h1 id="h1">I take messy regulatory data, check it properly and turn it into decisions</h1>
 <p class="lede">From 2022 to 2025 I worked in data, actuarial and reserving roles at an insurance group in Kenya and Mauritius. The work below rebuilds Kenya's general insurance market from the regulator's own returns, checks it {n(K['checks'])} times, and answers the questions an insurer's board or a reinsurer would ask of it.</p>
-<div class="cta"><a class="btn primary" href="#work">See the Kenya series</a><a class="btn quiet" href="{GH}">Code on GitHub</a></div>
+<div class="cta"><a class="btn primary" href="#work">See the Kenya series</a><a class="btn quiet" href="#actuarial">See the actuarial work</a></div>
 <p class="placings">{plac}</p>
 </div>
 {triangle_panel()}
@@ -541,9 +535,11 @@ def home():
 
 {toc}
 
+{part_head("data", "I", "Data analysis", "Start from the source and check it before believing it. Kenya's insurance market rebuilt from the regulator's own returns, a dealer group's ledgers taken apart, and two forecasting products.")}
+
 <section id="work" aria-labelledby="h-work">
 <div class="kenya-head">
-<div class="sechead">{eb(1, "Featured work")}
+<div class="sechead">{eb("I.1", "Featured work")}
 <h2 id="h-work">Kenya insurance series</h2>
 <p>Every general insurer and reinsurer in Kenya, every quarter from Q4 2016 to Q1 2026, extracted from the Insurance Regulatory Authority's statistics and checked against itself. Four pages, one validated dataset, three public repositories.</p>
 <p>Motor lost money in every one of the eight years from 2018 to 2025. Every other class together made {ksh(K['uw_other'])}.</p>
@@ -553,31 +549,38 @@ def home():
 <div class="grid2">{kenya_cards()}</div>
 </section>
 
-{signals(2)}
+{signals("I.2")}
 
-{apps_section(3)}
-
-<section id="cases" aria-labelledby="h-cases">
-<div class="sechead">{eb(4, "Case studies")}
-<h2 id="h-cases">The same standard on other data</h2>
-<p>The first is Kenyan client work, published without client identifiers. The other two use public US data sets with the long claims and price histories the methods need.</p></div>
-{case_rows()}
+<section id="data-more" aria-labelledby="h-data-more">
+<div class="sechead">{eb("I.3", "Audit and models")}
+<h2 id="h-data-more">The same standard on other data</h2>
+<p>A Kenyan client's ledgers, published without client identifiers, and two products that turn data into a forecast someone can act on.</p></div>
+<div class="grid3">{case_card("dealer-revenue")}{product_card("Mapema")}{product_card("Matchday Model")}</div>
 </section>
 
-{products_section(5)}
+{part_head("actuarial", "II", "Actuarial analysis", "Reserves, persistency and pricing, each built on a synthetic book or public industry triangles so every number can be published, then tested until it breaks.")}
+
+{apps_section("II.1")}
+
+<section id="actuarial-cases" aria-labelledby="h-actuarial-cases">
+<div class="sechead">{eb("II.2", "Case studies")}
+<h2 id="h-actuarial-cases">Reserves measured, then tested</h2>
+<p>Two public US data sets with the long claims and price histories the methods need.</p></div>
+<div class="grid2">{case_card("ifrs17-measurement")}{case_card("valuation-adequacy")}</div>
+</section>
 
 <section id="method" aria-labelledby="h-method">
-<div class="sechead">{eb(6, "How I work")}
+<div class="sechead"><span class="eyebrow">How I work</span>
 <h2 id="h-method">A total that balances is the first thing I check</h2>
 <p>The habit from actuarial training that stuck: distrust a clean number until it survives being split apart.</p></div>
 <ul class="principles">{principles}</ul>
 <div class="next"><span class="tag">Next</span><p>A reserving tool in Streamlit: chain ladder and Bornhuetter-Ferguson on the claims development tables Kenyan insurers publish under IFRS 17, with the reserve each method implies set against what was booked. It will be linked here when it is live.</p></div>
 </section>
 
-{contact_block(num=7)}
+{contact_block()}
 {TRI_JS}"""
     return layout("/", f"Marion Peter | {ROLE}",
-                  "Kenya's general insurance market rebuilt from the regulator's returns and checked 42,246 times: where insurers lose money, what premiums would need to do, and which cedants a reinsurer should worry about.",
+                  f"Kenya's general insurance market rebuilt from the regulator's returns and checked {n(K['checks'])} times: where insurers lose money, what premiums would need to do, and which cedants a reinsurer should worry about.",
                   body, "home", og_title=f"Marion Peter, {ROLE}")
 
 
@@ -590,10 +593,10 @@ def kenya_series():
         ("Analyse", "4 pages", "Profitability, market structure, a reinsurer's scorecard and an explorer, each rebuilt by one command."),
     ]
     pipe = "".join(f'<div class="step"><b>{a}</b><span class="n">{b}</span><p>{c}</p></div>' for a, b, c in steps)
-    repos = "".join(f"""<article class="card"><span class="tag">{t}</span><h3><a href="{u}">{r}</a></h3><p>{d}</p></article>""" for t, r, u, d in [
-        ("Data layer", "ira-kenya-data", CODE["data"], "Extraction, the company crosswalk, single-quarter panels, quality flags and validation. Tests on the processed tables run on every push."),
-        ("Insurer's view", "ira-kenya-insurance", CODE["insurance"], "Class profitability, rate adequacy, the low loss ratio test and market structure. Tests tie class totals to IRA's PDF releases."),
-        ("Reinsurer's view", "ira-kenya-reinsurance", CODE["reinsurance"], "The cedant scorecard on four pillars, with its back-test and weight sensitivity. Tests pin down the scoring rules."),
+    tools = "".join(f"""<article class="card"><span class="tag">{t}</span><h3>{h}</h3><p>{d}</p><p class="small">{u}.</p></article>""" for t, h, d, u in [
+        ("Data layer", "Extract and check", "Extraction, the company crosswalk, single-quarter panels, quality flags and validation.", TOOLS["data"]),
+        ("Insurer's view", "Profitability and structure", "Class profitability, rate adequacy, the low loss ratio test and market structure.", TOOLS["insurance"]),
+        ("Reinsurer's view", "The cedant scorecard", "Four pillars, a capital cap, the back-test against the regulator's actions and a weight sensitivity.", TOOLS["reinsurance"]),
     ])
     body = f"""<section class="hero" aria-labelledby="h1">
 <div class="hero-text">
@@ -608,6 +611,8 @@ def kenya_series():
 
 {proof_strip()}
 
+{story(PAGE)}
+
 <section aria-labelledby="h-pages">
 <div class="sechead"><span class="eyebrow">The pages</span><h2 id="h-pages">Four ways into the same data</h2>
 <p>Each page is a single file built from the validated tables, with the method and caveats on the page.</p></div>
@@ -620,10 +625,10 @@ def kenya_series():
 <div class="pipe">{pipe}</div>
 </section>
 
-<section aria-labelledby="h-code">
-<div class="sechead"><span class="eyebrow">Code</span><h2 id="h-code">Three repositories, one pipeline</h2>
-<p>Python and pandas. Every published number is rebuilt from the raw files, and the raw files are listed with their IRA source links and hashes.</p></div>
-<div class="grid3">{repos}</div>
+<section aria-labelledby="h-tools">
+<div class="sechead"><span class="eyebrow">Tools</span><h2 id="h-tools">Built in Python, checked at every step</h2>
+<p>Every published number is rebuilt from the raw files, and the raw files are listed with their IRA source links and hashes. The charts on this page are plain HTML and CSS, and every one has a table of its numbers.</p></div>
+<div class="grid3">{tools}</div>
 </section>
 
 <section aria-labelledby="h-next">
@@ -639,7 +644,7 @@ def kenya_series():
 </section>"""
     return layout("/kenya-insurance/", "Kenya Insurance, Rebuilt | Marion Peter",
                   "Kenya's general insurers and reinsurers, every quarter from Q4 2016 to Q1 2026, rebuilt from IRA's returns: profitability, market structure, a reinsurer's scorecard and a data explorer.",
-                  body, "kenya", og_title="Kenya Insurance, Rebuilt")
+                  body, "data", og_title="Kenya Insurance, Rebuilt", series="overview")
 
 
 def facts(items):
@@ -668,9 +673,9 @@ def pager(c):
 
 def case_page(c, eyebrow, lede, fact_items, data, method, sections, lim, code_note):
     body = f"""<section aria-labelledby="h1">
-<a class="more" href="/#cases">All case studies</a>
+<a class="more" href="{CASE_PART[c['slug']][1]}">Part {CASE_PART[c['slug']][2]}: {CASE_PART[c['slug']][3]}</a>
 <span class="eyebrow">{eyebrow}</span>
-<h1 id="h1" style="font-size:clamp(34px,5vw,54px);max-width:22ch">{c['title']}</h1>
+<h1 id="h1" style="font-size:clamp(32px,3.8vw,46px);max-width:24ch">{c['title']}</h1>
 <p class="lede">{lede}</p>
 {facts(fact_items)}
 <div class="dm"><div><span class="tag">Data</span><p>{data}</p></div><div><span class="tag">Method</span><p>{method}</p></div></div>
@@ -682,8 +687,8 @@ def case_page(c, eyebrow, lede, fact_items, data, method, sections, lim, code_no
 <p class="note">{code_note}</p>
 </section>
 {pager(c)}"""
-    return layout(f"/work/{c['slug']}/", f"{c['title']} | Marion Peter", c["desc"], body, "work",
-                  og_title=c["title"])
+    return layout(f"/work/{c['slug']}/", f"{c['title']} | Marion Peter", c["desc"], body, CASE_PART[c["slug"]][0],
+                  og_title=c["title"], up=CASE_PART[c["slug"]][1])
 
 
 def colbars(items, unit, top):
@@ -702,9 +707,7 @@ def dealer_page():
 <p>Before adding anything I matched invoice numbers across them. {n(D['overlap'])} of {n(D['jobs'])} job invoices, <b>{d1(D['overlap_pct'], False)}%</b>, also appear as workshop sales on the parts ledger: the same parts, reaching the books by two routes. Each ledger is right on its own. Treating them as additive counted <b>KSh {D['double_bn']}bn</b> twice.</p>
 <p>Revenue was KSh {D['actual_bn']}bn, not KSh {D['reported_bn']}bn. Growth rates, branch shares and margin had all been measured against a base that did not exist.</p>
 </div>
-<figure class="panel" style="margin:0"><h3>Revenue, KSh billions</h3>
-{colbars([(D['reported_bn'], str(D['reported_bn']), '--loss', 'As reported'), (D['actual_bn'], str(D['actual_bn']), '--gain', 'After removing the double count')], f"Revenue as reported KSh {D['reported_bn']}bn against KSh {D['actual_bn']}bn after removing the double count", D['reported_bn'])}
-<p class="small">January 2022 to August 2026.</p></figure>
+<div class="vz-stack">{case_viz.dealer_revenue()}{case_viz.dealer_jobs()}</div>
 </div>
 {checks_list([
     (True, f"The {n(D['labour_only'])} unmatched job invoices are labour only.", "None of them carries parts, so removing the overlap drops nothing."),
@@ -726,10 +729,9 @@ def dealer_page():
 </section>"""
     s3 = f"""<section aria-labelledby="h-s3">
 <div class="sechead"><span class="eyebrow">Step three</span><h2 id="h-s3">Then answer the brief, on the corrected base</h2></div>
-<div class="grid3">
-<div class="panel"><p class="big">{D['cagr']}%</p><p>a year compound revenue growth, 2022 to 2025.</p></div>
-<div class="panel"><p class="big">{D['accident_value']}%</p><p>of job value came from accident repair, which was {D['accident_jobs']}% of jobs: a commercial opportunity and a capacity risk in one number.</p></div>
-<div class="panel"><p class="big">{D['insurer_share']}%</p><p>of revenue came from {D['insurer_customers']} insurers as customers. Growth that leans on so few counterparties is growth with more concentration risk.</p></div>
+<div class="pair">
+<div class="panel"><p class="big">{D['cagr']}%</p><p>a year compound revenue growth, 2022 to 2025, measured on the corrected base.</p></div>
+{case_viz.dealer_mix()}
 </div>
 </section>
 <section aria-labelledby="h-s4">
@@ -765,16 +767,22 @@ def ifrs17_page():
 </section>
 <section aria-labelledby="h-s2">
 <div class="sechead"><span class="eyebrow">Step one</span><h2 id="h-s2">Discounting is a question of the payment pattern</h2></div>
+<div class="pair">
 <div class="prose">
 <p>At a flat {I['rate']}% with a mid-year convention, the six lines fall from US${I['undisc_bn']}bn to US${I['undisc_bn'] + I['disc_effect_bn']:.2f}bn: <b>US${-I['disc_effect_bn']}bn</b> comes off before any judgement is applied. The mean time to payment runs from {I['dur_low']} years for private motor to {I['dur_high']} years for medical malpractice, and that alone sets the order in which discounting shrinks the lines.</p>
+</div>
+{case_viz.ifrs17_duration()}
 </div>
 </section>
 <section aria-labelledby="h-s3">
 <div class="sechead"><span class="eyebrow">Step two</span><h2 id="h-s3">The same three words are worth US${I['ra75_m']}m or US${I['ra95_bn']}bn</h2></div>
+<div class="pair">
 <div class="prose">
 <p>IFRS 17 does not prescribe the risk adjustment; it requires the confidence level to be disclosed. Here the uncertainty comes from bootstrapping the same triangles: {n(I['sims'])} resampled refits with process variance. At the 75th percentile the six lines need <b>US${I['ra75_m']}m</b>; at the 95th, <b>US${I['ra95_bn']}bn</b>. Both are defensible, so the confidence level is the number, not a footnote.</p>
 <p>The spread differs by line. Private motor's simulated reserve has a coefficient of variation of {I['cv_pm']}%; product liability's is {I['cv_pl']}%, with a long right tail.</p>
 <p>Adding the six risk adjustments assumes every line goes wrong at once. Treating them as independent gives US${I['indep75_m']}m instead of US${I['ra75_m']}m at the 75th percentile. That one assumption is worth US${I['diversification_m']}m, {I['div_pct']}% of the risk adjustment, and belongs in the disclosure.</p>
+</div>
+<div class="vz-stack">{case_viz.ifrs17_ra()}{case_viz.ifrs17_cv()}</div>
 </div>
 </section>
 <section aria-labelledby="h-s4">
@@ -805,7 +813,7 @@ def ifrs17_page():
                      "CAS Loss Reserving Database, the triangles bundled with the chainladder Python package: NAIC Schedule P cumulative paid losses for all reporting US insurers, summed by line, accident years 1988 to 1997.",
                      f"Volume-weighted chain ladder to ultimate and the future payment pattern; present value at a flat rate, mid-year; risk adjustment from an over-dispersed Poisson bootstrap of the same triangle ({n(I['sims'])} simulations with process variance), taken as a percentile less the mean and discounted on the same pattern.",
                      s, lim,
-                     "The code is not on GitHub yet. The same triangles feed the reserve back-test listed on the About page.")
+                     "Built with Python and numpy. The same triangles feed the reserve back-test listed on the About page.")
 
 
 def auctions_page():
@@ -813,7 +821,7 @@ def auctions_page():
     s = f"""<section aria-labelledby="h-s1">
 <div class="sechead"><span class="eyebrow">Step one</span><h2 id="h-s1">Profile before you trust: one column, two scales</h2></div>
 <div class="prose">
-<p>Condition is the variable that matters most here, and it holds two grading scales stacked in one column with nothing to mark which is which: {n(A['short_scale'])} rows graded 1 to 5 and {n(A['long_scale'])} graded on a scale that runs to 49. A grade 5 car sells for a median $22,100, a grade 49 for $20,600 and a grade 17 for $2,600. Treated as one variable, the best cars in the file sort below the worst.</p>
+<p>Condition is the variable that matters most here, and it holds two grading scales stacked in one column with nothing to mark which is which: {n(A['short_scale'])} rows graded 1 to {A['short_max']} and {n(A['long_scale'])} graded on a scale that runs to {A['long_max']}. A grade {A['short_max']} car sells for a median ${n(A['median_g5'])}, a grade {A['long_max']} for ${n(A['median_g49'])} and a grade 17 for ${n(A['median_g17'])}. Treated as one variable, the best cars in the file sort below the worst.</p>
 <p>There is no defensible mapping between the scales, so the short-scale rows are excluded and the exclusion is stated. Inventing a conversion would put an unverifiable assumption under every number that follows.</p>
 </div>
 </section>
@@ -832,8 +840,9 @@ def auctions_page():
 <figure class="panel" style="margin:0"><h3>Average gap between price and estimate, by condition decile</h3>
 <p class="small">Percent of the estimate. Negative means the car sold for less, so the estimate was too high.</p>
 {bars([(f"Decile {i + 1}", v) for i, v in enumerate(AUCTION_DECILES)], f"Gap by condition decile, poorest to best, from {d1(AUCTION_DECILES[0])}% to {d1(AUCTION_DECILES[-1])}%", "%")}</figure>
-<div class="prose"><p>The poorest tenth sells {d1(-A['decile_low'], False)}% below its estimate; the best sells {d1(A['decile_high'], False)}% above. Above the middle the curve flattens near +3%, so the bias sits mostly in the bottom third of the scale.</p>
-<p>By condition band, the estimate is {d1(-A['worst_band_pct'], False)}% too high on the poorest cars and {d1(A['best_band_pct'], False)}% too low on the best. Those errors run in opposite directions on comparable sums of money, which is why the total looked clean: <b>US${A['gross_m']}m</b> of gross misvaluation nets to US${A['net_m']}m, and <b>{A['cancel']}%</b> of it cancels.</p></div>
+<div class="prose"><p>The poorest tenth sells {d1(-A['decile_low'], False)}% below its estimate; the best sells {d1(A['decile_high'], False)}% above. Above the middle the curve flattens near +{round(sum(AUCTION_DECILES[5:]) / len(AUCTION_DECILES[5:]))}%, so the bias sits mostly in the bottom third of the scale.</p>
+<p>By condition band, the estimate is {d1(-A['worst_band_pct'], False)}% too high on the poorest cars and {d1(A['best_band_pct'], False)}% too low on the best. Those errors run in opposite directions on comparable sums of money, which is why the total looked clean: <b>US${A['gross_m']}m</b> of gross misvaluation nets to US${A['net_m']}m, and <b>{A['cancel']}%</b> of it cancels.</p>
+{case_viz.auctions_cancel()}</div>
 </div>
 </section>
 <section aria-labelledby="h-s4">
@@ -842,7 +851,7 @@ def auctions_page():
     (True, "Is condition standing in for price?", "Holding appraised value constant, the gradient runs the same way in every value band."),
     (True, "Is it mileage?", "It holds inside each odometer band too."),
     (True, "Is it a few outliers?", "Medians and 1 to 99 percentile trimmed means show the same ordering as the means."),
-    (False, "Is it a handful of large sellers?", f"Without the 20 largest sellers ({n(A['excl_rows'])} rows) the poorest band still sells {d1(-A['excl_low'], False)}% below its estimate and the best {d1(A['excl_high'], False)}% above, but the middle bands reorder slightly, so the gradient is not strictly monotonic there."),
+    (False, "Is it a handful of large sellers?", f"Without the {A['top_sellers']} largest sellers ({n(A['excl_rows'])} rows) the poorest band still sells {d1(-A['excl_low'], False)}% below its estimate and the best {d1(A['excl_high'], False)}% above, but the middle bands reorder slightly, so the gradient is not strictly monotonic there."),
     (False, "Are the deciles monotonic?", "Not quite: two of the upper deciles dip by less than 0.1 points. The finding is the gap between the bottom and the rest, not a smooth line."),
 ])}
 </section>
@@ -865,7 +874,7 @@ def auctions_page():
                      f"Kaggle Vehicle Sales Data: {n(A['rows_total'])} US wholesale auction records with make, model, year, odometer, seller, a condition grade, the pre-sale estimate and the selling price. {n(A['rows'])} rows analysed after excluding the incompatible grading scale and incomplete records.",
                      "The estimate treated as a reserve and the selling price as the settled amount. Every field profiled first, then aggregate bias, error by condition, condition within value and mileage bands, and gross overvaluation set against gross undervaluation.",
                      s, lim,
-                     "The code and its six tests are ready to publish but are not on GitHub yet. The data is Kaggle's and is not redistributed.")
+                     "Built with Python and pandas, with six tests on the method. The data is Kaggle's and is not redistributed.")
 
 
 def about():
@@ -894,12 +903,12 @@ def about():
     prods = load_products()
     built = ""
     if prods:
-        built = '<section aria-labelledby="h-built"><div class="sechead"><span class="eyebrow">Built outside the day job</span><h2 id="h-built">Products</h2><p>Screenshots are on the <a href="/#products">home page</a>.</p></div><div class="cv">' + "".join(
+        built = '<section aria-labelledby="h-built"><div class="sechead"><span class="eyebrow">Built outside the day job</span><h2 id="h-built">Products</h2><p>Screenshots are on the <a href="/">home page</a>.</p></div><div class="cv">' + "".join(
             f'<div class="role"><div class="when">{esc(p["name"])}</div><div class="what"><p>{esc(p["line"])}</p></div></div>' for p in prods) + "</div></section>"
     body = f"""<section aria-labelledby="h1">
 <span class="eyebrow">About</span>
 <h1 id="h1">Marion Peter</h1>
-<p class="lede">{ROLE}. I studied actuarial science at Strathmore, worked in data, pricing and reserving roles in Kenya and Mauritius, and am now completing an MSc in data science. The work I like best starts by checking whether the data can be trusted.</p>
+<p class="lede">{esc(ROLE)}. I studied actuarial science at Strathmore, worked in data, pricing and reserving roles in Kenya and Mauritius, and am now completing an MSc in data science. The work I like best starts by checking whether the data can be trusted.</p>
 </section>
 <section aria-labelledby="h-exp">
 <div class="sechead"><span class="eyebrow">Experience</span><h2 id="h-exp">Roles</h2>
@@ -938,12 +947,15 @@ def not_found():
 
 def repo_index(repo, title, lede, links):
     """Index page for one Kenya repo's GitHub Pages site, in the same style. Links back to the series."""
-    items = "".join(f'<article class="card"><span class="tag">{t}</span><h3>{h}</h3><p class="find">{d}</p><div class="links"><a href="{u}">Open the page</a></div></article>' for t, h, d, u in links)
-    body = f"""<section aria-labelledby="h1"><span class="eyebrow">{repo}</span><h1 id="h1" style="font-size:clamp(32px,4.6vw,50px)">{title}</h1><p class="lede">{lede}</p>
-<div class="cta"><a class="btn quiet" href="{GH}/{repo}">Code and method on GitHub</a><a class="btn quiet" href="/kenya-insurance/">The whole series</a></div></section>
+    shots = {"explorer/kenya-insurer-explorer.html": "explorer", "page/kenya-insurance-loss-map.html": "lossmap",
+             "page/kenya-insurance-market-structure.html": "structure", "page/kenya-cedant-scorecard.html": "scorecard"}
+    items = "".join(f'<article class="card">{thumb(shots[u], u)}<span class="tag">{t}</span><h3>{h}</h3><p class="find">{d}</p><div class="links"><a href="{u}">Open the page</a></div></article>' for t, h, d, u in links)
+    body = f"""<section aria-labelledby="h1"><span class="eyebrow">Kenya insurance series</span><h1 id="h1" style="font-size:clamp(32px,3.8vw,46px)">{title}</h1><p class="lede">{lede}</p>
+<p class="small">Built with {TOOLS[repo.rsplit("-", 1)[1]]}.</p>
+<div class="cta"><a class="btn quiet" href="/kenya-insurance/">The whole series</a></div></section>
 <section class="grid2">{items}</section>
 <section class="small"><p>Source: Insurance Regulatory Authority, Kenya, quarterly industry statistics. Public data only.</p></section>"""
-    return layout(f"/{repo}/", f"{title} | Marion Peter", lede, body, "kenya")
+    return layout(f"/{repo}/", f"{title} | Marion Peter", lede, body, "data", up="/kenya-insurance/", series="")
 
 
 REPO_INDEX = {
@@ -986,6 +998,7 @@ def main():
     for rel, text in pages.items():
         write(rel, text)
     paths = ["/" + r.replace("index.html", "") for r in pages if r != "404.html"]
+    write("assets/nav.css", NAV_CSS)
     write("sitemap.xml", sitemap(paths))
     write("robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {BASE}/sitemap.xml\n")
     if a.repo_index:
