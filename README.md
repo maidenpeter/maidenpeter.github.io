@@ -22,7 +22,7 @@ The home page leads with the Kenya insurance series, built from the Insurance Re
 
 ## How it is built
 
-Static HTML, no framework. `tools/build.py` writes every page from one layout, so the head, header, footer and theme script are written once; `assets/site.css` holds the tokens for the two themes: ink (dark, the default) and paper (light), with gold for emphasis, teal for gain and oxblood for loss.
+Static HTML, no framework. `tools/build.py` writes every page from one layout, so the head, header, footer and theme script are written once; `assets/site.css` holds the tokens for the two themes: ink (dark, the default) and paper (light), with gold for emphasis, teal for gain and oxblood for loss. Its copperplate layer matches the Kenya series plates: a grained, foxed ground, IM Fell English for headings, Old Standard TT for labels, Pinyon Script in the name line, double-ruled frames and hatched bars.
 
 The home page triangle is a volume-weighted chain ladder on the six NAIC Schedule P paid triangles in `tools/cas_triangles.json`, the same data as the IFRS 17 case study. The build computes it in Python so the page reads correctly without JavaScript; the page then recomputes it in the browser and fills the projected corner one calendar year at a time.
 
@@ -43,7 +43,7 @@ python tools/check_links.py [--external]                  # internal links, asse
 python tools/screenshots.py OUT                           # 1280 and 390 px, ink and paper; fails on sideways scrolling
 ```
 
-On a machine without Chrome on the default path or without internet access, set `CHROME` to the browser binary and `FONTS_DIR` to a folder of the EB Garamond and IBM Plex Sans Condensed `.woff2` files.
+On a machine without Chrome on the default path or without internet access, set `CHROME` to the browser binary and `FONTS_DIR` to a folder of the EB Garamond, IBM Plex Sans Condensed, IM Fell English, IM Fell English SC, Pinyon Script and Old Standard TT `.woff2` files.
 
 `check_figures.py` also checks the earlier case studies when their output files are listed in `tools/local_paths.json`, which stays out of git because the client work is private. GitHub Actions rebuilds the site on every push, fails if the committed pages differ from the build, and runs the text and link checks.
 

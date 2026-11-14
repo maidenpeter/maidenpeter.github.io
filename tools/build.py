@@ -22,7 +22,9 @@ EMAIL = "marionpeter@nuruops.com"
 ROLE = "Actuarial Engineer"
 LINKEDIN = "https://www.linkedin.com/in/marion-peter"
 FONTS = ("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400"
-         "&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap")
+         "&family=IBM+Plex+Sans+Condensed:wght@400;500;600"
+         "&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Pinyon+Script"
+         "&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap")
 
 # Live pages in the analysis repos. Linked, never copied.
 PAGE = dict(

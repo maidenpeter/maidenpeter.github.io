@@ -33,10 +33,15 @@ class Quiet(http.server.SimpleHTTPRequestHandler):
 
 
 def local_fonts(ctx, folder):
-    """Offline machines: serve the two typefaces from local woff2 files (for example the
-    @fontsource npm packages) instead of Google Fonts. FONTS_DIR holds the .woff2 files."""
+    """Offline machines: serve the typefaces from local woff2 files (for example the
+    @fontsource npm packages) instead of Google Fonts. FONTS_DIR holds the .woff2 files;
+    a face whose file is missing falls back to the next family in the stack."""
     faces = [("EB Garamond", "eb-garamond", w, st) for w in (400, 500, 600) for st in ("normal", "italic")]
     faces += [("IBM Plex Sans Condensed", "ibm-plex-sans-condensed", w, "normal") for w in (400, 500, 600)]
+    faces += [("IM Fell English", "im-fell-english", 400, st) for st in ("normal", "italic")]
+    faces += [("IM Fell English SC", "im-fell-english-sc", 400, "normal"), ("Pinyon Script", "pinyon-script", 400, "normal")]
+    faces += [("Old Standard TT", "old-standard-tt", w, st) for w, st in ((400, "normal"), (400, "italic"), (700, "normal"))]
+    faces = [x for x in faces if (folder / f"{x[1]}-latin-{x[2]}-{x[3]}.woff2").exists()]
     css = "".join(f"@font-face{{font-family:'{f}';font-style:{st};font-weight:{w};font-display:swap;"
                   f"src:url(https://fonts.gstatic.com/local/{slug}-latin-{w}-{st}.woff2) format('woff2')}}"
                   for f, slug, w, st in faces)
