@@ -180,3 +180,34 @@ AUCTIONS = dict(
     excl_high=3.4,
 )
 AUCTION_DECILES = [-12.16, -3.22, 0.18, 2.37, 2.88, 2.86, 3.05, 3.14, 3.08, 3.34]
+
+# ------------------------------------------------------------- Hero triangle
+# tools/cas_triangles.json holds the six paid triangles the IFRS 17 case study uses.
+# The home page runs a volume-weighted chain ladder on them; check_figures.py
+# confirms the six reserves add up to IFRS17["undisc_bn"].
+
+# --------------------------------------------------------------------- Apps
+# Health IBNR Lab: Streamlit Projects/Health IBNR Lab/data/headline.json (checked).
+# Instalment Persistency Lab: the repo README, computed by the app from its
+# seeded synthetic book (not recomputed here; it needs the app's DuckDB build).
+APPS = dict(
+    hil_claims=64646,
+    hil_be_kes=138821204,
+    hil_cv=12.0,
+    hil_backlog_months=3,
+    hil_backlog_pct=30,
+    hil_backlog_err_kes=93608488,
+    hil_backlog_err_pct=50.0,
+    ipl_policies=20000,
+    ipl_inforce_10=57.3,
+    ipl_lapsed_ratio=1.14,
+    ipl_stayed_ratio=0.65,
+)
+IPL_URL = "https://instalment-persistency-lab.streamlit.app/"
+
+# ----------------------------------------------------------------- Placings
+# Stated by Marion, 14 November 2026.
+HACKATHONS = [
+    ("2026", "Third place, Kenya Re 3rd AI4 Hackathon", "Catastrophe modelling. Second runners-up nationally."),
+    ("2025", "Fourth place, Kenya Re AI4 Hackathon", "A decision support tool for triaging facultative reinsurance submissions."),
+]

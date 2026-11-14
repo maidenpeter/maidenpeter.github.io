@@ -2,7 +2,7 @@
 
 Kenya figures are checked against the three analysis repos, cloned side by side:
 
-    python tools/check_figures.py --repos "../Marion Peter"
+    python tools/check_figures.py --repos ..
 
 The earlier case studies are checked too when their output files are listed in
 tools/local_paths.json (kept out of git, because client work stays private):
@@ -275,15 +275,53 @@ def dealer(path, check_path):
     check("dealer cells_match", D["cells_match"], sum(1 for r in c if r["status"] == "MATCH"), 0)
 
 
+def triangle():
+    """The home page triangle: six chain ladder reserves must add up to the IFRS 17 case study's reserve."""
+    d = json.load(open(Path(__file__).with_name("cas_triangles.json"), encoding="utf-8"))
+    total = 0.0
+    for line in d["lines"]:
+        t = line["paid"]
+        n = len(t)
+        f = []
+        for j in range(n - 1):
+            rows_j = [i for i in range(n) if t[i][j + 1] is not None]
+            f.append(sum(t[i][j + 1] for i in rows_j) / sum(t[i][j] for i in rows_j))
+        for i in range(n):
+            last = max(j for j in range(n) if t[i][j] is not None)
+            u = t[i][last]
+            for j in range(last, n - 1):
+                u *= f[j]
+            total += u - t[i][last]
+    check("triangle reserves sum (US$bn)", F.IFRS17["undisc_bn"], round(total / 1e6, 2), 0.005)
+
+
+def apps(root):
+    """Health IBNR Lab headline numbers, when the lab sits beside the analysis repos."""
+    p = root / "Streamlit Projects" / "Health IBNR Lab" / "data" / "headline.json"
+    if not p.exists():
+        return False
+    h = json.load(open(p, encoding="utf-8"))
+    A = F.APPS
+    check("hil claims", A["hil_claims"], h["n_claims"], 0)
+    check("hil best estimate", A["hil_be_kes"], h["best_estimate_outstanding_kes"], 0)
+    check("hil mack cv", A["hil_cv"], round(h["mack_cv"] * 100, 1), 0.05)
+    check("hil backlog months", A["hil_backlog_months"], h["backlog"]["n_months"], 0)
+    check("hil backlog pct", A["hil_backlog_pct"], round(h["backlog"]["pct"] * 100), 0)
+    check("hil backlog error", A["hil_backlog_err_kes"], -h["backlog"]["cl_error_kes"], 0)
+    check("hil backlog error pct", A["hil_backlog_err_pct"], round(-h["backlog"]["cl_error_pct"] * 100, 1), 0.05)
+    return True
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--repos", default=os.environ.get("IRA_REPOS", "../Marion Peter"),
+    ap.add_argument("--repos", default=os.environ.get("IRA_REPOS", ".."),
                     help="folder holding ira-kenya-data, ira-kenya-insurance and ira-kenya-reinsurance")
     a = ap.parse_args()
     root = Path(a.repos)
     if not (root / "ira-kenya-data").exists():
         sys.exit(f"Cannot find the analysis repos under {root.resolve()}. Pass --repos.")
     kenya(root)
+    triangle()
 
     local = Path(__file__).with_name("local_paths.json")
     skipped = []
@@ -299,6 +337,8 @@ def main():
     else:
         skipped = ["ifrs17", "reserving", "pricing", "auctions", "dealer"]
 
+    if not apps(root):
+        skipped.append("health ibnr lab")
     print(f"{OK[0]} figures match their source.")
     if skipped:
         print("Not checked (no local_paths.json entry): " + ", ".join(skipped))
