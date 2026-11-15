@@ -192,3 +192,25 @@ def split(parts, label, total=None):
     seg = "".join(f'<span class="vz-seg {c}" style="flex:{v / total * 100:.3f} 1 0" title="{esc(f"{n}: {t or v}")}">'
                   + (f"<b>{t}</b>" if fits(v, t) else "") + "</span>" for c, n, v, t in parts)
     return f'<div class="vz-split" role="img" aria-label="{esc(label)}">{seg}</div>'
+
+
+def timeline(groups, years, label):
+    """Items on a shared row of years, one row per item, drawn to the year.
+
+    groups: (group name, [(title, note, first year, last year, mark)]). mark "bar" spans first to last year;
+    "dot" marks a single year (a qualification); "ring" marks a single year as an annotation (a placing).
+    The note carries the exact dates, so the drawing never claims more precision than the source has."""
+    cols = len(years)
+    head = "".join(f"<span>{y}</span>" for y in years)
+    rows = []
+    for name, items in groups:
+        rows.append(f'<div class="vz-tl-group">{name}</div>')
+        for title, note, a, b, mark in items:
+            i, j = years.index(a) + 1, years.index(b) + 2
+            m = (f'<i class="vz-tl-bar" style="grid-column:{i} / {j}" title="{esc(f"{title}: {note}")}"></i>' if mark == "bar" else
+                 f'<i class="vz-tl-pt {mark}" style="grid-column:{i} / {i + 1}" title="{esc(f"{title}: {note}")}"></i>')
+            rows.append(f'<div class="vz-tl-row"><span class="vz-tl-name">{title}<small>{note}</small></span>'
+                        f'<span class="vz-tl-track" style="--n:{cols}">{m}</span></div>')
+    return (f'<div class="vz-tl" role="img" aria-label="{esc(label)}">'
+            f'<div class="vz-tl-row vz-tl-head" aria-hidden="true"><span></span><span class="vz-tl-track" style="--n:{cols}">{head}</span></div>'
+            + "".join(rows) + "</div>")

@@ -33,7 +33,9 @@ SIDE_CSS = {
     "structure": f"@media (min-width:861px) and (max-width:1140px){{{_ONE_COL}}}\n",
     "scorecard": ("@media (min-width:861px) and (max-width:1140px){.split{grid-template-columns:1fr}.detail{position:static}"
                   ".summary{grid-template-columns:repeat(2,minmax(0,1fr))}.summary .kpi:first-child{grid-column:1 / -1}"
-                  ".grid2,.method{grid-template-columns:1fr}.stamp{text-align:left}}\n"),
+                  ".grid2,.method{grid-template-columns:1fr}.stamp{text-align:left}}\n"
+                  # its sticky detail panel stays below the top bar and the series strip
+                  "@media (min-width:861px){.detail{top:calc(var(--mp-top) + var(--mp-sub) + 12px)}}\n"),
     "explorer": ("@media (min-width:861px) and (max-width:1100px){.grid2{grid-template-columns:1fr}"
                  ".kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.tabs{margin-left:0}.stamp{text-align:left}}\n"),
 }

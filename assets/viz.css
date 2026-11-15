@@ -167,3 +167,28 @@
 
 /* charts stacked in one column of a two-column pair */
 .vz-stack{display:flex;flex-direction:column;gap:20px;min-width:0}
+
+/* timeline: one row per item on a shared row of years, drawn to the year */
+.vz-tl{font-family:var(--ui);display:flex;flex-direction:column}
+.vz-tl-row{display:grid;grid-template-columns:minmax(0,17em) minmax(0,1fr);gap:16px;align-items:center;min-height:40px;border-top:1px solid var(--rule-soft)}
+.vz-tl-head{border:0;min-height:26px}
+.vz-tl-track{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));align-items:center;height:100%;
+  background:repeating-linear-gradient(90deg,transparent 0 calc(100% / var(--n) - 1px),var(--rule-soft) calc(100% / var(--n) - 1px) calc(100% / var(--n)))}
+.vz-tl-head .vz-tl-track{background:none}
+.vz-tl-head span span{font-size:12.5px;color:var(--muted);text-align:center}
+.vz-tl-name{font-size:14px;color:var(--ink);line-height:1.25;text-align:right}
+.vz-tl-name small{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.vz-tl-group{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:16px 0 6px;border-top:1px solid var(--rule-strong)}
+.vz-tl-group:first-of-type{border-top:0}
+.vz-tl-bar{display:block;height:14px;margin:0 3px;border-radius:4px;background:var(--vz-neu)}
+.vz-tl-pt{justify-self:center;width:14px;height:14px;border-radius:50%;background:var(--vz-neu);box-shadow:0 0 0 2px var(--surface)}
+.vz-tl-pt.ring{background:var(--surface);box-shadow:0 0 0 2px var(--surface),inset 0 0 0 2.5px var(--accent)}
+.vz-key i.tl-bar{background:var(--vz-neu);width:18px;height:10px;border-radius:3px;vertical-align:0}
+.vz-key i.tl-dot{background:var(--vz-neu);border-radius:50%}
+.vz-key i.tl-ring{background:transparent;border-radius:50%;box-shadow:inset 0 0 0 2px var(--accent)}
+@container (max-width:560px){
+  .vz-tl-row{grid-template-columns:minmax(0,1fr);gap:4px;padding:8px 0}
+  .vz-tl-head .vz-tl-track{min-height:20px}
+  .vz-tl-name{text-align:left}
+  .vz-tl-track{min-height:16px}
+}

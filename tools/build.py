@@ -16,6 +16,8 @@ from figures import (KENYA as K, CLASS_RESULTS, BACKTEST, DEALER as D, IFRS17 as
 from nav import nav_html, series_html, NAV_JS, NAV_CSS, THEME_HEAD, ROLE
 from kenya_story import story
 import case_viz
+import viz
+import re
 
 ROOT = Path(__file__).resolve().parent.parent
 BASE = "https://maidenpeter.github.io"   # change to https://marionpeter.nuruops.com once the custom domain is live
@@ -69,7 +71,7 @@ def ksh(v):
 
 
 # ----------------------------------------------------------------- layout
-def layout(path, title, desc, body, section=None, og_title=None, up="/", series=None):
+def layout(path, title, desc, body, section=None, og_title=None, up="/", series=None, where=None):
     url = BASE + path
     return f"""<!doctype html>
 <html lang="en">
@@ -104,7 +106,7 @@ def layout(path, title, desc, body, section=None, og_title=None, up="/", series=
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-{nav_html(path, section, up=up)}
+{nav_html(path, section, up=up, where=where)}
 {series_html(series) if series is not None else ''}
 <main id="main" class="wrap">
 {body}
@@ -877,6 +879,29 @@ def auctions_page():
                      "Built with Python and pandas, with six tests on the method. The data is Kaggle's and is not redistributed.")
 
 
+def career_timeline(roles, edu, placings):
+    """The CV as a timeline, drawn to the year. Every year comes from the dates written in the CV entries
+    below it; an entry still in progress sits at the latest year the CV mentions."""
+    def years(s):
+        ys = [int(y) for y in re.findall(r"\d{4}", s)]
+        return ys[0], ys[-1]
+    latest = max(y for s in [r[0] for r in roles] + [e[0] for e in edu] + [p[0] for p in placings] for y in map(int, re.findall(r"\d{4}", s)))
+    work = sorted(((t, f"{org}, {w}", *years(w), "bar") for w, t, org, _, _, _ in roles), key=lambda x: (x[2], x[3]))
+    study = sorted(((t, f"{org}, {w[0].lower() + w[1:] if not w[0].isdigit() else w}", *((latest, latest) if not re.search(r"\d{4}", w) else years(w)), "dot")
+                    for w, t, org in edu), key=lambda x: x[2])
+    placed = sorted(((t, w, int(w), int(w), "ring") for w, t, _ in placings), key=lambda x: x[2])
+    first = min(x[2] for x in work + study + placed)
+    ys = list(range(first, latest + 1))
+    every = work + study + placed
+    return viz.figure(
+        "Career at a glance",
+        viz.timeline([("Work", work), ("Study", study), ("Recognition", placed)], ys,
+                     "Career timeline: " + "; ".join(f"{t}, {n}" for t, n, *_ in every) + "."),
+        sub="Roles, study and placings by year, drawn to the year. The dates under each name are as written in the CV below.",
+        key=viz.key([("tl-bar", "Role"), ("tl-dot", "Qualification, completed or in progress"), ("tl-ring", "Placing")]),
+        table=viz.table(["Item", "Dates"], [[t, n] for t, n, *_ in every]))
+
+
 def about():
     roles = [
         ("2024 to 2025", "Reserving Analyst", "MUA Mauritius and East Africa", "Local and regional market",
@@ -899,6 +924,7 @@ def about():
         ("2023", "BSc Actuarial Science", "Strathmore University"),
     ]
     rec = HACKATHONS
+    career = career_timeline(roles, edu, rec)
     rows = lambda items: "".join(f'<div class="role"><div class="when">{w}</div><div class="what"><h3>{t}</h3><p class="small" style="font-size:15px">{d}</p></div></div>' for w, t, d in items)
     prods = load_products()
     built = ""
@@ -909,6 +935,10 @@ def about():
 <span class="eyebrow">About</span>
 <h1 id="h1">Marion Peter</h1>
 <p class="lede">{esc(ROLE)}. I studied actuarial science at Strathmore, worked in data, pricing and reserving roles in Kenya and Mauritius, and am now completing an MSc in data science. The work I like best starts by checking whether the data can be trusted.</p>
+</section>
+<section aria-labelledby="h-tl">
+<div class="sechead"><span class="eyebrow">At a glance</span><h2 id="h-tl">From research to reserving</h2></div>
+{career}
 </section>
 <section aria-labelledby="h-exp">
 <div class="sechead"><span class="eyebrow">Experience</span><h2 id="h-exp">Roles</h2>
@@ -941,7 +971,7 @@ def not_found():
 <p class="lede">It may have moved. The Kenya insurance series now lives at <a href="/kenya-insurance/">/kenya-insurance/</a>.</p>
 <div class="cta"><a class="btn primary" href="/">Go to the home page</a><a class="btn quiet" href="/kenya-insurance/">Kenya insurance series</a></div>
 </section>"""
-    return layout("/404.html", "Page not found | Marion Peter", "This page could not be found.", body).replace(
+    return layout("/404.html", "Page not found | Marion Peter", "This page could not be found.", body, where=[("Page not found", None)]).replace(
         f'<link rel="canonical" href="{BASE}/404.html">\n', '<meta name="robots" content="noindex">\n')
 
 
@@ -955,7 +985,8 @@ def repo_index(repo, title, lede, links):
 <div class="cta"><a class="btn quiet" href="/kenya-insurance/">The whole series</a></div></section>
 <section class="grid2">{items}</section>
 <section class="small"><p>Source: Insurance Regulatory Authority, Kenya, quarterly industry statistics. Public data only.</p></section>"""
-    return layout(f"/{repo}/", f"{title} | Marion Peter", lede, body, "data", up="/kenya-insurance/", series="")
+    return layout(f"/{repo}/", f"{title} | Marion Peter", lede, body, "data", up="/kenya-insurance/", series="",
+                  where=[("Kenya series", "/kenya-insurance/"), (title, None)])
 
 
 REPO_INDEX = {
