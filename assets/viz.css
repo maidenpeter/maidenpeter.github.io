@@ -1,7 +1,7 @@
 /* Charts for maidenpeter.github.io, drawn by tools/viz.py. Plain HTML and CSS; uses the tokens in site.css.
    Teal and oxblood carry polarity, a dimmed grey carries context, gold is for annotation only.
    Chart text is never smaller than 12px and never wears the data colour. */
-:root{--vz-ctx:#565f69;--vz-neu:#8f98a3;--vz-band:rgba(237,231,216,.07)}
+:root{--vz-ctx:#5e6873;--vz-neu:#8f98a3;--vz-band:rgba(237,231,216,.07)}
 :root[data-theme="light"]{--vz-ctx:#ab9e85;--vz-neu:#56677a;--vz-band:rgba(43,33,24,.07)}
 
 .vz{gap:10px}

@@ -82,7 +82,7 @@ def layout(path, title, desc, body, section=None, og_title=None, up="/", series=
 <meta name="description" content="{esc(desc)}">
 <link rel="canonical" href="{url}">
 <meta name="author" content="Marion Peter">
-<meta name="theme-color" content="#0f1b2d">
+<meta name="theme-color" content="#15253b">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Marion Peter">
 <meta property="og:title" content="{esc(og_title or title)}">
