@@ -445,3 +445,10 @@ a.plain:hover{color:var(--accent)}
 /* browsers without the popover attribute: the explanation opens in place under its card */
 @supports not selector(:popover-open){.pop{display:none;position:static;width:auto;max-height:none;margin:12px 0 0;box-shadow:none}.pop[data-open]{display:block}.pop-x{display:none}}
 @media print{.thumb .cue,.pop{display:none}}
+
+/* Ask the data: three sample questions on the home page (the page itself has assets/ask/ask.css) */
+.ask-teaser{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.ask-teaser a{display:flex;flex-direction:column;gap:8px;height:100%;padding:16px 18px;border:1px solid var(--rule-strong);outline:1px solid var(--rule);outline-offset:-5px;border-radius:2px;text-decoration:none;color:var(--ink);font-size:19px;line-height:1.35}
+.ask-teaser a::before{content:"Ask";font-family:var(--label);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.ask-teaser a:hover{border-color:var(--accent)}
+@media (max-width:960px){.ask-teaser{grid-template-columns:minmax(0,1fr)}}

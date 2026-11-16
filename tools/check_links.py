@@ -104,7 +104,8 @@ def main():
             if not t.exists():
                 bad.append(f"{show(page)}: {ref} -> missing {show(t)}")
                 continue
-            if frag and t.suffix == ".html":
+            # /ask/#q=... is a question for the Ask page's script, not an anchor; check_ask.py checks those
+            if frag and t.suffix == ".html" and not (frag.startswith("q=") and t == (ROOT / "ask" / "index.html").resolve()):
                 ids = parsed[t].ids if t in parsed else parse(t).ids
                 if frag not in ids:
                     bad.append(f"{show(page)}: {ref} -> no id '{frag}'")

@@ -507,7 +507,7 @@ PRINCIPLES = [
 
 PARTS = {
     "data": ("I", "Data analysis", "Kenya's insurance market rebuilt from the regulator's returns: the loss map, market structure, a cedant scorecard and an insurer explorer. Then a dealer group's revenue audit, a drought forecast and a football model.",
-             [("#work", "Kenya series"), ("#signals", "Reinsurer signals"), ("#data-more", "Audit and models")]),
+             [("#work", "Kenya series"), ("#signals", "Reinsurer signals"), ("#ask", "Ask the data"), ("#data-more", "Audit and models")]),
     "actuarial": ("II", "Actuarial analysis", "Health IBNR reserving, instalment persistency and parametric crop pricing as working tools, then IFRS 17 measurement and a reserve adequacy test on public US data.",
                   [("#apps", "Apps and pricing"), ("#actuarial-cases", "Case studies")]),
 }
@@ -562,8 +562,10 @@ def home():
 
 {signals("I.2")}
 
+{ask_teaser("I.3")}
+
 <section id="data-more" aria-labelledby="h-data-more">
-<div class="sechead">{eb("I.3", "Audit and models")}
+<div class="sechead">{eb("I.4", "Audit and models")}
 <h2 id="h-data-more">The same standard on other data</h2>
 <p>A Kenyan client's ledgers, published without client identifiers, and two products that turn data into a forecast someone can act on.</p></div>
 <div class="grid3">{case_card("dealer-revenue")}{product_card("Mapema")}{product_card("Matchday Model")}</div>
@@ -628,6 +630,10 @@ def kenya_series():
 <div class="sechead"><span class="eyebrow">The pages</span><h2 id="h-pages">Four ways into the same data</h2>
 <p>Each page is a single file built from the validated tables, with the method and caveats on the page.</p></div>
 <div class="grid2">{kenya_cards()}</div>
+</section>
+
+<section aria-label="Ask the data">
+<p class="note">A question these pages do not answer directly? <a href="/ask/">Ask the data</a>: pick an insurer, a class and a year, and the answer is calculated from the same validated figures.</p>
 </section>
 
 <section aria-labelledby="h-method">
@@ -1039,6 +1045,28 @@ def ask_about():
         [["Email", EMAIL], f"mailto:{EMAIL}", "Write an email", "/"],
         [["LinkedIn", "in/marion-peter"], LINKEDIN, "Open LinkedIn", "/"]])
     return {"about-done": done, "about-tools": tools, "about-checks": checks, "about-open": opened, "about-contact": contact}
+
+
+def ask_href(q, s):
+    return "/ask/#q=" + q + "".join(f"&{k}={v}" for k, v in s.items())
+
+
+def ask_teaser(num):
+    """Three questions about the market on the home page, each opening its answer on /ask/. No insurer names."""
+    D, B = load_ask(), ask_bank({})
+    qs = [("class-range", dict(y1=D["cyears"][0], y2=D["cyears"][-1])), ("uw-inv", dict(yr=D["years"][-1])),
+          ("concentration", dict(yr=D["years"][-1]))]
+    items = ""
+    for q, s in qs:
+        s = ask_answers.normalize(D, B, q, s)
+        items += f'<li><a href="{esc(ask_href(q, s))}">{esc(ask_answers.title(D, B, q, s))}</a></li>'
+    return f"""<section id="ask" aria-labelledby="h-ask">
+<div class="sechead">{eb(num, "Ask the data")}
+<h2 id="h-ask">Put a question to the market</h2>
+<p>The market, any insurer, the scorecard or reserving, answered in your browser from the validated figures. No language model, so nothing is made up.</p></div>
+<ul class="ask-teaser">{items}</ul>
+<div class="cta"><a class="btn primary" href="/ask/">Ask the data</a></div>
+</section>"""
 
 
 def ask_page():

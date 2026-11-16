@@ -35,7 +35,7 @@ KENYA = {  # the Kenya series pages, in reading order: (path, label in the side 
 #  home page sections that mark it while scrolling, [(href, label)])
 CHAPTERS = [
     ("data", "I", "Data analysis", "Data", "chart", "/#data", "Kenya's insurers, rebuilt from the regulator's returns",
-     "data work signals data-more",
+     "data work signals ask data-more",
      [(h, t) for h, t, _ in KENYA.values()] + [("/work/dealer-revenue/", "Dealer revenue audit")]),
     ("actuarial", "II", "Actuarial analysis", "Actuarial", "tri", "/#actuarial", "Reserving, IFRS 17 and pricing",
      "actuarial apps actuarial-cases",
@@ -54,7 +54,7 @@ _I, _II = ("I", "Data analysis", "/#data"), ("II", "Actuarial analysis", "/#actu
 HOME_WHERE = {
     "": [("Home", None)],
     "data": [_I], "work": [_I, ("Kenya series", "/#work")], "signals": [_I, ("Reinsurer signals", "/#signals")],
-    "data-more": [_I, ("Audit and models", "/#data-more")],
+    "ask": [_I, ("Ask the data", "/#ask")], "data-more": [_I, ("Audit and models", "/#data-more")],
     "actuarial": [_II], "apps": [_II, ("Apps and pricing", "/#apps")], "actuarial-cases": [_II, ("Case studies", "/#actuarial-cases")],
     "method": [("How I work", "/#method")], "contact": [("Contact", "/#contact")],
 }
