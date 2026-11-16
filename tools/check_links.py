@@ -114,11 +114,13 @@ def main():
             if urlparse(u).netloc in ("fonts.googleapis.com", "fonts.gstatic.com"):
                 continue
             code = fetch(u)
-            note = "" if code in (200, 999) else "  <- check"
+            # a sleeping app answers 202 (starting) or a redirect while it wakes; both mean the address is live
+            live = isinstance(code, int) and (200 <= code < 400 or code == 999)
+            note = "" if live else "  <- check"
             if code == 999:
                 note = "  (LinkedIn refuses automated requests; open it by hand)"
             print(f"  {code}  {u}{note}")
-            if code not in (200, 999):
+            if not live:
                 bad.append(f"external {u} returned {code}")
     if bad:
         print(f"{len(bad)} broken:")

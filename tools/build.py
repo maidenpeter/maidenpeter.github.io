@@ -435,6 +435,10 @@ def eb(num, text):
     return f'<span class="eyebrow"><i>{num}</i>{text}</span>'
 
 
+# The live apps run on free hosting that puts them to sleep when nobody is using them.
+APP_WAIT = "The app may take a few seconds to load while it starts up."
+
+
 def apps_section(num):
     a = AP
     hil = f"""<article class="card" id="hil">
@@ -444,6 +448,7 @@ def apps_section(num):
 <p class="find">A synthetic medical book of {n(a['hil_claims'])} claims. Best estimate outstanding KES {n(a['hil_be_kes'])}, Mack CV {d1(a['hil_cv'], False)}%. Then the test that matters: <b>a {a['hil_backlog_months']}-month, {a['hil_backlog_pct']}% payment slowdown makes chain ladder under-reserve by {d1(a['hil_backlog_err_pct'], False)}%</b>.</p>
 <dl class="meta"><dt>Method</dt><dd>Paid and received triangles, chain ladder, Mack, Bornhuetter-Ferguson, an ODP bootstrap and an IFRS 17 liability for incurred claims view.</dd><dt>Data</dt><dd>Seeded synthetic portfolio. Illustrative only.</dd><dt>Built with</dt><dd>R, Shiny, bslib and ChainLadder.</dd></dl>
 <div class="links"><a href="{HIL_URL}">Open the app</a></div>
+<p class="small">{APP_WAIT}</p>
 </article>"""
     ipl = f"""<article class="card" id="ipl">
 {thumb("ipl", IPL_URL)}<span class="badge live">Live</span>
@@ -452,6 +457,7 @@ def apps_section(num):
 <p class="find">Pay-as-you-go health cover on a synthetic book of {n(a['ipl_policies'])} policies. {d1(a['ipl_inforce_10'], False)}% are still in force after the 10th instalment, and members who lapse are paid <b>KES {a['ipl_lapsed_ratio']:.2f} in claims for every KES 1</b> they paid in, against KES {a['ipl_stayed_ratio']:.2f} for members who stay.</p>
 <dl class="meta"><dt>Method</dt><dd>Decrement tables in SQL (DuckDB), survival checks in R, an early warning model and a product levers simulator.</dd><dt>Data</dt><dd>Seeded synthetic portfolio. Illustrative only.</dd><dt>Built with</dt><dd>DuckDB, Python, R and Streamlit.</dd></dl>
 <div class="links"><a href="{IPL_URL}">Open the app</a></div>
+<p class="small">{APP_WAIT}</p>
 </article>"""
     return f"""<section id="apps" aria-labelledby="h-apps">
 <div class="sechead">{eb(num, "Apps and pricing")}
