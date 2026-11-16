@@ -44,6 +44,7 @@ CHAPTERS = [
 ]
 # (href, label, short label, icon, section, home page sections that mark it)
 HOME = ("/", "Home", "Home", "home", "home", "")
+ASK = ("/ask/", "Ask the data", "Ask", "ask", "ask", "")
 END = [("/about/", "About", "About", "person", "about", "method"),
        ("/#contact", "Contact", "Contact", "mail", None, "contact")]
 
@@ -66,6 +67,7 @@ ICONS = {
     "tri": "M4 4h4.5v4.5H4zM9.75 4h4.5v4.5h-4.5zM15.5 4H20v4.5h-4.5zM4 9.75h4.5v4.5H4zM9.75 9.75h4.5v4.5h-4.5zM4 15.5h4.5V20H4z",
     "person": "M12 11.5a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5zM4.5 20.5c.6-3.9 3.6-6 7.5-6s6.9 2.1 7.5 6",
     "mail": "M3.5 5.5h17v13h-17zM3.5 6.5l8.5 6.5 8.5-6.5",
+    "ask": "M3.5 4.5h17v11.5h-9l-5 4v-4h-3zM9.6 8.4a2.4 2.4 0 1 1 3.4 2.2c-.6.3-1 .8-1 1.5M12 14v.1",
     "code": "M8.5 7 3.5 12l5 5M15.5 7l5 5-5 5M13.5 4.5l-3 15",
     "theme": "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17z",
 }
@@ -153,7 +155,7 @@ def nav_html(path, section=None, base="", up="/", where=None):
     # On the home page there is no level above, so Back shows only once there is somewhere to go back to.
     back = (f'<a class="mp-back" href="{base}{up}"{" hidden data-home" if path == "/" else ""}>'
             f'{icon("back")}<span class="mp-l">Back</span><span class="mp-s">Back</span></a>')
-    links = top(*HOME) + "".join(chapters) + "".join(top(*e) for e in END)
+    links = top(*HOME) + "".join(chapters) + top(*ASK) + "".join(top(*e) for e in END)
     crumbs = crumbs_for(path, section, where)
     live = ""
     if path == "/":  # the home page follows the reader through its sections

@@ -18,6 +18,8 @@ from kenya_story import story
 import case_viz
 import viz
 import re
+from ask_bank import bank as ask_bank, DEFINITIONS as ASK_DEFS, GROUPS as ASK_GROUPS
+import ask_answers
 
 ROOT = Path(__file__).resolve().parent.parent
 BASE = "https://maidenpeter.github.io"   # change to https://marionpeter.nuruops.com once the custom domain is live
@@ -71,7 +73,7 @@ def ksh(v):
 
 
 # ----------------------------------------------------------------- layout
-def layout(path, title, desc, body, section=None, og_title=None, up="/", series=None, where=None):
+def layout(path, title, desc, body, section=None, og_title=None, up="/", series=None, where=None, head=""):
     url = BASE + path
     return f"""<!doctype html>
 <html lang="en">
@@ -102,7 +104,7 @@ def layout(path, title, desc, body, section=None, og_title=None, up="/", series=
 <link rel="stylesheet" href="{FONTS}">
 <link rel="stylesheet" href="/assets/site.css">
 <link rel="stylesheet" href="/assets/nav.css">
-<link rel="stylesheet" href="/assets/viz.css">
+<link rel="stylesheet" href="/assets/viz.css">{head}
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -437,6 +439,7 @@ def eb(num, text):
 
 # The live apps run on free hosting that puts them to sleep when nobody is using them.
 APP_WAIT = "The app may take a few seconds to load while it starts up."
+APP_OPEN = "Open the app (it may take a few seconds to load)"
 
 
 def apps_section(num):
@@ -970,6 +973,122 @@ def about():
                   body, "about", og_title=f"Marion Peter, {ROLE}")
 
 
+# ------------------------------------------------------------------ Ask the data
+ASK_DATA = ROOT / "assets" / "ask" / "data.json"
+
+
+def load_ask():
+    """The derived figures behind /ask/, written by tools/build_ask.py from the analysis repos and committed."""
+    return json.load(open(ASK_DATA, encoding="utf-8"))
+
+
+def ask_about():
+    """The About Marion answers. Each point is ([quotes], link, link text, page the quotes are on). Every quote
+    is copied from a page already on this site, and tools/check_ask.py fails if one is not on its page, so these
+    answers never say more about Marion than the site already does."""
+    yes = "Yes. The evidence on this site:"
+    reserving = "Reserving Analyst, MUA Mauritius and East Africa"
+    actuarial = "Actuarial Analyst, MUA Insurance (Kenya) Limited"
+    data_role = "Data Analyst, MUA Insurance (Kenya) Limited"
+    hil = ["Health IBNR Lab", "Paid and received triangles, chain ladder, Mack, Bornhuetter-Ferguson, an ODP bootstrap and an IFRS 17 liability for incurred claims view."]
+    ifrs = next(c for c in CASES if c["slug"] == "ifrs17-measurement")
+    dealer = next(c for c in CASES if c["slug"] == "dealer-revenue")
+    agro = next(p for p in load_products() if p["name"] == "AgroShield")
+    about_link = ["/about/", "About"]
+    done = {
+        "ibnr": dict(lead=yes, points=[
+            [[reserving, "Group-level IBNR reserve calculations across multiple entities"], *about_link, "/about/"],
+            [[reserving, "Reserve adequacy testing on the reserving methodology itself"], *about_link, "/about/"],
+            [hil, HIL_URL, APP_OPEN, "/"]]),
+        "ifrs17": dict(lead=yes, points=[
+            [[reserving, "IFRS 17 reporting support"], *about_link, "/about/"],
+            [[ifrs["title"], ifrs["method"]], "/work/ifrs17-measurement/", "Read the case study", "/"],
+            [hil, HIL_URL, APP_OPEN, "/"]]),
+        "pricing": dict(lead=yes, points=[
+            [[actuarial, "Product and claims analysis to support pricing decisions"], *about_link, "/about/"],
+            [[f"Worked example on public data: Buhlmann-Straub credibility across {CREDIBILITY['insurers']} US private motor insurers."], *about_link, "/about/"],
+            [["AgroShield", agro["line"].split(". ")[0].rstrip(".") + "."], "/#agroshield", "AgroShield on the home page", "/"],
+            [["Kenya Insurance Loss Map", f"On 2023 to 2025 experience, motor commercial premiums would need to rise {d1(K['rate_mc'], False)}% to break even."],
+             PAGE["lossmap"], "Open the Loss Map", "/"]]),
+        "reinsurance": dict(lead=yes, points=[
+            [["Kenya Cedant Scorecard", "Every insurer graded A to E each year the way a reinsurer screens a cedant."], PAGE["scorecard"], "Open the scorecard", "/"]]
+            + [[[t, d], *about_link, "/about/"] for _, t, d in HACKATHONS]),
+        "health": dict(lead=yes, points=[
+            [["Health IBNR Lab", f"A synthetic medical book of {n(AP['hil_claims'])} claims."], HIL_URL, APP_OPEN, "/"],
+            [["Instalment Persistency Lab", f"Pay-as-you-go health cover on a synthetic book of {n(AP['ipl_policies'])} policies."], IPL_URL, APP_OPEN, "/"]]),
+    }
+    tools = dict(lead="The evidence on this site, tool by tool:", points=[
+        [["What the work is built with", "Python (pandas, numpy, chainladder, pytest), Excel, Power BI, pdftotext for regulator PDFs, Git and GitHub Actions."], *about_link, "/about/"],
+        [["Health IBNR Lab", "R, Shiny, bslib and ChainLadder."], HIL_URL, APP_OPEN, "/"],
+        [["Instalment Persistency Lab", "Decrement tables in SQL (DuckDB), survival checks in R, an early warning model and a product levers simulator."], IPL_URL, APP_OPEN, "/"],
+        [[data_role, "Power BI and Excel dashboards tracking KPIs and operational metrics"], *about_link, "/about/"],
+        [[dealer["title"], dealer["method"]], "/work/dealer-revenue/", "Read the case study", "/"]])
+    checks = dict(lead="In her words, from the home page:", points=[
+        [["A total that balances is the first thing I check"], "/#method", "How I work", "/"]]
+        + [[[t, d], "/#method", "How I work", "/"] for t, d in PRINCIPLES]
+        + [[[f"Errors in the official tables are documented, not hidden: every one of the {K['failed_checks']} failed checks traces to a known IRA publishing error."],
+            "/kenya-insurance/", "The Kenya series", "/kenya-insurance/"]])
+    opened = dict(lead="Live now, with nothing to install:", points=[
+        [["Health IBNR Lab", "Health reserving, R and Shiny"], HIL_URL, APP_OPEN, "/"],
+        [["Instalment Persistency Lab", "Health product design, SQL, Python and R"], IPL_URL, APP_OPEN, "/"]]
+        + [[[t], PAGE[k], "Open", "/"] for k, t in [("lossmap", "Kenya Insurance Loss Map"), ("structure", "Kenya Insurance Market Structure"),
+                                                    ("scorecard", "Kenya Cedant Scorecard"), ("explorer", "Kenya Insurer Explorer")]]
+        + [[[c["title"]], f"/work/{c['slug']}/", "Read", "/"] for c in CASES])
+    contact = dict(lead="From the contact section:", points=[
+        [["If you are hiring for an actuarial, pricing, reserving or data role at an insurer or reinsurer, write to me."], "/#contact", "Contact", "/"],
+        [["Email", EMAIL], f"mailto:{EMAIL}", "Write an email", "/"],
+        [["LinkedIn", "in/marion-peter"], LINKEDIN, "Open LinkedIn", "/"]])
+    return {"about-done": done, "about-tools": tools, "about-checks": checks, "about-open": opened, "about-contact": contact}
+
+
+def ask_page():
+    D = load_ask()
+    B = ask_bank(ask_about())
+    data = json.dumps(B, separators=(",", ":"), ensure_ascii=True).replace("</", "<\\/")
+    defs = "".join(f'<dt>{esc(t)}</dt><dd>{esc(d)} <span class="ask-def-src">{esc(r)}, {esc(f)}</span></dd>' for t, d, r, f in ASK_DEFS)
+    built = " and ".join(f'<a href="{GH}/{r}/commit/{sha}">{r} at commit {sha}</a>' for r, sha in D["sources"].items())
+    kb = round(ASK_DATA.stat().st_size / 1024)
+    places = {"market": [(PAGE["lossmap"], "Loss Map"), (PAGE["structure"], "Market Structure"), ("/kenya-insurance/", "the Kenya series")],
+              "insurer": [(PAGE["explorer"], "Insurer Explorer")], "reinsurer": [(PAGE["scorecard"], "Cedant Scorecard")],
+              "reserving": [("/#tri-h", "the triangle on the home page"), ("/work/ifrs17-measurement/", "the IFRS 17 case study")],
+              "about": [("/about/", "About"), ("/#contact", "Contact")]}
+    noscript = "".join(f'<li>{esc(t)}: ' + ", ".join(f'<a href="{h}">{x}</a>' for h, x in places[k]) + "</li>" for k, t in ASK_GROUPS)
+    body = f"""<section class="ask-head" aria-labelledby="h1">
+<span class="eyebrow">Kenya insurance series</span>
+<h1 id="h1">Ask the data</h1>
+<p class="lede">Every answer is calculated from the validated IRA panel. No language model, so nothing is made up.</p>
+<p class="ask-how"><b>How this works.</b> Pick a question, set its insurer, class or year, and press Ask. Your browser loads a compact file of derived figures, built and tested from the validated panel, and calculates the answer from it: the finding, its numbers, a chart, the source and the page that shows it in full. A typed question is matched to the nearest question here, and nothing is calculated until you confirm it.</p>
+</section>
+
+<section class="ask-layout" aria-label="Questions and answers">
+<div class="ask-main">
+<p class="ask-empty" id="ask-empty">Answers appear here. Pick a question to start.</p>
+<div id="ask-thread" class="ask-thread" hidden></div>
+<p id="ask-status" class="sr-only" aria-live="polite"></p>
+<button type="button" id="ask-reset" class="btn quiet ask-reset" hidden>Reset the thread</button>
+</div>
+<div class="ask-side">
+<form id="ask-form" class="ask-form" hidden><label for="ask-text">Type a question</label><input id="ask-text" type="text" autocomplete="off" spellcheck="false" placeholder="For example: motor loss ratio each year"><button type="submit" class="btn quiet">Find it</button></form>
+<p id="ask-loading" class="small" hidden>Loading the figures.</p>
+<div id="ask-bank" class="ask-bank"></div>
+<noscript><div class="ask-noscript"><p>The answers here are calculated by JavaScript, which is off. The same figures are on these pages:</p><ul>{noscript}</ul></div></noscript>
+</div>
+</section>
+
+<section aria-labelledby="h-how">
+<div class="sechead"><span class="eyebrow">Method</span><h2 id="h-how">How the answers are calculated</h2>
+<p>Each answer is a lookup, a sum, a rank or a ratio of the figures below, done in your browser. The same answers are recomputed in Python straight from the processed tables, and read back from this page in a browser; any difference fails the site's checks.</p></div>
+<dl class="meta ask-defs">{defs}</dl>
+<p class="small">The figures file ({kb} KB) holds, for each insurer, its full-year totals, the four class figures the <a href="{PAGE['explorer']}">Insurer Explorer</a> already shows (gross premium, net earned premium, incurred claims and underwriting result), its scorecard results, and the six US reserves. The extracted tables themselves are not published here. Built from {built}.</p>
+<p class="small">An answer that names an insurer reads its unaudited returns to the IRA. A screening view, not a credit opinion.</p>
+</section>
+<script type="application/json" id="ask-bank-data">{data}</script>
+<script src="/assets/ask/ask.js" defer></script>"""
+    return layout("/ask/", "Ask the data | Marion Peter",
+                  "Questions about Kenya's general insurance market, answered in the browser from the validated IRA panel. No language model, so nothing is made up.",
+                  body, "ask", where=[("Ask the data", None)], head='\n<link rel="stylesheet" href="/assets/ask/ask.css">')
+
+
 def not_found():
     body = f"""<section aria-labelledby="h1" style="min-height:40vh;justify-content:center">
 <span class="eyebrow">404</span>
@@ -1027,6 +1146,7 @@ def main():
         "index.html": home(),
         "kenya-insurance/index.html": kenya_series(),
         "about/index.html": about(),
+        "ask/index.html": ask_page(),
         "work/dealer-revenue/index.html": dealer_page(),
         "work/ifrs17-measurement/index.html": ifrs17_page(),
         "work/valuation-adequacy/index.html": auctions_page(),
