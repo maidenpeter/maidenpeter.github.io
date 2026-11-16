@@ -50,10 +50,17 @@ def short(name):
     return name
 
 
+# The files each repo contributes. A repo's stamp is the last commit that changed one of them, so a commit
+# that only touches pages (a navigation change, say) leaves the stamp, and data.json, as they are.
+INPUTS = {"ira-kenya-data": ["data/processed", "reference", "validation"],
+          "ira-kenya-insurance": ["src/structure/build.py"],
+          "ira-kenya-reinsurance": ["output"]}
+
+
 def commit(repo):
     try:
-        return subprocess.run(["git", "-C", str(repo), "rev-parse", "--short=12", "HEAD"], capture_output=True,
-                              text=True, check=True).stdout.strip()
+        return subprocess.run(["git", "-C", str(repo), "log", "-1", "--format=%h", "--abbrev=12", "--", *INPUTS[repo.name]],
+                              capture_output=True, text=True, check=True).stdout.strip() or "unknown"
     except (OSError, subprocess.CalledProcessError):
         return "unknown"
 

@@ -332,9 +332,9 @@ def repos(root, D, B, C):
         check(f"data.json {key} equals the processed tables", same(D[key], F[key]),
               next((f"{i}" for i in sorted(set(D[key]) | set(F[key])) if not same(D[key].get(i), F[key].get(i))), "") if isinstance(D[key], dict) else "")
     check("data.json triangles equal a chain ladder on tools/cas_triangles.json", same(D["tri"], F["tri"], 0.001))
-    check("data.json sources are the repos' current commits", all(
-        subprocess.run(["git", "-C", str(root / r), "rev-parse", "--short=12", "HEAD"], capture_output=True, text=True).stdout.strip() == sha
-        for r, sha in D["sources"].items()), D["sources"])
+    import build_ask   # the stamp is the last commit that changed the files data.json is built from
+    now = {r: build_ask.commit((root / r).resolve()) for r in D["sources"]}
+    check("data.json sources are the last commits that changed its inputs", now == D["sources"], f"{D['sources']} / now {now}")
     for label, q, s in C:
         a, b = strip(AA.answer(D, B, q, s)), strip(AA.answer(F, B, q, s))
         diff = [k for k in a if a[k] != b[k]]
