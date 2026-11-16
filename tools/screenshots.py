@@ -13,7 +13,9 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parent.parent
 PAGES = ["/", "/kenya-insurance/", "/about/", "/work/dealer-revenue/", "/work/ifrs17-measurement/",
-         "/work/valuation-adequacy/", "/no-such-page/"]
+         "/work/valuation-adequacy/", "/no-such-page/",
+         # Ask the data: empty, with an answer about one insurer, and with an answer about the market
+         "/ask/", "/ask/#q=ins-class-year&ins=cic_general&cls=medical&yr=2024", "/ask/#q=class-range&y1=2018&y2=2025"]
 
 
 class Quiet(http.server.SimpleHTTPRequestHandler):
@@ -82,7 +84,7 @@ def main():
                     pg.wait_for_load_state("networkidle")
                     pg.wait_for_timeout(2200)  # let the triangle finish filling in
                     sw = pg.evaluate("Math.max(document.documentElement.scrollWidth, document.body.scrollWidth)")
-                    name = (path.strip("/").replace("/", "_") or "home") + f"_{width}_{scheme}.png"
+                    name = (path.strip("/").replace("/", "_").replace("#q=", "").replace("&", "_").replace("=", "-") or "home") + f"_{width}_{scheme}.png"
                     pg.screenshot(path=str(out / name), full_page=True)
                     if sw > width:
                         problems.append(f"{path} at {width}px {scheme}: page is {sw}px wide")
