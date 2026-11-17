@@ -613,11 +613,71 @@
     return vzFigure(c.title, plot, key, o.table ? vzTable(o.table) : '');
   }
 
-  /* --- the thread --- */
+  /* --- the conversation --- */
   var D = null, B = null, thread, status, n = 0;
+  var SLOTNAME = { y1: 'First year', y2: 'Last year', yr: 'Year', ins: 'Insurer', cls: 'Class', line: 'Line', topic: 'Topic' };
+
+  // the question text with its chosen values marked, for a pill or a bubble
+  function marked(q, s) {
+    var Q = question(B, q);
+    return esc(Q.t).replace(/\{(\w+)\}/g, function (m, k) { return '<span class="ask-tok">' + esc(label(D, B, Q.slots[k], s[k])) + '</span>'; });
+  }
+  function pill(q, s, cls) {
+    return '<button type="button" class="ask-pill' + (cls ? ' ' + cls : '') + '" data-q="' + q + '" data-s="' + esc(JSON.stringify(s)) + '">' + marked(q, s) + '</button>';
+  }
+  function slotSelect(k, kind, v) {
+    return '<label class="ask-slot"><span>' + SLOTNAME[k] + '</span><select data-slot="' + k + '">' + choices(D, B, kind).map(function (c) {
+      return '<option value="' + esc(c[0]) + '"' + (c[0] === v ? ' selected' : '') + '>' + esc(c[1]) + '</option>';
+    }).join('') + '</select></label>';
+  }
+  // the question's values as dropdowns, and a button to ask it with them
+  function changer(q, s, go) {
+    var Q = question(B, q), ks = Object.keys(Q.slots);
+    return '<div class="ask-change" data-q="' + q + '">' + ks.map(function (k) { return slotSelect(k, Q.slots[k], s[k]); }).join('')
+      + '<button type="button" class="ask-go">' + go + '</button></div>';
+  }
+  function readChip(el) {
+    var s = {};
+    [].forEach.call(el.querySelectorAll('select[data-slot]'), function (x) { s[x.getAttribute('data-slot')] = x.value; });
+    return s;
+  }
+
+  // two or three questions that follow from an answer, carrying over its insurer and year
+  function follow(q, s) {
+    var ins = s.ins, yr = s.yr || s.y2, a = function (q2, s2) { return [q2, s2 || {}]; };
+    var T = {
+      'class-range': [a('motor-lr'), a('uw-inv', { yr: s.y2 }), a('profit-count', { yr: s.y2 })],
+      'uw-inv': [a('profit-count', { yr: yr }), a('concentration', { yr: yr }), a('class-range')],
+      'profit-count': [a('uw-inv', { yr: yr }), a('concentration', { yr: yr }), a('growth', { yr: yr })],
+      'concentration': [a('growth', { yr: yr }), a('ins-rank', { yr: yr }), a('profit-count', { yr: yr })],
+      'motor-lr': [a('class-range'), a('ins-class-year', { cls: 'motor-commercial' })],
+      'ins-class-year': [a('ins-trend', { ins: ins }), a('ins-rank', { ins: ins, yr: yr }), a('ins-mix', { ins: ins, yr: yr })],
+      'ins-trend': [a('ins-rank', { ins: ins, yr: yr }), a('ins-mix', { ins: ins, yr: yr }), a('scorecard', { ins: ins, yr: yr })],
+      'ins-rank': [a('ins-mix', { ins: ins, yr: yr }), a('ins-trend', { ins: ins }), a('scorecard', { ins: ins, yr: yr })],
+      'ins-mix': [a('ins-class-year', { ins: ins, yr: yr }), a('ins-rank', { ins: ins, yr: yr }), a('scorecard', { ins: ins, yr: yr })],
+      'scorecard': [a('ins-trend', { ins: ins }), a('ins-rank', { ins: ins, yr: yr }), a('backtest')],
+      'growth': [a('concentration', { yr: yr }), a('uw-inv', { yr: yr })],
+      'backtest': [a('scorecard'), a('growth')],
+      'tri-largest': [a('tri-unpaid'), a('tri-sum')],
+      'tri-unpaid': [a('tri-largest'), a('tri-sum')],
+      'tri-sum': [a('tri-largest'), a('about-done', { topic: 'ifrs17' })],
+      'about-done': [a('about-tools'), a('about-open'), a('about-contact')],
+      'about-tools': [a('about-checks'), a('about-open')],
+      'about-checks': [a('about-tools'), a('about-done', { topic: 'ibnr' })],
+      'about-open': [a('about-contact'), a('about-done', { topic: 'reinsurance' })],
+      'about-contact': [a('about-open'), a('about-done', { topic: 'pricing' })]
+    };
+    return (T[q] || []).map(function (f) {
+      var s2 = defaults(D, B, f[0]);
+      Object.keys(f[1]).forEach(function (k) { if (f[1][k] !== undefined && k in s2) s2[k] = String(f[1][k]); });
+      return [f[0], normalize(D, B, f[0], s2)];
+    });
+  }
 
   function answerHtml(o) {
-    var h = '<p class="ask-who">Answer</p>' + o.say.map(function (p) { return '<p class="ask-say">' + esc(p) + '</p>'; }).join('');
+    // an amount never breaks between its currency and its number (the text itself is unchanged)
+    var keep = function (t) { return esc(t).replace(/(KSh|US\$) ([^\s,;:]+)/g, '<span class="ask-nb">$1 $2</span>'); };
+    var h = '<p class="ask-who">Answer</p>' + o.say.map(function (p, i) { return '<p class="ask-say' + (i ? '' : ' ask-lead') + '">' + keep(p) + '</p>'; }).join('');
     // About answers: quotes from pages on this site, a heading and what it says, then the link
     if (o.points) h += '<ul class="ask-points">' + o.points.map(function (p) {
       var q = p[0].length > 1 ? '<b>' + esc(p[0][0]) + '</b>: ' + esc(p[0].slice(1).join(' ')) : esc(p[0][0]);
@@ -626,19 +686,23 @@
     if (o.nums.length) h += '<dl class="ask-nums">' + o.nums.map(function (x) { return '<div data-k="' + esc(x[0]) + '"><dt>' + esc(x[1]) + '</dt><dd>' + esc(x[2]) + '</dd></div>'; }).join('') + '</dl>';
     if (o.chart) h += chartHtml(o);
     else if (o.table) h += vzTable(o.table);
-    if (o.src) h += '<p class="ask-src"><b>Source</b> ' + esc(o.src) + '</p>';
-    if (o.cav) h += '<p class="ask-cav">' + esc(B.caveat) + '</p>';
-    if (o.note) h += '<p class="ask-note">' + esc(o.note) + '</p>';
-    if (o.link.length) h += '<p class="ask-links">' + o.link.map(function (l) { return '<a href="' + esc(l[0]) + '">' + esc(l[1]) + '</a>'; }).join('') + '</p>';
+    var meta = (o.src ? '<p class="ask-src"><b>Source</b> ' + esc(o.src) + '</p>' : '')
+      + (o.cav ? '<p class="ask-cav">' + esc(B.caveat) + '</p>' : '')
+      + (o.note ? '<p class="ask-note">' + esc(o.note) + '</p>' : '')
+      + (o.link.length ? '<p class="ask-links">' + o.link.map(function (l) { return '<a href="' + esc(l[0]) + '">' + esc(l[1]) + '</a>'; }).join('') + '</p>' : '');
+    if (meta) h += '<div class="ask-meta">' + meta + '</div>';
+    var acts = '';
+    if (Object.keys(o.slots).length) acts += '<div class="ask-act"><p class="ask-act-t">Change the question</p>' + changer(o.q, o.slots, 'Ask again') + '</div>';
+    var nx = follow(o.q, o.slots);
+    if (nx.length) acts += '<div class="ask-act"><p class="ask-act-t">Ask next</p><div class="ask-next">' + nx.map(function (f) { return pill(f[0], f[1], 'ask-follow'); }).join('') + '</div></div>';
+    if (acts) h += '<div class="ask-acts">' + acts + '</div>';
     return h;
   }
-  function post(html, cls) {
-    var el = document.createElement('div');
+  function post(html, cls, tag) {
+    var el = document.createElement(tag || 'div');
     el.className = 'ask-msg ' + cls;
     el.innerHTML = html;
     thread.appendChild(el);
-    thread.hidden = false;
-    document.getElementById('ask-empty').hidden = true;
     document.getElementById('ask-reset').hidden = false;
     return el;
   }
@@ -653,45 +717,53 @@
     var o = answer(D, B, q, s);
     if (!o) return;
     n += 1;
-    post('<p class="ask-who">You asked</p><p class="ask-qt">' + esc(o.title) + '</p>', 'ask-q');
-    var el = post(answerHtml(o), 'ask-a' + (o.ok ? '' : ' ask-none'));
+    var you = post('<p class="ask-who">You asked</p><p class="ask-qt">' + marked(q, o.slots) + '</p>', 'ask-q');
+    var el = post(answerHtml(o), 'ask-a' + (o.ok ? '' : ' ask-none'), 'article');
     el.setAttribute('data-q', q);
     el.setAttribute('data-n', String(n));
+    el.setAttribute('aria-label', 'Answer: ' + o.title);
     status.textContent = o.say.join(' ');
     try { history.replaceState(history.state, '', hashFor(q, o.slots)); } catch (e) { /* a file:// page may refuse */ }
-    show(el.previousSibling);
+    show(you);
   }
 
-  /* --- the question chips --- */
-  function slotSelect(q, k, kind, v) {
-    var names = { y1: 'First year', y2: 'Last year', yr: 'Year', ins: 'Insurer', cls: 'Class', line: 'Line', topic: 'Topic' };
-    return '<select data-slot="' + k + '" aria-label="' + names[k] + '">' + choices(D, B, kind).map(function (c) {
-      return '<option value="' + esc(c[0]) + '"' + (c[0] === v ? ' selected' : '') + '>' + esc(c[1]) + '</option>';
-    }).join('') + '</select>';
-  }
-  function chipHtml(Q, s) {
-    if (!Object.keys(Q.slots).length) return '<button type="button" class="ask-chip ask-one" data-q="' + Q.id + '">' + esc(Q.t) + '</button>';
-    var text = esc(Q.t).replace(/\{(\w+)\}/g, function (m, k) { return slotSelect(Q.id, k, Q.slots[k], s[k]); });
-    return '<div class="ask-chip" data-q="' + Q.id + '"><span class="ask-chip-t">' + text + '</span><button type="button" class="ask-go">Ask</button></div>';
-  }
-  function readChip(el) {
-    var s = {};
-    [].forEach.call(el.querySelectorAll('select[data-slot]'), function (x) { s[x.getAttribute('data-slot')] = x.value; });
-    return s;
+  /* --- the questions: topics as tabs, each question a pill asked with its usual values --- */
+  function pickTab(i, focus) {
+    var tabs = [].slice.call(document.querySelectorAll('#ask-bank .ask-tab'));
+    tabs.forEach(function (t, k) {
+      var on = k === i;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    });
+    if (focus) tabs[i].focus();
   }
   function drawBank() {
     var box = document.getElementById('ask-bank');
-    box.innerHTML = B.groups.map(function (g) {
-      var qs = B.questions.filter(function (Q) { return Q.g === g[0]; });
-      return '<div class="ask-group"><h3 class="tag">' + esc(g[1]) + '</h3><div class="ask-chips">'
-        + qs.map(function (Q) { return chipHtml(Q, defaults(D, B, Q.id)); }).join('') + '</div></div>';
+    var tabs = B.groups.map(function (g, i) {
+      return '<button type="button" role="tab" class="ask-tab" id="ask-tab-' + g[0] + '" aria-controls="ask-panel-' + g[0] + '" aria-selected="' + (i === 0) + '" tabindex="' + (i ? -1 : 0) + '">' + esc(g[1]) + '</button>';
     }).join('');
-    box.addEventListener('click', function (e) {
-      var b = e.target.closest('button');
-      if (!b) return;
-      var chip = b.closest('[data-q]');
-      ask(chip.getAttribute('data-q'), readChip(chip));
+    var panels = B.groups.map(function (g, i) {
+      return '<div class="ask-pills" role="tabpanel" id="ask-panel-' + g[0] + '" aria-labelledby="ask-tab-' + g[0] + '"' + (i ? ' hidden' : '') + '>'
+        + B.questions.filter(function (Q) { return Q.g === g[0]; }).map(function (Q) { return pill(Q.id, defaults(D, B, Q.id)); }).join('') + '</div>';
+    }).join('');
+    box.innerHTML = '<div class="ask-tabs" role="tablist" aria-label="Topics">' + tabs + '</div>' + panels;
+    var tl = box.querySelector('.ask-tabs');
+    tl.addEventListener('click', function (e) { var t = e.target.closest('.ask-tab'); if (t) pickTab([].indexOf.call(tl.children, t)); });
+    tl.addEventListener('keydown', function (e) {
+      var i = [].indexOf.call(tl.children, document.activeElement), m = tl.children.length;
+      var k = { ArrowRight: i + 1, ArrowLeft: i - 1 + m, Home: 0, End: m - 1 }[e.key];
+      if (k === undefined || i < 0) return;
+      e.preventDefault();
+      pickTab(k % m, true);
     });
+  }
+  // one listener for every pill and every Ask button on the page
+  function onClick(e) {
+    var p = e.target.closest('.ask-pill');
+    if (p) { ask(p.getAttribute('data-q'), JSON.parse(p.getAttribute('data-s'))); return; }
+    var g = e.target.closest('.ask-go');
+    if (g) { var c = g.closest('.ask-change'); ask(c.getAttribute('data-q'), readChip(c)); }
   }
 
   /* --- typed questions: matched to a chip by keywords, never answered by guess --- */
@@ -747,24 +819,17 @@
   }
   function typed(text) {
     if (!text.trim()) return;
-    post('<p class="ask-who">You typed</p><p class="ask-qt">' + esc(text) + '</p>', 'ask-q');
-    var m = match(text), el;
+    var you = post('<p class="ask-who">You typed</p><p class="ask-qt">' + esc(text) + '</p>', 'ask-q'), m = match(text);
     if (m) {
-      el = post('<p class="ask-who">Did you mean</p><div class="ask-chips">' + chipHtml(question(B, m.q), m.s) + '</div>'
-        + '<p class="ask-say small">Change anything in the question, then ask it. Nothing is answered until you do.</p>', 'ask-a ask-dym');
-      el.addEventListener('click', function (e) {
-        var b = e.target.closest('button');
-        if (!b) return;
-        var chip = b.closest('[data-q]');
-        ask(chip.getAttribute('data-q'), readChip(chip));
-      });
+      post('<p class="ask-who">Did you mean</p><p class="ask-qt">' + marked(m.q, m.s) + '</p>' + changer(m.q, m.s, 'Ask this')
+        + '<p class="ask-hint">Change anything above, then ask it. Nothing is calculated until you do.</p>', 'ask-a ask-dym');
       status.textContent = 'Did you mean: ' + title(D, B, m.q, m.s);
     } else {
-      el = post('<p class="ask-who">No match</p><p class="ask-say">None of the questions here matches that, so there is no answer to give. The questions cover '
-        + B.groups.map(function (g) { return esc(g[1].toLowerCase()); }).join(', ') + '. <a href="#ask-bank">Choose one</a>.</p>', 'ask-a ask-none');
+      post('<p class="ask-who">No match</p><p class="ask-say">None of the questions here matches that, so there is no answer to give. The questions cover '
+        + B.groups.map(function (g) { return esc(g[1].toLowerCase()); }).join(', ') + '. <a href="#ask-welcome">Choose one</a>.</p>', 'ask-a ask-none');
       status.textContent = 'No question matches that.';
     }
-    show(el.previousSibling);
+    show(you);
   }
 
   function fromHash() {
@@ -784,17 +849,19 @@
       D = d;
       note.hidden = true;
       drawBank();
-      document.getElementById('ask-form').hidden = false;
-      document.getElementById('ask-form').addEventListener('submit', function (e) {
-        e.preventDefault();
-        var f = document.getElementById('ask-text');
-        typed(f.value);
-        f.value = '';
+      document.addEventListener('click', onClick);
+      var form = document.getElementById('ask-form'), text = document.getElementById('ask-text');
+      form.hidden = false;
+      form.addEventListener('submit', function (e) { e.preventDefault(); typed(text.value); text.value = ''; });
+      document.getElementById('ask-browse').addEventListener('click', function () {
+        show(document.getElementById('ask-welcome'));
+        var t = document.querySelector('#ask-bank .ask-tab[aria-selected="true"]');
+        if (t) t.focus({ preventScroll: true });
       });
       document.getElementById('ask-reset').addEventListener('click', function () {
-        thread.innerHTML = ''; thread.hidden = true; this.hidden = true; status.textContent = 'The thread is cleared.';
-        document.getElementById('ask-empty').hidden = false;
+        thread.innerHTML = ''; this.hidden = true; status.textContent = 'The answers are cleared.';
         try { history.replaceState(history.state, '', location.pathname); } catch (e) { /* ignore */ }
+        text.focus();
       });
       addEventListener('hashchange', fromHash);
       fromHash();

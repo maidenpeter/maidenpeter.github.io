@@ -102,21 +102,21 @@
 .vz-grades tbody th{text-align:left;color:var(--ink);font-size:14px;font-weight:500;padding:4px 10px 4px 0;min-width:8em;max-width:10.5em}
 .vz-grades tbody th small{display:block;font-size:12px;font-weight:400;color:var(--muted)}
 .vz-grades td{min-width:28px;height:32px;text-align:center;border-radius:4px;color:var(--ink);font-weight:600;background:var(--sunk)}
-.vz-grades td.g-A{background:color-mix(in oklab,var(--gain) 62%,var(--surface))}
+.vz-grades td.g-A{background:color-mix(in oklab,var(--gain) 55%,var(--surface))}
 .vz-grades td.g-B{background:color-mix(in oklab,var(--gain) 30%,var(--surface))}
 .vz-grades td.g-C{background:color-mix(in oklab,var(--ink) 12%,var(--surface))}
 .vz-grades td.g-D{background:color-mix(in oklab,var(--loss) 34%,var(--surface))}
-.vz-grades td.g-E{background:color-mix(in oklab,var(--loss) 66%,var(--surface))}
+.vz-grades td.g-E{background:color-mix(in oklab,var(--loss) 58%,var(--surface))}
 .vz-grades td.nr{background:repeating-linear-gradient(45deg,var(--rule) 0 2px,transparent 2px 6px);color:var(--muted);font-weight:400;font-size:12px}
 .vz-grades td.act{background:transparent;box-shadow:inset 0 0 0 2px var(--accent);color:var(--ink);font-weight:500;font-size:12px;white-space:nowrap;padding:0 6px}
 .vz-grades td.last{box-shadow:inset 0 0 0 2px var(--ink)}
 .vz-grades td:empty:not(.nr){background:transparent}
 .vz-grades tr.vz-div th{text-align:left;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:14px 0 2px}
-.vz-key i.g-A{background:color-mix(in oklab,var(--gain) 62%,var(--surface))}
+.vz-key i.g-A{background:color-mix(in oklab,var(--gain) 55%,var(--surface))}
 .vz-key i.g-B{background:color-mix(in oklab,var(--gain) 30%,var(--surface))}
 .vz-key i.g-C{background:color-mix(in oklab,var(--ink) 12%,var(--surface))}
 .vz-key i.g-D{background:color-mix(in oklab,var(--loss) 34%,var(--surface))}
-.vz-key i.g-E{background:color-mix(in oklab,var(--loss) 66%,var(--surface))}
+.vz-key i.g-E{background:color-mix(in oklab,var(--loss) 58%,var(--surface))}
 .vz-key i.nr{background:repeating-linear-gradient(45deg,var(--rule-strong) 0 2px,transparent 2px 5px)}
 .vz-key i.act{background:transparent;box-shadow:inset 0 0 0 2px var(--accent)}
 
@@ -192,3 +192,14 @@
   .vz-tl-name{text-align:left}
   .vz-tl-track{min-height:16px}
 }
+
+/* readability: chart text one step larger, for readers who need it (nothing under 13px) */
+.vz-sub{font-size:15px}
+.vz-note,.vz-ylab,.vz-xlab{font-size:14px}
+.vz-key,.vz-tab,.vz-grades{font-size:14.5px}
+.vz-tick b,.vz-axis span span,.vz-top span span,.vz-gx b,.vz-gy b,.vz-refx b,.vz-refy b,.vz-quad,.vz-dot b,.vz-name small,
+.vz-tl-name small,.vz-tl-group,.vz-grades th,.vz-grades tbody th small,.vz-grades tr.vz-div th{font-size:13px}
+.vz-col em,.vz-x,.vz-pt b,.vz-tl-head span span{font-size:13.5px}
+.vz-name,.vz-tl-name,.vz-grades tbody th{font-size:15px}
+.vz-seg b{font-size:14px}
+@container (max-width:400px){.vz-x{font-size:13px}.vz-name{font-size:14px}.vz-grades td{font-size:13.5px}}

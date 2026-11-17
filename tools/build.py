@@ -194,7 +194,8 @@ def popout(pid, title, tag, body, img, alt):
 
 PRODUCT_KEYS = {"AgroShield": ("agroshield", "Parametric crop insurance, pricing"),
                 "Mapema": ("mapema", "Drought early warning, forecasting"),
-                "Matchday Model": ("matchday", "Sports statistics, Dixon-Coles model")}
+                "Matchday Model": ("matchday", "Sports statistics, Dixon-Coles model"),
+                "CargoShield": ("cargoshield", "Air cargo risk and cover, aviation")}
 
 
 def product_card(name):
@@ -506,7 +507,7 @@ PRINCIPLES = [
 
 
 PARTS = {
-    "data": ("I", "Data analysis", "Kenya's insurance market rebuilt from the regulator's returns: the loss map, market structure, a cedant scorecard and an insurer explorer. Then a dealer group's revenue audit, a drought forecast and a football model.",
+    "data": ("I", "Data analysis", "Kenya's insurance market rebuilt from the regulator's returns: the loss map, market structure, a cedant scorecard and an insurer explorer. Then a dealer group's revenue audit, a cargo airline's risk layer, a drought forecast and a football model.",
              [("#work", "Kenya series"), ("#signals", "Reinsurer signals"), ("#ask", "Ask the data"), ("#data-more", "Audit and models")]),
     "actuarial": ("II", "Actuarial analysis", "Health IBNR reserving, instalment persistency and parametric crop pricing as working tools, then IFRS 17 measurement and a reserve adequacy test on public US data.",
                   [("#apps", "Apps and pricing"), ("#actuarial-cases", "Case studies")]),
@@ -546,7 +547,7 @@ def home():
 
 {toc}
 
-{part_head("data", "I", "Data analysis", "Start from the source and check it before believing it. Kenya's insurance market rebuilt from the regulator's own returns, a dealer group's ledgers taken apart, and two forecasting products.")}
+{part_head("data", "I", "Data analysis", "Start from the source and check it before believing it. Kenya's insurance market rebuilt from the regulator's own returns, a dealer group's ledgers taken apart, a cargo airline's risk layer and two forecasting products.")}
 
 <section id="work" aria-labelledby="h-work">
 <div class="kenya-head">
@@ -567,8 +568,8 @@ def home():
 <section id="data-more" aria-labelledby="h-data-more">
 <div class="sechead">{eb("I.4", "Audit and models")}
 <h2 id="h-data-more">The same standard on other data</h2>
-<p>A Kenyan client's ledgers, published without client identifiers, and two products that turn data into a forecast someone can act on.</p></div>
-<div class="grid3">{case_card("dealer-revenue")}{product_card("Mapema")}{product_card("Matchday Model")}</div>
+<p>Automotive: a Kenyan client's ledgers, published without client identifiers. Aviation: a risk and cover layer for a cargo airline. And two products that turn data into a forecast someone can act on.</p></div>
+<div class="grid2">{case_card("dealer-revenue")}{product_card("CargoShield")}{product_card("Mapema")}{product_card("Matchday Model")}</div>
 </section>
 
 {part_head("actuarial", "II", "Actuarial analysis", "Reserves, persistency and pricing, each built on a synthetic book or public industry triangles so every number can be published, then tested until it breaks.")}
@@ -1085,22 +1086,26 @@ def ask_page():
 <span class="eyebrow">Kenya insurance series</span>
 <h1 id="h1">Ask the data</h1>
 <p class="lede">Every answer is calculated from the validated IRA panel. No language model, so nothing is made up.</p>
-<p class="ask-how"><b>How this works.</b> Pick a question, set its insurer, class or year, and press Ask. Your browser loads a compact file of derived figures, built and tested from the validated panel, and calculates the answer from it: the finding, its numbers, a chart, the source and the page that shows it in full. A typed question is matched to the nearest question here, and nothing is calculated until you confirm it.</p>
+<details class="ask-how"><summary>How this works</summary><p>Pick a question, or type one. Your browser loads a compact file of derived figures, built and tested from the validated panel, and calculates the answer from it: the finding, its numbers, a chart, the source and the page that shows it in full. Each answer lets you change its insurer, class or year and suggests what to ask next. A typed question is matched to the nearest question here, and nothing is calculated until you confirm it.</p></details>
 </section>
 
-<section class="ask-layout" aria-label="Questions and answers">
-<div class="ask-main">
-<p class="ask-empty" id="ask-empty">Answers appear here. Pick a question to start.</p>
-<div id="ask-thread" class="ask-thread" hidden></div>
-<p id="ask-status" class="sr-only" aria-live="polite"></p>
-<button type="button" id="ask-reset" class="btn quiet ask-reset" hidden>Reset the thread</button>
-</div>
-<div class="ask-side">
-<form id="ask-form" class="ask-form" hidden><label for="ask-text">Type a question</label><input id="ask-text" type="text" autocomplete="off" spellcheck="false" placeholder="For example: motor loss ratio each year"><button type="submit" class="btn quiet">Find it</button></form>
+<section class="ask-chat" aria-label="Questions and answers">
+<div class="ask-msg ask-a ask-welcome" id="ask-welcome">
+<p class="ask-who">Ask the data</p>
+<p class="ask-say ask-lead">Pick a question to start, or type your own below.</p>
+<p class="ask-hint">The market, any of Kenya's general insurers, a reinsurer's view, reserving, and Marion's own work.</p>
 <p id="ask-loading" class="small" hidden>Loading the figures.</p>
 <div id="ask-bank" class="ask-bank"></div>
 <noscript><div class="ask-noscript"><p>The answers here are calculated by JavaScript, which is off. The same figures are on these pages:</p><ul>{noscript}</ul></div></noscript>
 </div>
+<div id="ask-thread" class="ask-thread"></div>
+<p id="ask-status" class="sr-only" aria-live="polite"></p>
+<form id="ask-form" class="ask-composer" hidden>
+<label for="ask-text" class="sr-only">Type a question</label>
+<input id="ask-text" type="text" autocomplete="off" spellcheck="false" placeholder="Type a question">
+<button type="submit" class="ask-send">Ask</button>
+<div class="ask-tools"><button type="button" id="ask-browse" class="ask-tool">All questions</button><button type="button" id="ask-reset" class="ask-tool" hidden>Clear answers</button></div>
+</form>
 </section>
 
 <section aria-labelledby="h-how">

@@ -97,6 +97,10 @@ Decisions made while building, where the brief left room:
 - The default insurer is the largest by written premium in the latest full year (CIC General); the default class is Motor Private; the default year is the latest full year.
 - About Marion answers are quotes from pages already on the site, each with a link. `check_ask.py` fails if a quote is not on the page it cites. Links to the two live apps say they may take a few seconds to load.
 
+## The page
+
+A conversation in one centred column. A welcome message holds the questions under five topic tabs (arrow keys move between them); each question is a pill asked in one click with its usual values (the latest full year, Motor Private, the largest insurer), and those values are marked in the text. The visitor's question sits on the right, the answer below it as a plate in the site's double rule: the finding, the numbers, the chart and its table, the source, the caveat when an insurer is named, then "Change the question" (its insurer, class or year as dropdowns) and "Ask next" (two or three related questions carrying the same insurer and year). The box to type in is held at the bottom of the window, above the phone navigation bar, with "All questions" and "Clear answers" under it.
+
 ## Charts
 
 The site draws every chart as HTML and CSS from `tools/viz.py` (no SVG, no library). The answers use the same
@@ -125,9 +129,9 @@ The sample is 115 questions, seeded so it is the same every run. It covers:
   - every chart class `ask.js` writes is styled;
   - every About quote is on its page;
   - every `/ask/#q=` link on the site is valid.
-- `tools/check_ask_page.py` (576 checks pass): asks the sample through the real page in Chrome at 1280 and 390 px, in both themes, and compares the rendered sentences, numbers, tables, links and caveats with Python. It also checks:
+- `tools/check_ask_page.py` (592 checks pass): asks the sample through the real page in Chrome at 1280 and 390 px, in both themes, and compares the rendered sentences, numbers, tables, links and caveats with Python. It also checks:
   - typed text that matches nothing, and typed questions that match;
-  - the keyboard, Reset and the live region;
+  - topic tabs, the keyboard, changing a question, the follow-up questions, Clear and the live region;
   - sideways scrolling and WCAG AA contrast;
   - console errors.
 - `tools/screenshots.py` includes `/ask/` empty, with an insurer answer and with a market answer.

@@ -205,7 +205,7 @@ def classes():
     defined = set(re.findall(r"[.#]([a-zA-Z][\w-]*)", css))
     used = set(re.findall(r"\b((?:vz|ask)-[a-z0-9-]+)\b", js))
     used |= {"panel", "vz", "pos", "neg", "neu", "ctx", "ring", "up", "dn", "bars", "lab", "track", "bar", "val", "in", "data", "tag", "small", "btn", "quiet"}
-    ids = {"ask-thread", "ask-status", "ask-reset", "ask-empty", "ask-form", "ask-text", "ask-loading", "ask-bank", "ask-bank-data"}
+    ids = {"ask-status", "ask-reset", "ask-form", "ask-text", "ask-loading", "ask-bank-data", "ask-browse", "ask-panel"}
     missing = sorted(c for c in used - ids if c not in defined)
     check("every class ask.js writes is styled", not missing, missing)
 

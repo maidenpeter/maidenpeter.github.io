@@ -22,5 +22,13 @@
     "alt": "Matchday Model output slide: home win 63 percent, draw 22 percent, away win 15 percent, most likely scoreline 2-0 in 11 percent of simulations.",
     "source": "Football Hub/nuruops, output/arsenal_liverpool_2026_03_08/matchday_model_slides/4_output.png",
     "repo": ""
+  },
+  {
+    "name": "CargoShield",
+    "line": "A trust and risk layer for a cargo airline: anyone can check an air waybill or a cover certificate in seconds, every booking is scored from 0 to 100 with plain-English reasons before it is accepted, and lower-risk bookings get a cargo insurance quote priced from the same score. Shown on a fictional airline with synthetic data; a high score sends the booking to a person, and nothing is rejected automatically.",
+    "image": "cargoshield.jpg",
+    "alt": "CargoShield bookings screen for a fictional demo airline: the day's screening totals, and the medium and high risk bookings with their scores and main reasons.",
+    "source": "cargo-shield repo, the app's bookings screen filtered to medium and high risk (schedule label hidden), captured 16 November 2026",
+    "repo": ""
   }
 ]

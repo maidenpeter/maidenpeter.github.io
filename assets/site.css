@@ -19,10 +19,11 @@
 :root[data-theme="light"]{
   color-scheme:light;
   --ground:#ecdfc3; --surface:#f3e8cf; --sunk:#e2d3b2;
-  --ink:#2b2118; --ink-2:#4a3a2a; --muted:#655440;
+  /* text at 7:1 or more on the paper and on panels (9:1 for the second ink), for readers who need it */
+  --ink:#2b2118; --ink-2:#433426; --muted:#534535;
   --rule:rgba(43,33,24,.20); --rule-soft:rgba(43,33,24,.10); --rule-strong:rgba(43,33,24,.42);
-  --accent:#7d530e; --accent-soft:rgba(125,83,14,.10); --on-accent:#f3e8cf;
-  --gain:#008a7e; --loss:#a8432a; --gain-ink:#005a52; --loss-ink:#7a2d1b; --on-loss:#ffffff;
+  --accent:#68450c; --accent-soft:rgba(104,69,12,.10); --on-accent:#f3e8cf;
+  --gain:#008a7e; --loss:#a8432a; --gain-ink:#005049; --loss-ink:#7a2d1b; --on-loss:#ffffff;
   --shade:rgba(168,67,42,.14);
   --cell:0,138,126; --mark:#b08a2a;
 }
@@ -452,3 +453,24 @@ a.plain:hover{color:var(--accent)}
 .ask-teaser a::before{content:"Ask";font-family:var(--label);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
 .ask-teaser a:hover{border-color:var(--accent)}
 @media (max-width:960px){.ask-teaser{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------------------------------------------------------------- readability
+   Small text one step larger, for readers who need it: labels at 13px or more, reading text at 15px or more. */
+.eyebrow{font-size:13.5px}
+.tag{font-size:13px}
+.small{font-size:15px}
+.badge,.facts span,.contact li span,.tri-read span,.contents a i{font-size:13px}
+dl.meta{font-size:15.5px}
+.links,.more{font-size:16px}
+.proof span,.step p,.role .when,.share,.legend,.tri-key,.placings,.site-foot{font-size:15px}
+.tri-tabs button{font-size:14.5px}
+table.data{font-size:15px}
+table.data th{font-size:13.5px}
+.bars,.bars .val{font-size:15px}
+.note,.dm p{font-size:16px}
+.principles b{font-size:16px}
+.ask-teaser a::before{font-size:13px}
+.rank .end,.rank .zl,.pager span,table.tri th{font-size:13px}
+.thumb .cue{font-size:12.5px}
+@media (max-width:420px){.bars,.bars .val{font-size:14.5px}}
+@media (max-width:420px){table.tri th{font-size:12.5px}.tri-read span{font-size:12.5px}}

@@ -146,15 +146,39 @@ def main():
             got = pg.evaluate(READ)
             check(f"{tag}: confirming a matched question answers it", got["n"] == n0 + 1 and got["say"] == expected(D, B, "about-done", dict(topic="ifrs17"))["say"])
 
-            # the keyboard, then reset
+            # topics: tabs by click and by arrow key
+            pg.locator("#ask-bank .ask-tab").nth(1).click()
+            check(f"{tag}: a topic tab shows its questions", pg.locator("#ask-panel-insurer").is_visible() and not pg.locator("#ask-panel-market").is_visible())
+            pg.keyboard.press("ArrowRight")
+            check(f"{tag}: arrow keys move between topics", pg.locator("#ask-panel-reinsurer").is_visible()
+                  and pg.evaluate("document.activeElement.id") == "ask-tab-reinsurer")
+
+            # the keyboard: a question pill asked with Enter
             n0 = pg.evaluate(READ)["n"]
-            pg.locator("#ask-bank .ask-go").first.focus()
+            pg.locator("#ask-panel-reinsurer .ask-pill").first.focus()
             pg.keyboard.press("Enter")
             pg.wait_for_function(f"() => +[...document.querySelectorAll('.ask-a[data-n]')].pop().getAttribute('data-n') > {n0}")
-            check(f"{tag}: Ask works from the keyboard", True)
+            check(f"{tag}: a question pill works from the keyboard", pg.evaluate(READ)["title"] == AA.title(D, B, "scorecard", AA.defaults(D, B, "scorecard")))
+
+            # change the question, then a follow-up
+            last = pg.locator(".ask-a[data-n]").last
+            yrs = [o.get_attribute("value") for o in last.locator(".ask-change select[data-slot=yr] option").all()]
+            last.locator(".ask-change select[data-slot=yr]").select_option(yrs[0])
+            n0 = pg.evaluate(READ)["n"]
+            last.locator(".ask-change .ask-go").click()
+            pg.wait_for_function(f"() => +[...document.querySelectorAll('.ask-a[data-n]')].pop().getAttribute('data-n') > {n0}")
+            s = dict(AA.defaults(D, B, "scorecard"), yr=yrs[0])
+            check(f"{tag}: changing the year asks it again", pg.evaluate(READ)["say"] == AA.answer(D, B, "scorecard", s)["say"])
+            fp = pg.locator(".ask-a[data-n]").last.locator(".ask-follow").first
+            fq, fs = fp.get_attribute("data-q"), json.loads(fp.get_attribute("data-s"))
+            n0 = pg.evaluate(READ)["n"]
+            fp.click()
+            pg.wait_for_function(f"() => +[...document.querySelectorAll('.ask-a[data-n]')].pop().getAttribute('data-n') > {n0}")
+            check(f"{tag}: an Ask next pill asks its question", pg.evaluate(READ)["say"] == AA.answer(D, B, fq, fs)["say"], f"{fq} {fs}")
+
             pg.locator("#ask-reset").click()
-            check(f"{tag}: Reset clears the thread and the link", pg.locator(".ask-msg").count() == 0 and pg.evaluate("location.hash") == ""
-                  and pg.locator("#ask-empty").is_visible())
+            check(f"{tag}: Clear empties the thread and the link", pg.locator("#ask-thread .ask-msg").count() == 0 and pg.evaluate("location.hash") == ""
+                  and pg.locator("#ask-welcome").is_visible())
             check(f"{tag}: no console errors", not errs, errs[:3])
             ctx.close()
         b.close()
