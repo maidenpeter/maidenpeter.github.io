@@ -5,7 +5,8 @@
 Pages on this site and in the three Kenya repositories are served locally the way GitHub Pages
 serves them, opened in Chrome on the ink theme with the side bar hidden, and captured at the
 chart that best shows what the page does. The two apps are taken from the screenshots in their
-own project folders. Everything is written to assets/shots/<id>.webp at 960 x 600.
+own project folders, and the M-Pesa tool from the README screenshot in its repository.
+Everything is written to assets/shots/<id>.webp at 960 x 600.
 Needs Playwright, Chrome and Pillow.
 """
 import argparse, http.server, io, os, threading
@@ -35,6 +36,11 @@ PAGES = [
 FILES = [
     ("hil", "Health IBNR Lab/assets/readme/hero_backlog.png", (0, 0, 1264, 790)),
     ("ipl", "Instalment Persistency Lab/assets/screenshots/0_home.png", None),
+]
+# Tools in their own repositories (under --repos), from the screenshot in their README. The M-Pesa one is
+# made by that repo's tests/e2e.py --readme-shot from a synthetic statement.
+REPO_FILES = [
+    ("mpesa", "mpesa-statement-to-excel/docs/screenshot.png", (0, 440, 1280, 1240)),
 ]
 
 
@@ -73,11 +79,10 @@ def main():
     ap.add_argument("--only", help="comma-separated ids to render, leaving the other shots as they are")
     a = ap.parse_args()
     only = set(a.only.split(",")) if a.only else None
-    for name, rel, box in FILES:
+    for name, src, box in [(n, Path(a.apps) / r, b) for n, r, b in FILES] + [(n, Path(a.repos) / r, b) for n, r, b in REPO_FILES]:
         if only and name not in only:
             continue
-        src = Path(a.apps) / rel
-        if not src.exists():  # the app projects live outside this repo; keep the committed shot
+        if not src.exists():  # the projects live outside this repo; keep the committed shot
             print(f"skip {name}: {src} not found, keeping assets/shots/{name}.webp")
             continue
         img = Image.open(src)

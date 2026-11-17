@@ -2,13 +2,15 @@
 
     python tools/check_links.py              # internal links, assets and #anchors
     python tools/check_links.py --external   # also request every external URL once
-    python tools/check_links.py --repos ..   # also check links into, and inside, the three Kenya repos
+    python tools/check_links.py --repos ..   # also check links into, and inside, the Kenya repos and the M-Pesa tool
 
 Internal links are resolved against the repo root the way GitHub Pages serves it
 (/path/ -> path/index.html). Anchors must exist as an id on the target page.
 Without --repos, pages served from the analysis repos are treated as external URLs (CI has
-only this repo). With --repos, /ira-kenya-*/ paths are resolved in the sibling repositories,
-and their index pages and analysis pages are crawled as well.
+only this repo). With --repos, /ira-kenya-*/ and /mpesa-statement-to-excel/ paths are resolved in
+the sibling repositories, and their index pages and analysis pages are crawled as well. The M-Pesa
+tool's address 404s until its repository is pushed and Pages is on, so --external reports it as
+broken until then.
 """
 import argparse, sys, urllib.request, urllib.error
 from html.parser import HTMLParser
@@ -17,8 +19,8 @@ from urllib.parse import urlparse, urldefrag
 
 ROOT = Path(__file__).resolve().parent.parent
 BASES = ("https://maidenpeter.github.io", "https://marionpeter.nuruops.com")
-# Pages served from the analysis repos, not this one.
-OTHER_REPOS = ("/ira-kenya-data/", "/ira-kenya-insurance/", "/ira-kenya-reinsurance/")
+# Pages served from the analysis repos and the M-Pesa tool's repo, not this one.
+OTHER_REPOS = ("/ira-kenya-data/", "/ira-kenya-insurance/", "/ira-kenya-reinsurance/", "/mpesa-statement-to-excel/")
 REPO_PAGES = ("index.html", "page/*.html", "explorer/*.html")
 
 

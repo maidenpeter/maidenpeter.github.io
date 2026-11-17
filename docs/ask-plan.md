@@ -60,7 +60,7 @@ table that could be downloaded, no export button.
 | Bottom fifth | rank above 0.8 times the number scored | `ira-kenya-reinsurance/src/scorecard/backtest.py` line 67 |
 | Reserve | volume-weighted chain ladder on the paid triangle, ultimate less paid to date | `tools/build.py` `chain_ladder()` |
 
-## Questions shipped (20)
+## Questions shipped (22)
 
 Every question in the brief shipped; none was dropped.
 
@@ -82,6 +82,8 @@ Every question in the brief shipped; none was dropped.
 | | How much of {line}'s ultimate is still unpaid? | six lines |
 | | How do the six reserves add up, and how does that tie to the IFRS 17 case study? | |
 | About Marion | Has she done {topic}? | IBNR reserving, IFRS 17, pricing, reinsurance analysis, health insurance |
+| | Has she worked with mobile money or M-Pesa data? | |
+| | Can she get clean data out of messy PDFs? | |
 | | Which tools does she use: R, Python, SQL, Excel? | |
 | | How does she check her numbers? | |
 | | What has she built that I can open now? | |
@@ -109,7 +111,7 @@ is a change from the brief, which asked for inline SVG; matching the house style
 
 ## Checks
 
-The sample is 115 questions, seeded so it is the same every run. It covers:
+The sample is 117 questions, seeded so it is the same every run. It covers:
 
 - every question, every class, and the first and last years
 - the six merged or renamed companies and the smallest insurer
@@ -117,19 +119,19 @@ The sample is 115 questions, seeded so it is the same every run. It covers:
 - a capped grade, a year not scored, and unknown slot values
 - a tie made up for the test, since no real ties exist in the data
 
-- `tools/check_ask.py --repos ..` (778 checks pass):
+- `tools/check_ask.py --repos ..` (802 checks pass):
   - every figure in `data.json` is rebuilt from the processed tables by separate code;
   - the sample is answered from those full-precision tables and must read word for word as from `data.json`;
   - market totals tie to `class_market.csv`, `structure_market.csv` and `structure_shares.csv`;
   - the scorecard ties to `cedant_scorecard.csv`;
   - the answer links resolve.
-- `tools/check_ask.py`, run in CI without the data repos (212 checks pass):
+- `tools/check_ask.py`, run in CI without the data repos (234 checks pass):
   - the field list above;
   - the page's engine, run in Node, against `tools/ask_answers.py` on the committed `data.json`;
   - every chart class `ask.js` writes is styled;
   - every About quote is on its page;
   - every `/ask/#q=` link on the site is valid.
-- `tools/check_ask_page.py` (592 checks pass): asks the sample through the real page in Chrome at 1280 and 390 px, in both themes, and compares the rendered sentences, numbers, tables, links and caveats with Python. It also checks:
+- `tools/check_ask_page.py` (632 checks pass): asks the sample through the real page in Chrome at 1280 and 390 px, in both themes, and compares the rendered sentences, numbers, tables, links and caveats with Python. It also checks:
   - typed text that matches nothing, and typed questions that match;
   - topic tabs, the keyboard, changing a question, the follow-up questions, Clear and the live region;
   - sideways scrolling and WCAG AA contrast;

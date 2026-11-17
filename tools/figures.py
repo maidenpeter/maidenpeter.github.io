@@ -244,6 +244,9 @@ APPS = dict(
 )
 IPL_URL = "https://instalment-persistency-lab.streamlit.app/"
 HIL_URL = "https://maidenpeter.shinyapps.io/health-ibnr-lab/"  # from the app's rsconnect deployment record
+# M-Pesa Statement to Excel: a static page in its own repo, served by GitHub Pages (no figures on its card).
+MPESA_URL = "https://maidenpeter.github.io/mpesa-statement-to-excel/"
+MPESA_REPO = "https://github.com/maidenpeter/mpesa-statement-to-excel"
 
 # ----------------------------------------------------------------- Placings
 # Stated by Marion, 14 November 2026.

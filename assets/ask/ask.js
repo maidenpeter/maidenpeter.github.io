@@ -499,7 +499,7 @@
     o.points = item.points;
   }
   A['about-done'] = function (D, B, s, o) { about(D, B, s, o, B.about['about-done'][s.topic]); };
-  ['about-tools', 'about-checks', 'about-open', 'about-contact'].forEach(function (q) {
+  ['about-tools', 'about-mpesa', 'about-pdfs', 'about-checks', 'about-open', 'about-contact'].forEach(function (q) {
     A[q] = function (D, B, s, o) { about(D, B, s, o, B.about[q]); };
   });
 
@@ -663,6 +663,8 @@
       'tri-sum': [a('tri-largest'), a('about-done', { topic: 'ifrs17' })],
       'about-done': [a('about-tools'), a('about-open'), a('about-contact')],
       'about-tools': [a('about-checks'), a('about-open')],
+      'about-mpesa': [a('about-pdfs'), a('about-open')],
+      'about-pdfs': [a('about-checks'), a('about-mpesa')],
       'about-checks': [a('about-tools'), a('about-done', { topic: 'ibnr' })],
       'about-open': [a('about-contact'), a('about-done', { topic: 'reinsurance' })],
       'about-contact': [a('about-open'), a('about-done', { topic: 'pricing' })]

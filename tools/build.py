@@ -13,7 +13,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from figures import REINSURANCE_FLOWS as RF, CLAIMS as CL
 from figures import (KENYA as K, CLASS_RESULTS, BACKTEST, DEALER as D, IFRS17 as I, IFRS17_LINES,
-                     BACKTEST_AE, CREDIBILITY, AUCTIONS as A, AUCTION_DECILES, APPS as AP, IPL_URL, HIL_URL, HACKATHONS)
+                     BACKTEST_AE, CREDIBILITY, AUCTIONS as A, AUCTION_DECILES, APPS as AP, IPL_URL, HIL_URL, HACKATHONS,
+                     MPESA_URL, MPESA_REPO)
 from nav import nav_html, series_html, NAV_JS, NAV_CSS, THEME_HEAD, ROLE
 from kenya_story import story
 import case_viz
@@ -484,6 +485,11 @@ def eb(num, text):
 # The live apps run on free hosting that puts them to sleep when nobody is using them.
 APP_WAIT = "The app may take a few seconds to load while it starts up."
 APP_OPEN = "Open the app (it may take a few seconds to load)"
+# The M-Pesa card's sentence, quoted by the Ask the data answers about mobile money and PDFs.
+MPESA_LINE = ("Reads Safaricom M-Pesa PDF statements into a formatted Excel workbook inside your browser: "
+              "nothing is uploaded, and every balance is reconciled to the one before it.")
+MPESA_DATA = "Your own statement, read in your browser. Tested on synthetic statements."
+MPESA_TAG = "Mobile money data, JavaScript"
 
 
 def apps_section(num):
@@ -506,11 +512,19 @@ def apps_section(num):
 <div class="links"><a href="{IPL_URL}">Open the app</a></div>
 <p class="small">{APP_WAIT}</p>
 </article>"""
+    mpesa = f"""<article class="card" id="mpesa">
+{thumb("mpesa", MPESA_URL)}<span class="badge live">Live</span>
+<span class="tag">{MPESA_TAG}</span>
+<h3>M-Pesa Statement to Excel</h3>
+<p class="find">{esc(MPESA_LINE)}</p>
+<dl class="meta"><dt>Method</dt><dd>Statement text read with PDF.js, each transaction typed from its details, a running-balance check on every row and the totals compared with the statement's own summary.</dd><dt>Data</dt><dd>{MPESA_DATA}</dd><dt>Built with</dt><dd>JavaScript, PDF.js and ExcelJS.</dd></dl>
+<div class="links"><a href="{MPESA_URL}">Open the tool</a><a href="{MPESA_REPO}">Code: mpesa-statement-to-excel</a></div>
+</article>"""
     return f"""<section id="apps" aria-labelledby="h-apps">
 <div class="sechead">{eb(num, "Apps and pricing")}
 <h2 id="h-apps">Reserving and product questions, as tools you can use</h2>
-<p>Built on synthetic books so every number can be published, with the assumptions on the page and tests behind them.</p></div>
-<div class="grid3">{hil}{ipl}{product_card("AgroShield")}</div>
+<p>The reserving and product tools are built on synthetic books so every number can be published, with the assumptions on the page and tests behind them. The M-Pesa tool reads your own statement and keeps it in your browser.</p></div>
+<div class="grid3">{hil}{ipl}{product_card("AgroShield")}{mpesa}</div>
 </section>"""
 
 
@@ -1075,7 +1089,19 @@ def ask_about():
         [["Health IBNR Lab", "R, Shiny, bslib and ChainLadder."], HIL_URL, APP_OPEN, "/"],
         [["Instalment Persistency Lab", "Decrement tables in SQL (DuckDB), survival checks in R, an early warning model and a product levers simulator."], IPL_URL, APP_OPEN, "/"],
         [[data_role, "Power BI and Excel dashboards tracking KPIs and operational metrics"], *about_link, "/about/"],
-        [[dealer["title"], dealer["method"]], "/work/dealer-revenue/", "Read the case study", "/"]])
+        [[dealer["title"], dealer["method"]], "/work/dealer-revenue/", "Read the case study", "/"],
+        [["M-Pesa Statement to Excel", "JavaScript, PDF.js and ExcelJS."], MPESA_URL, "Open the tool", "/"]])
+    mpesa = ["M-Pesa Statement to Excel", MPESA_LINE]
+    mobile = dict(lead=yes, points=[
+        [mpesa, MPESA_URL, "Open the tool", "/"],
+        [["M-Pesa Statement to Excel", MPESA_DATA], "/#mpesa", "The tool on the home page", "/"],
+        [["AgroShield", agro["line"].split(". ")[-1].rstrip(".") + "."], "/#agroshield", "AgroShield on the home page", "/"]])
+    rebuild = next(p for p in PRINCIPLES if p[0] == "Rebuild before analysing")
+    pdfs = dict(lead=yes, points=[
+        [list(rebuild), "/#method", "How I work", "/"],
+        [[f"{K['pdf_match']} of {K['pdf_total']} figures match IRA's own PDF releases"], "/kenya-insurance/", "The Kenya series", "/kenya-insurance/"],
+        [["What the work is built with", "Python (pandas, numpy, chainladder, pytest), Excel, Power BI, pdftotext for regulator PDFs, Git and GitHub Actions."], *about_link, "/about/"],
+        [mpesa, MPESA_URL, "Open the tool", "/"]])
     checks = dict(lead="In her words, from the home page:", points=[
         [["A total that balances is the first thing I check"], "/#method", "How I work", "/"]]
         + [[[t, d], "/#method", "How I work", "/"] for t, d in PRINCIPLES]
@@ -1083,7 +1109,8 @@ def ask_about():
             "/kenya-insurance/", "The Kenya series", "/kenya-insurance/"]])
     opened = dict(lead="Live now, with nothing to install:", points=[
         [["Health IBNR Lab", "Health reserving, R and Shiny"], HIL_URL, APP_OPEN, "/"],
-        [["Instalment Persistency Lab", "Health product design, SQL, Python and R"], IPL_URL, APP_OPEN, "/"]]
+        [["Instalment Persistency Lab", "Health product design, SQL, Python and R"], IPL_URL, APP_OPEN, "/"],
+        [["M-Pesa Statement to Excel", MPESA_TAG], MPESA_URL, "Open the tool", "/"]]
         + [[[t], PAGE[k], "Open", "/"] for k, t in [("lossmap", "Kenya Insurance Loss Map"), ("structure", "Kenya Insurance Market Structure"), ("flows", "Kenya Reinsurance Flows"),
                                                     ("scorecard", "Kenya Cedant Scorecard"), ("explorer", "Kenya Insurer Explorer")]]
         + [[[c["title"]], f"/work/{c['slug']}/", "Read", "/"] for c in CASES])
@@ -1091,7 +1118,8 @@ def ask_about():
         [["If you are hiring for an actuarial, pricing, reserving or data role at an insurer or reinsurer, write to me."], "/#contact", "Contact", "/"],
         [["Email", EMAIL], f"mailto:{EMAIL}", "Write an email", "/"],
         [["LinkedIn", "in/marion-peter"], LINKEDIN, "Open LinkedIn", "/"]])
-    return {"about-done": done, "about-tools": tools, "about-checks": checks, "about-open": opened, "about-contact": contact}
+    return {"about-done": done, "about-tools": tools, "about-mpesa": mobile, "about-pdfs": pdfs, "about-checks": checks,
+            "about-open": opened, "about-contact": contact}
 
 
 def ask_href(q, s):

@@ -143,7 +143,7 @@ def sample(D, B):
         add("tri-unpaid", "every line", line=AA.slug(t[0]))
     for k, *_ in B["topics"]:
         add("about-done", "every topic", topic=k)
-    for q in ("about-tools", "about-checks", "about-open", "about-contact"):
+    for q in ("about-tools", "about-mpesa", "about-pdfs", "about-checks", "about-open", "about-contact"):
         add(q, "fixed")
     add("ins-trend", "unknown slot values fall back", ins="no-such-insurer", y1="1999", y2="abc")
     return C

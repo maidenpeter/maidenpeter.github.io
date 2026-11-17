@@ -743,7 +743,7 @@ def _about_done(D, B, s, o):
     _about(o, B["about"]["about-done"][s["topic"]])
 
 
-for _q in ("about-tools", "about-checks", "about-open", "about-contact"):
+for _q in ("about-tools", "about-mpesa", "about-pdfs", "about-checks", "about-open", "about-contact"):
     A[_q] = (lambda q: lambda D, B, s, o: _about(o, B["about"][q]))(_q)
 
 

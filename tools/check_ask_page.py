@@ -133,6 +133,10 @@ def main():
             for text, q, want in [("How did CIC do on medical in 2024?", "ins-class-year", dict(ins="cic_general", cls="medical", yr="2024")),
                                   ("motor loss ratio each year", "motor-lr", {}),
                                   ("Which insurers grew fastest in 2023", "growth", dict(yr="2023")),
+                                  ("has she worked with M-Pesa", "about-mpesa", {}),
+                                  ("mpesa experience", "about-mpesa", {}),
+                                  ("can she extract data from messy PDFs", "about-pdfs", {}),
+                                  ("IBNR experience", "about-done", dict(topic="ibnr")),
                                   ("has she done IFRS 17 work", "about-done", dict(topic="ifrs17"))]:
                 pg.fill("#ask-text", text)
                 pg.press("#ask-text", "Enter")

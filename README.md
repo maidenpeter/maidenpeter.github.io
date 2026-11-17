@@ -16,7 +16,7 @@ Insurance and reinsurance analysis built from public data. The site leads with K
 
 | Page | What it is |
 |---|---|
-| [`/`](https://maidenpeter.github.io/) | A chain ladder worked out in the page, then **Part I, Data analysis** (analysis 1, the Kenya series, and what a reinsurer would act on; analysis 2, claims settlement; Ask the data, the dealer audit, CargoShield and two forecasting products) and **Part II, Actuarial analysis** (the reserving and persistency apps, AgroShield pricing, the IFRS 17 and reserve adequacy case studies) |
+| [`/`](https://maidenpeter.github.io/) | A chain ladder worked out in the page, then **Part I, Data analysis** (analysis 1, the Kenya series, and what a reinsurer would act on; analysis 2, claims settlement; Ask the data, the dealer audit, CargoShield and two forecasting products) and **Part II, Actuarial analysis** (the reserving and persistency apps, AgroShield pricing, the M-Pesa statement tool, the IFRS 17 and reserve adequacy case studies) |
 | [`/kenya-insurance/`](https://maidenpeter.github.io/kenya-insurance/) | Front page of the Kenya insurance series |
 | [`/ask/`](https://maidenpeter.github.io/ask/) | Ask the data: questions about the market, any insurer, the scorecard and reserving, answered in the browser |
 | [`/work/dealer-revenue/`](https://maidenpeter.github.io/work/dealer-revenue/) | Case study: a Kenyan dealer group's revenue counted twice (anonymised) |
@@ -99,10 +99,10 @@ python tools/kenya_nav.py --repos ..       # the navigation inside the Kenya ana
 | Command | What it checks |
 |---|---|
 | `python tools/check_figures.py --repos ..` | Recomputes every figure on the site from the analysis repos beside this one |
-| `python tools/check_ask.py [--repos ..]` | Ask the data: the field list, and a seeded sample of 115 questions answered by the page's engine (in Node) and in Python, word for word. With `--repos`, every figure is also rebuilt from the processed tables |
+| `python tools/check_ask.py [--repos ..]` | Ask the data: the field list, and a seeded sample of 117 questions answered by the page's engine (in Node) and in Python, word for word. With `--repos`, every figure is also rebuilt from the processed tables |
 | `python tools/check_ask_page.py` | The same questions asked through the real page in Chrome, both themes, 1280 and 390 px |
 | `python tools/check_text.py` | Plain ASCII only, and no flagged phrases |
-| `python tools/check_links.py [--external] [--repos ..]` | Internal links, assets and anchors; optionally every external URL and the Kenya repos' pages |
+| `python tools/check_links.py [--external] [--repos ..]` | Internal links, assets and anchors; optionally every external URL, and the pages of the Kenya repos and the M-Pesa tool |
 | `python tools/screenshots.py OUT` | Every page at 1280 and 390 px in both themes; fails on sideways scrolling, failed requests or console errors |
 
 **On every push,** GitHub Actions rebuilds the site and fails if the committed pages differ from the build, then runs the text and link checks and `check_ask.py` on the committed figures.

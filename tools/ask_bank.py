@@ -55,6 +55,13 @@ QUESTIONS = [
          slots={}, kw=["add up", "ifrs 17", "ifrs17", "total reserve", "six reserves", "tie"]),
     dict(id="about-done", g="about", t="Has she done {topic}?",
          slots=dict(topic="topic"), kw=["has she", "experience", "worked on", "done", "ibnr", "pricing", "reinsurance", "health"]),
+    # Each word found scores 2 and a tie goes to the question listed first. These two carry about-done's general
+    # words too ("has she", "experience"), so their own subject decides: "mpesa experience" comes here, while
+    # "IBNR experience" still goes to about-done, which also scores its topic.
+    dict(id="about-mpesa", g="about", t="Has she worked with mobile money or M-Pesa data?",
+         slots={}, kw=["m-pesa", "mpesa", "mobile money", "safaricom", "fuliza", "has she", "experience", "worked with"]),
+    dict(id="about-pdfs", g="about", t="Can she get clean data out of messy PDFs?",
+         slots={}, kw=["pdf", "messy", "extract", "scrape", "parse", "clean data", "unstructured", "has she", "can she", "experience"]),
     dict(id="about-tools", g="about", t="Which tools does she use: R, Python, SQL, Excel?",
          slots={}, kw=["tools", "python", "excel", "sql", " r ", "language", "software", "stack"]),
     dict(id="about-checks", g="about", t="How does she check her numbers?",
