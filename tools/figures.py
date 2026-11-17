@@ -70,6 +70,23 @@ REINSURANCE_FLOWS = dict(
     lr_2025=58.0,
 )
 
+# Analysis 2, claims settlement (ira-kenya-insurance/output/claims_*.csv, ira-kenya-data/validation/claims_checks.csv).
+# A payment ratio is claims paid in the quarter over the claims open in the quarter, pooled over 2025's four quarters.
+CLAIMS = dict(
+    quarters=32,             # quarterly workbooks IRA has published, Q1 2017 to Q1 2026
+    checks=12791,
+    liab_2025=11.7,          # percent of open liability claims paid in an average quarter of 2025
+    liab_2017=8.2,
+    life_2025=78.7,          # the same for life claims
+    open_2025=125141,        # liability claims outstanding at the end of 2025
+    open_ksh_2025=33.4,      # KSh bn, the insurers' own estimates
+    clear_2025=7.2,          # quarters of 2025 payments the outstanding claims represent
+    reg_total=5,             # insurers the regulator stepped into since 2022, all among those compared
+    runs=12, compared=39,    # general insurers with four quarters running under half the median insurer's liability
+                             # payment ratio at some point since 2017, of the general insurers compared
+    runs_acted=3,            # of the twelve, later under the regulator
+)
+
 # Underwriting result by class, 2018 to 2025, KSh bn (ira-kenya-insurance/output/class_market.csv)
 CLASS_RESULTS = [
     ("Motor private", -29.25),

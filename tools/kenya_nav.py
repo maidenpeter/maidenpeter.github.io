@@ -1,4 +1,4 @@
-"""Put the site navigation (tools/nav.py) into the four Kenya analysis pages and their templates.
+"""Put the site navigation (tools/nav.py) into the Kenya analysis pages and their templates.
 
     python tools/kenya_nav.py [--repos ..]
 
@@ -12,13 +12,15 @@ import argparse, re, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from nav import SITE, KENYA, NAV_CSS, NAV_JS, nav_html, series_html
+from nav import SITE, KENYA, CLAIMS, NAV_CSS, NAV_JS, nav_html, series_html
 
 PAGES = [("lossmap", "Loss map", "ira-kenya-insurance/page/kenya-insurance-loss-map.html", ["ira-kenya-insurance/page/template.html"]),
          ("structure", "Market structure", "ira-kenya-insurance/page/kenya-insurance-market-structure.html", ["ira-kenya-insurance/page/structure_template.html"]),
          ("flows", "Reinsurance flows", "ira-kenya-insurance/page/kenya-insurance-reinsurance-flows.html", ["ira-kenya-insurance/page/reinsurance_template.html"]),
          ("scorecard", "Cedant scorecard", "ira-kenya-reinsurance/page/kenya-cedant-scorecard.html", ["ira-kenya-reinsurance/page/template.html"]),
-         ("explorer", "Insurer explorer", "ira-kenya-data/explorer/kenya-insurer-explorer.html", ["ira-kenya-data/explorer/template.html"])]
+         ("explorer", "Insurer explorer", "ira-kenya-data/explorer/kenya-insurer-explorer.html", ["ira-kenya-data/explorer/template.html"]),
+         # analysis 2: one page, so it has no series strip
+         ("claims", "Claims settlement", "ira-kenya-insurance/page/kenya-claims-settlement.html", ["ira-kenya-insurance/page/claims_template.html"])]
 
 # The side bar and series strip come from nav.py; these two only matter on the analysis pages.
 SUB_CSS = """
@@ -33,6 +35,7 @@ SIDE_CSS = {
     "lossmap": f"@media (min-width:861px) and (max-width:1140px){{{_ONE_COL}}}\n",
     "structure": f"@media (min-width:861px) and (max-width:1140px){{{_ONE_COL}}}\n",
     "flows": f"@media (min-width:861px) and (max-width:1140px){{{_ONE_COL}}}\n",
+    "claims": f"@media (min-width:861px) and (max-width:1140px){{{_ONE_COL}}}\n",
     "scorecard": ("@media (min-width:861px) and (max-width:1140px){.split{grid-template-columns:1fr}.detail{position:static}"
                   ".summary{grid-template-columns:repeat(2,minmax(0,1fr))}.summary .kpi:first-child{grid-column:1 / -1}"
                   ".grid2,.method{grid-template-columns:1fr}.stamp{text-align:left}}\n"
@@ -50,11 +53,12 @@ NEW_JS = re.compile(r'<script id="mp-nav-js">.*?</script>', re.S)
 
 
 def block(key):
-    path = KENYA[key][0]
+    path = (KENYA.get(key) or CLAIMS[key])[0]
+    strip = series_html(key, base=SITE) + "\n" if key in KENYA else ""   # the series strip, on the Kenya series pages
     # a skip link first and a target after the navigation, both inside the markers so re-runs stay clean
     return (HTML_START + '<a class="mp-skip" href="#mp-content">Skip to content</a>\n'
-            + nav_html(path, "data", base=SITE, up="/kenya-insurance/") + "\n"
-            + series_html(key, base=SITE) + '\n<span id="mp-content" tabindex="-1"></span>\n' + HTML_END)
+            + nav_html(path, "data", base=SITE, up="/kenya-insurance/" if key in KENYA else "/#data") + "\n"
+            + strip + '<span id="mp-content" tabindex="-1"></span>\n' + HTML_END)
 
 
 def between(s, a, b, new):

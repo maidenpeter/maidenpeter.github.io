@@ -486,6 +486,42 @@ def reinsurance_flows(root):
     check("reinsurance: loss ratio 2025", R["lr_2025"], 100 * float(seg[last]["loss_ratio"]), 0.05)
 
 
+def claims(root, skipped):
+    """CLAIMS: analysis 2, claims settlement, from ira-kenya-insurance's output files and ira-kenya-data's checks."""
+    out, C = root / "ira-kenya-insurance" / "output", F.CLAIMS
+    mk = rows(out / "claims_market.csv")
+    check("claims: quarters", C["quarters"], len({r["period"] for r in mk}), 0)
+    ck = root / "ira-kenya-data" / "validation" / "claims_checks.csv"   # local only: it carries IRA's figures
+    if ck.exists():
+        check("claims: checks", C["checks"], count_rows(ck), 0)
+    else:
+        skipped.append("the claims check count (ira-kenya-data/validation/claims_checks.csv is local only)")
+
+    def pooled(business, year):
+        x = [r for r in mk if r["business"] == business and r["year"] == str(year)]
+        if len(x) != 4:
+            return None
+        return 100 * sum(float(r["paid"]) for r in x) / sum(float(r["actionable"]) for r in x)
+    check("claims: liability paid 2025", C["liab_2025"], pooled("general_liability", 2025), 0.05)
+    check("claims: liability paid 2017", C["liab_2017"], pooled("general_liability", 2017), 0.05)
+    check("claims: life paid 2025", C["life_2025"], pooled("long_term", 2025), 0.05)
+    q4 = next(r for r in mk if r["business"] == "general_liability" and r["period"] == "2025Q4")
+    check("claims: liability outstanding end-2025", C["open_2025"], float(q4["closing"]), 0)
+    check("claims: liability outstanding end-2025, KSh bn", C["open_ksh_2025"], float(q4["closing_amount"]) / 1e6, 0.05)
+    paid = [float(r["paid"]) for r in mk if r["business"] == "general_liability" and r["year"] == "2025"]
+    check("claims: quarters to clear", C["clear_2025"], float(q4["closing"]) / (sum(paid) / len(paid)), 0.05)
+    reg = {r["company_id"] for r in rows(out / "claims_regulator.csv")}
+    check("claims: regulator cases", C["reg_total"], len(reg), 0)
+    rn = rows(out / "claims_runs.csv")
+    check("claims: insurers with a slow run", C["runs"], len({r["company_id"] for r in rn}), 0)
+    check("claims: of those, later under the regulator", C["runs_acted"], len({r["company_id"] for r in rn if r["company_id"] in reg}), 0)
+    iy = rows(out / "claims_insurer_year.csv")
+    compared = {r["company_id"] for r in iy if r["business"] == "general_liability" and r["compared"] == "True"}
+    check("claims: general insurers compared", C["compared"], len(compared), 0)
+    # the home page sets the five against "the other" insurers compared, so all five must be among them
+    check("claims: the five are among those compared", C["reg_total"], len(reg & compared), 0)
+
+
 def ifrs17_viz(path):
     """IFRS17_VIZ: durations, coefficients of variation and the risk adjustment by confidence level."""
     d = json.load(open(path, encoding="utf-8"))
@@ -509,13 +545,18 @@ def main():
     root = Path(a.repos)
     if not (root / "ira-kenya-data").exists():
         sys.exit(f"Cannot find the analysis repos under {root.resolve()}. Pass --repos.")
-    kenya(root)
-    kenya_story(root)
+    skipped = []
+    # ira-kenya-data's tables are built locally from the raw files and not published, so a fresh clone lacks them
+    if (root / "ira-kenya-data" / "data" / "processed" / "general_revenue_panel.csv").exists():
+        kenya(root)
+        kenya_story(root)
+    else:
+        skipped.append("Kenya figures from ira-kenya-data (its tables are built locally and not published)")
     reinsurance_flows(root)
+    claims(root, skipped)
     triangle()
 
     local = Path(__file__).with_name("local_paths.json")
-    skipped = []
     if local.exists():
         p = json.load(open(local, encoding="utf-8"))
         for key, fn, args in [("ifrs17", ifrs17, ("ifrs17",)), ("ifrs17 charts", ifrs17_viz, ("ifrs17",)), ("reserving", reserving, ("reserving",)),
@@ -526,13 +567,13 @@ def main():
             else:
                 skipped.append(key)
     else:
-        skipped = ["ifrs17", "ifrs17 charts", "reserving", "pricing", "auctions", "dealer"]
+        skipped += ["ifrs17", "ifrs17 charts", "reserving", "pricing", "auctions", "dealer"]
 
     if not apps(root):
         skipped.append("health ibnr lab")
     print(f"{OK[0]} figures match their source.")
     if skipped:
-        print("Not checked (no local_paths.json entry): " + ", ".join(skipped))
+        print("Not checked (its source is not on this machine): " + ", ".join(skipped))
     if FAIL:
         print(f"{len(FAIL)} figures do not match:")
         for f in FAIL:

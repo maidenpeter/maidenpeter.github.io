@@ -25,6 +25,7 @@ PAGES = [
     ("lossmap", "/ira-kenya-insurance/page/kenya-insurance-loss-map.html", 740),
     ("structure", "/ira-kenya-insurance/page/kenya-insurance-market-structure.html", 1150),
     ("flows", "/ira-kenya-insurance/page/kenya-insurance-reinsurance-flows.html", "#classes .grid2"),
+    ("claims", "/ira-kenya-insurance/page/kenya-claims-settlement.html", "#queue .panel"),
     ("scorecard", "/ira-kenya-reinsurance/page/kenya-cedant-scorecard.html", 0),
     ("explorer", "/ira-kenya-data/explorer/kenya-insurer-explorer.html", 200),
     ("ifrs17", "/work/ifrs17-measurement/", "figure.panel"),

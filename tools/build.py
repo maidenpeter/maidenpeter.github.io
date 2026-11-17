@@ -11,7 +11,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from figures import REINSURANCE_FLOWS as RF
+from figures import REINSURANCE_FLOWS as RF, CLAIMS as CL
 from figures import (KENYA as K, CLASS_RESULTS, BACKTEST, DEALER as D, IFRS17 as I, IFRS17_LINES,
                      BACKTEST_AE, CREDIBILITY, AUCTIONS as A, AUCTION_DECILES, APPS as AP, IPL_URL, HIL_URL, HACKATHONS)
 from nav import nav_html, series_html, NAV_JS, NAV_CSS, THEME_HEAD, ROLE
@@ -40,6 +40,7 @@ PAGE = dict(
     flows=f"{BASE}/ira-kenya-insurance/page/kenya-insurance-reinsurance-flows.html",
     scorecard=f"{BASE}/ira-kenya-reinsurance/page/kenya-cedant-scorecard.html",
     explorer=f"{BASE}/ira-kenya-data/explorer/kenya-insurer-explorer.html",
+    claims=f"{BASE}/ira-kenya-insurance/page/kenya-claims-settlement.html",
 )
 CODE = dict(data=f"{GH}/ira-kenya-data", insurance=f"{GH}/ira-kenya-insurance", reinsurance=f"{GH}/ira-kenya-reinsurance")
 
@@ -285,6 +286,34 @@ def kenya_cards():
     ])
 
 
+def claims_section(num):
+    """Analysis 2: claims settlement. No insurer is named here; the names stay on the analysis page."""
+    c = CL
+    card = work_card("Claims settlement", "Kenya Claims Settlement",
+                     f"In an average quarter of 2025 general insurers paid <b>{d1(c['liab_2025'], False)}%</b> of the liability claims open to them, "
+                     f"up from {d1(c['liab_2017'], False)}% in 2017; life insurers paid {d1(c['life_2025'], False)}% of theirs. <b>{n(c['open_2025'])}</b> liability claims, "
+                     f"{ksh(c['open_ksh_2025'])} by the insurers' own estimates, were still outstanding at the end of 2025: {d1(c['clear_2025'], False)} quarters of payments.",
+                     f"IRA's quarterly claims settlement statistics, {c['quarters']} quarters from Q1 2017 to Q1 2026, every general and life insurer.",
+                     f"Claims paid over claims open, quarter by quarter, against the median insurer; {n(c['checks'])} checks against IRA's printed totals and each insurer's previous quarter.",
+                     PAGE["claims"], TOOLS["insurance"], shot="claims")
+    share = c['runs_acted'] / c['reg_total'] * 100
+    others = c['compared'] - c['reg_total']
+    other = (c['runs'] - c['runs_acted']) / others * 100
+    return f"""<section id="claims" aria-labelledby="h-claims">
+<div class="sechead">{eb(num, "Analysis 2")}
+<h2 id="h-claims">Do Kenya's insurers pay?</h2>
+<p>The Kenya series asks where insurers make and lose money. This analysis asks whether they pay claims, and how fast: general and life business, every insurer, every quarter IRA has published since 2017, checked {n(c['checks'])} times.</p></div>
+<div class="grid2">{card}
+<div class="panel">
+<span class="tag">Was the warning in the claims returns?</span>
+<p class="big">{c['runs_acted']} <small>of {c['reg_total']}</small></p>
+<p>insurers the regulator stepped into since 2022 had, at some point since 2017, paid liability claims at under half the median insurer's rate for four quarters running. So had {c['runs'] - c['runs_acted']} of the other {others} general insurers.</p>
+{share_bars([("The five the regulator stepped into", share, ""), (f"The other {others} general insurers", other, "g")])}
+<p class="small">Paying slowly is common and is not on its own a sign of trouble: {w(c['runs'] - c['runs_acted'])} of the {w(c['runs'])} insurers with four slow quarters in a row carried on writing business. Five cases is a small sample.</p>
+</div></div>
+</section>"""
+
+
 def N_PAGES():
     """How many Kenya pages there are: one card each."""
     return kenya_cards().count('<article class="card">')
@@ -521,8 +550,8 @@ PRINCIPLES = [
 
 
 PARTS = {
-    "data": ("I", "Data analysis", "Kenya's insurance market rebuilt from the regulator's returns: the loss map, market structure, reinsurance flows, a cedant scorecard and an insurer explorer. Then a dealer group's revenue audit, a cargo airline's risk layer, a drought forecast and a football model.",
-             [("#work", "Kenya series"), ("#signals", "Reinsurer signals"), ("#ask", "Ask the data"), ("#data-more", "Audit and models")]),
+    "data": ("I", "Data analysis", "Kenya's insurance market rebuilt from the regulator's returns: the loss map, market structure, reinsurance flows, a cedant scorecard and an insurer explorer. Then whether insurers pay their claims, a dealer group's revenue audit, a cargo airline's risk layer, a drought forecast and a football model.",
+             [("#work", "Kenya series"), ("#signals", "Reinsurer signals"), ("#claims", "Claims settlement"), ("#ask", "Ask the data"), ("#data-more", "Audit and models")]),
     "actuarial": ("II", "Actuarial analysis", "Health IBNR reserving, instalment persistency and parametric crop pricing as working tools, then IFRS 17 measurement and a reserve adequacy test on public US data.",
                   [("#apps", "Apps and pricing"), ("#actuarial-cases", "Case studies")]),
 }
@@ -565,7 +594,7 @@ def home():
 
 <section id="work" aria-labelledby="h-work">
 <div class="kenya-head">
-<div class="sechead">{eb("I.1", "Featured work")}
+<div class="sechead">{eb("I.1", "Analysis 1")}
 <h2 id="h-work">Kenya insurance series</h2>
 <p>Every general insurer and reinsurer in Kenya, every quarter from Q4 2016 to Q1 2026, extracted from the Insurance Regulatory Authority's statistics and checked against itself. {w(N_PAGES(), cap=True)} pages, one validated dataset, three public repositories.</p>
 <p>Motor lost money in every one of the eight years from 2018 to 2025. Every other class together made {ksh(K['uw_other'])}.</p>
@@ -577,10 +606,12 @@ def home():
 
 {signals("I.2")}
 
-{ask_teaser("I.3")}
+{claims_section("I.3")}
+
+{ask_teaser("I.4")}
 
 <section id="data-more" aria-labelledby="h-data-more">
-<div class="sechead">{eb("I.4", "Audit and models")}
+<div class="sechead">{eb("I.5", "Audit and models")}
 <h2 id="h-data-more">The same standard on other data</h2>
 <p>Automotive: a Kenyan client's ledgers, published without client identifiers. Aviation: a risk and cover layer for a cargo airline. And two products that turn data into a forecast someone can act on.</p></div>
 <div class="grid2">{case_card("dealer-revenue")}{product_card("CargoShield")}{product_card("Mapema")}{product_card("Matchday Model")}</div>
@@ -1152,7 +1183,7 @@ def repo_index(repo, title, lede, links):
     """Index page for one Kenya repo's GitHub Pages site, in the same style. Links back to the series."""
     shots = {"explorer/kenya-insurer-explorer.html": "explorer", "page/kenya-insurance-loss-map.html": "lossmap",
              "page/kenya-insurance-market-structure.html": "structure", "page/kenya-cedant-scorecard.html": "scorecard",
-             "page/kenya-insurance-reinsurance-flows.html": "flows"}
+             "page/kenya-insurance-reinsurance-flows.html": "flows", "page/kenya-claims-settlement.html": "claims"}
     items = "".join(f'<article class="card">{thumb(shots[u], u)}<span class="tag">{t}</span><h3>{h}</h3><p class="find">{d}</p><div class="links"><a href="{u}">Open the page</a></div></article>' for t, h, d, u in links)
     body = f"""<section aria-labelledby="h1"><span class="eyebrow">Kenya insurance series</span><h1 id="h1" style="font-size:clamp(32px,3.8vw,46px)">{title}</h1><p class="lede">{lede}</p>
 <p class="small">Built with {TOOLS[repo.rsplit("-", 1)[1]]}.</p>
@@ -1166,10 +1197,11 @@ def repo_index(repo, title, lede, links):
 REPO_INDEX = {
     "ira-kenya-data": ("Kenya Insurer Data", f"The data layer behind the series: every general insurer and reinsurer, every quarter from Q4 2016 to Q1 2026, validated with {n(K['checks'])} checks.",
                        [("Data", "Kenya Insurer Explorer", "Any insurer, any year: premium, ratios, single quarters, class mix, balance sheet and return-quality flags.", "explorer/kenya-insurer-explorer.html")]),
-    "ira-kenya-insurance": ("Kenya Insurance Analysis", "Kenya's general insurance market from the insurer's side: where the money is lost, what premiums would have to do, who holds the market, and what is passed on to reinsurers.",
+    "ira-kenya-insurance": ("Kenya Insurance Analysis", "Kenya's insurance market from the insurer's side: where the money is lost, what premiums would have to do, who holds the market, what is passed on to reinsurers, and whether claims are paid.",
                             [("Profitability", "Kenya Insurance Loss Map", "Class by class results 2018 to 2025, the rate change each class needs, and motor results that look too good.", "page/kenya-insurance-loss-map.html"),
                              ("Market structure", "Kenya Insurance Market Structure", "Concentration, share shifts, growth against results and what fragmentation costs.", "page/kenya-insurance-market-structure.html"),
-                             ("Reinsurance flows", "Kenya Reinsurance Flows", "How much insurers cede by class and insurer, how much the reinsurers that file IRA returns could take, and how they fare on all the business they accept.", "page/kenya-insurance-reinsurance-flows.html")]),
+                             ("Reinsurance flows", "Kenya Reinsurance Flows", "How much insurers cede by class and insurer, how much the reinsurers that file IRA returns could take, and how they fare on all the business they accept.", "page/kenya-insurance-reinsurance-flows.html"),
+                             ("Analysis 2: claims settlement", "Kenya Claims Settlement", "How much of what is claimed gets paid, how fast and by whom, general and life, every quarter IRA has published since 2017.", "page/kenya-claims-settlement.html")]),
     "ira-kenya-reinsurance": ("Kenya Cedant Scorecard", "Every Kenyan general insurer graded each year the way a reinsurer screens a cedant, back-tested against the insurers the regulator stepped into.",
                               [("Reinsurance", "Kenya Cedant Scorecard", "Grades A to E on balance sheet, operating performance, business profile and return quality, 2016 to 2025.", "page/kenya-cedant-scorecard.html")]),
 }
