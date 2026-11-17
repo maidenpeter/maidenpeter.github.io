@@ -462,6 +462,30 @@ def kenya_story(root):
             check(f"not scored, {name} {yy}", 0, 0 if ok else None, 0)
 
 
+def reinsurance_flows(root):
+    """REINSURANCE_FLOWS: module 3 of ira-kenya-insurance, from its output files."""
+    out, R = root / "ira-kenya-insurance" / "output", F.REINSURANCE_FLOWS
+    mk = {int(r["year"]): r for r in rows(out / "reinsurance_market.csv")}
+    last = max(mk)
+    check("reinsurance: ceded 2025", R["ceded_2025"], float(mk[last]["ceded_premium"]) / 1e6, 0.05)
+    check("reinsurance: cession rate 2025", R["cession_2025"], 100 * float(mk[last]["cession_rate"]), 0.05)
+    check("reinsurance: ceded 2018 to 2025", R["ceded_total"], sum(float(r["ceded_premium"]) for r in mk.values()) / 1e6, 0.5)
+    check("reinsurance: local reinsurers", R["local_reinsurers"], int(mk[last]["local_reinsurers"]), 0)
+    check("reinsurance: local upper bound 2025", R["local_bound_2025"], 100 * float(mk[last]["local_share_upper_bound"]), 0.5)
+    cc = {r["class"]: r for r in rows(out / "reinsurance_class_cession.csv") if int(r["year"]) == last}
+    motor = [cc[c] for c in ("Motor Private", "Motor Commercial")]
+    check("reinsurance: motor cession 2025", R["motor_2025"],
+          100 * sum(float(r["ceded_premium"]) for r in motor) / sum(float(r["gross_premium"]) for r in motor), 0.05)
+    check("reinsurance: aviation cession 2025", R["aviation_2025"], 100 * float(cc["Aviation"]["cession_rate"]), 0.05)
+    seg = {int(r["year"]): r for r in rows(out / "reinsurance_reinsurer_results.csv")
+           if r["company_id"] == "all_local_reinsurers" and r["class"] == "All classes"}
+    first = min(seg)
+    check("reinsurance: commission ratio 2018", R["comm_2018"], 100 * float(seg[first]["commission_ratio"]), 0.05)
+    check("reinsurance: commission ratio 2025", R["comm_2025"], 100 * float(seg[last]["commission_ratio"]), 0.05)
+    check("reinsurance: loss ratio 2018", R["lr_2018"], 100 * float(seg[first]["loss_ratio"]), 0.05)
+    check("reinsurance: loss ratio 2025", R["lr_2025"], 100 * float(seg[last]["loss_ratio"]), 0.05)
+
+
 def ifrs17_viz(path):
     """IFRS17_VIZ: durations, coefficients of variation and the risk adjustment by confidence level."""
     d = json.load(open(path, encoding="utf-8"))
@@ -487,6 +511,7 @@ def main():
         sys.exit(f"Cannot find the analysis repos under {root.resolve()}. Pass --repos.")
     kenya(root)
     kenya_story(root)
+    reinsurance_flows(root)
     triangle()
 
     local = Path(__file__).with_name("local_paths.json")

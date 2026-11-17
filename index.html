@@ -76,7 +76,7 @@
 
 <section class="proof" aria-label="The data in numbers"><div><b>35</b><span>quarters of returns, Q4 2016 to Q1 2026</span></div><div><b>52</b><span>insurers and reinsurers, every one, on stable ids</span></div><div><b>42,246</b><span>consistency checks, none unexplained</span></div><div><b>12 of 12</b><span>figures match IRA's own PDF releases</span></div><div><b>Python</b><span>with pandas, numpy and openpyxl; every table tested</span></div></section>
 
-<nav class="parts" aria-label="Contents"><a class="part-card" href="#data"><span class="part-num" aria-hidden="true">I</span><span class="eyebrow">Part I</span><b>Data analysis</b><span class="part-sum">Kenya's insurance market rebuilt from the regulator's returns: the loss map, market structure, a cedant scorecard and an insurer explorer. Then a dealer group's revenue audit, a cargo airline's risk layer, a drought forecast and a football model.</span></a><a class="part-card" href="#actuarial"><span class="part-num" aria-hidden="true">II</span><span class="eyebrow">Part II</span><b>Actuarial analysis</b><span class="part-sum">Health IBNR reserving, instalment persistency and parametric crop pricing as working tools, then IFRS 17 measurement and a reserve adequacy test on public US data.</span></a></nav>
+<nav class="parts" aria-label="Contents"><a class="part-card" href="#data"><span class="part-num" aria-hidden="true">I</span><span class="eyebrow">Part I</span><b>Data analysis</b><span class="part-sum">Kenya's insurance market rebuilt from the regulator's returns: the loss map, market structure, reinsurance flows, a cedant scorecard and an insurer explorer. Then a dealer group's revenue audit, a cargo airline's risk layer, a drought forecast and a football model.</span></a><a class="part-card" href="#actuarial"><span class="part-num" aria-hidden="true">II</span><span class="eyebrow">Part II</span><b>Actuarial analysis</b><span class="part-sum">Health IBNR reserving, instalment persistency and parametric crop pricing as working tools, then IFRS 17 measurement and a reserve adequacy test on public US data.</span></a></nav>
 
 <section id="data" class="part" aria-labelledby="h-data">
 <span class="part-num" aria-hidden="true">I</span>
@@ -87,7 +87,7 @@
 <div class="kenya-head">
 <div class="sechead"><span class="eyebrow"><i>I.1</i>Featured work</span>
 <h2 id="h-work">Kenya insurance series</h2>
-<p>Every general insurer and reinsurer in Kenya, every quarter from Q4 2016 to Q1 2026, extracted from the Insurance Regulatory Authority's statistics and checked against itself. Four pages, one validated dataset, three public repositories.</p>
+<p>Every general insurer and reinsurer in Kenya, every quarter from Q4 2016 to Q1 2026, extracted from the Insurance Regulatory Authority's statistics and checked against itself. Five pages, one validated dataset, three public repositories.</p>
 <p>Motor lost money in every one of the eight years from 2018 to 2025. Every other class together made KSh 19.6bn.</p>
 <a class="more" href="/kenya-insurance/">How the series is built</a></div>
 <figure class="panel" style="margin:0">
@@ -115,6 +115,12 @@
 <p class="find">In 2020, two insurers wrote over KSh 10bn a year and held 16% of the market. By 2025, <b>seven</b> did, holding 53%. The ten insurers losing share ran a median combined ratio of <b>112.0%</b>.</p>
 <dl class="meta"><dt>Data</dt><dd>Written premium and results for every general insurer, 2016 to 2025, pro forma for mergers.</dd><dt>Method</dt><dd>Herfindahl-Hirschman index, share shifts, growth against combined ratio, and expense rates measured class for class against the five largest insurers.</dd><dt>Tools</dt><dd>Python, pandas and numpy; class totals tested against IRA's PDF releases with pytest</dd></dl>
 <div class="links"><a href="https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-insurance-market-structure.html">Open the page</a></div>
+</article><article class="card">
+<a class="thumb" href="https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-insurance-reinsurance-flows.html" tabindex="-1" aria-hidden="true"><img src="/assets/shots/flows.webp" alt="" width="960" height="600" loading="lazy" decoding="async"><span class="cue">Open</span></a><span class="tag">Reinsurance flows</span>
+<h3>Kenya Reinsurance Flows</h3>
+<p class="find">Kenyan general insurers passed <b>KSh 66.6bn</b> of premium to reinsurers in 2025, 29.3% of what they wrote: 3.2% of motor, 99.3% of aviation. At most <b>49%</b> of it could have gone to the five reinsurers that file IRA returns. The local reinsurers' net commission rose from 23.2% of earned premium in 2018 to 32.0% in 2025.</p>
+<dl class="meta"><dt>Data</dt><dd>Gross and net premium by class for every general insurer, and the local reinsurers' returns, full years 2018 to 2025.</dd><dt>Method</dt><dd>Cession and retention by class, insurer and size, reconciled to each insurer's outward reinsurance; the local reinsurers' results by class; retention against the Cedant Scorecard.</dd><dt>Tools</dt><dd>Python, pandas and numpy; class totals tested against IRA's PDF releases with pytest</dd></dl>
+<div class="links"><a href="https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-insurance-reinsurance-flows.html">Open the page</a></div>
 </article><article class="card">
 <a class="thumb" href="https://maidenpeter.github.io/ira-kenya-data/explorer/kenya-insurer-explorer.html" tabindex="-1" aria-hidden="true"><img src="/assets/shots/explorer.webp" alt="" width="960" height="600" loading="lazy" decoding="async"><span class="cue">Open</span></a><span class="tag">Data</span>
 <h3>Kenya Insurer Explorer</h3>

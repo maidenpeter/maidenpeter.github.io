@@ -121,7 +121,8 @@ def part_money(links):
     rg = S["rate_gap"]
     c4 = figure(
         "What premiums would have to do",
-        columns([n for n, _ in rg], [(["neg", "neg", "neu", "neu"], "Premium change to break even", [v for _, v in rg])],
+        columns([(n, n.replace("Motor commercial", "Motor<br>comm.").replace("Motor private", "Motor<br>private").replace("All classes", "All<br>classes"))
+                 for n, _ in rg], [(["neg", "neg", "neu", "neu"], "Premium change to break even", [v for _, v in rg])],
                 "Premium change each class needs to break even on 2023 to 2025 experience: " + ", ".join(f"{n} {d1(v)}%" for n, v in rg) + ".",
                 lambda v: f"{d1(v)}%", tick_fmt=lambda v: f"{v:g}%", ticks=[0, 5, 10, 15, 20], height=170,
                 marks={(0, i): f"{d1(v)}%" for i, (_, v) in enumerate(rg)}),
@@ -142,7 +143,7 @@ def part_money(links):
 
 # ------------------------------------------------------------------ part III
 LABELS = {  # where each named insurer's label sits on the scatter; '*' keeps it on phones
-    "GA": "l*", "Mayfair": "r*", "Intra-Africa": "tr", "Tausi": "b*", "ICEA Lion General": "br", "Heritage": "t",
+    "GA": "l*", "Mayfair": "r*", "Intra-Africa": "tr", "Tausi": "b*", "ICEA Lion General": "b", "Heritage": "t",
     "Pioneer": "l", "Kenya Orient": "r*", "Kenindia": "r", "Directline": "tr", "Occidental": "b", "Cannon General": "r",
     "Britam General": "tl", "NCBA Insurance": "l",
 }
@@ -185,9 +186,9 @@ def part_market(links):
         "Medical is taking over the book",
         columns([str(y) for y, _, _ in mix], [("neu", "Medical", [m for _, m, _ in mix]), ("neg", "Motor", [o for _, _, o in mix])],
                 f"Share of gross premium: medical rose from {whole(mix[0][1])}% in {mix[0][0]} to {whole(mix[-1][1])}% in {mix[-1][0]}, motor fell from {whole(mix[0][2])}% to {whole(mix[-1][2])}%.",
-                lambda v: f"{v:.1f}%", tick_fmt=lambda v: f"{v:g}%", ticks=[0, 10, 20, 30, 40, 50], height=170,
-                marks={(0, 0): whole(mix[0][1]), (1, 0): whole(mix[0][2]), (0, len(mix) - 1): whole(mix[-1][1]), (1, len(mix) - 1): whole(mix[-1][2])}),
-        sub="Share of gross written premium, percent.",
+                lambda v: f"{v:.1f}%", tick_fmt=lambda v: f"{v:g}%", ticks=[0, 10, 20, 30, 40, 50], height=200,
+                marks={(0, len(mix) - 1): whole(mix[-1][1]), (1, len(mix) - 1): whole(mix[-1][2])}),
+        sub=f"Share of gross written premium, percent. In {mix[0][0]}: medical {whole(mix[0][1])}%, motor {whole(mix[0][2])}%.",
         key=key([("neu", "Medical"), ("neg", "Motor, private and commercial")]),
         table=table(["Year", "Medical", "Motor"], [[y, f"{m:.1f}%", f"{o:.1f}%"] for y, m, o in mix]),
         note=f"Medical is the one large class that is concentrated: three insurers write {S['medical_top3_2025']}% of it.")
@@ -243,11 +244,12 @@ def motor_winners():
     lo = {(n, y): v for n, y, v in S["low_lr"]}
     t21, t22 = whole(lo[("Trident", 2021)]), whole(lo[("Trident", 2022)])
     rows = [(esc(n), f"rests on two years at {t21}% and {t22}%" if n == "Trident" else "a profit the rest of the data supports",
-             [(v, "neg ring" if n == "Trident" else "pos", f"{n}: motor underwriting result 2018 to 2025, KSh {v:.2f}bn", f"KSh {v:.2f}bn")]) for n, v in w]
+             [(v, "neg ring" if n == "Trident" else "pos", f"{n}: motor underwriting result 2018 to 2025, KSh {v:.2f}bn",
+               f'<span class="u">KSh </span>{v:.2f}<span class="u">bn</span>')]) for n, v in w]  # a narrow chart drops the units
     losers = S["motor_losers"]
     return '<div class="story-2">' + figure(
         "The only three insurers that made money on motor",
-        dotrows(rows, 0, 1, [0, 0.25, 0.5, 0.75, 1], lambda v: f"{v:g}", "Motor underwriting result 2018 to 2025, KSh bn: "
+        dotrows(rows, 0, 1.5, [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5], lambda v: f"{v:g}", "Motor underwriting result 2018 to 2025, KSh bn: "
                 + ", ".join(f"{n} {v:.2f}" for n, v in w) + ". Trident's result rests on two implausibly low loss ratio years."),
         sub="Motor underwriting result 2018 to 2025, KSh billions.",
         key=key([("pos dot", "Supported by the rest of the data"), ("neg ring", "Rests on loss ratios too low to trust")]),

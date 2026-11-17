@@ -55,6 +55,21 @@ KENYA = dict(
     hhi_2025=530,
 )
 
+# Reinsurance flows, full years 2018 to 2025 (ira-kenya-insurance/output/reinsurance_*.csv)
+REINSURANCE_FLOWS = dict(
+    ceded_2025=66.6,         # KSh bn of premium Kenyan general insurers ceded in 2025
+    cession_2025=29.3,       # percent of their gross premium
+    ceded_total=402,         # KSh bn ceded, 2018 to 2025
+    motor_2025=3.2,          # percent of motor premium ceded, private and commercial together
+    aviation_2025=99.3,      # percent of aviation premium ceded
+    local_reinsurers=5,
+    local_bound_2025=49,     # percent: the most the local reinsurers could have taken of what was ceded
+    comm_2018=23.2,          # local reinsurers' commission over earned premium, percent
+    comm_2025=32.0,
+    lr_2018=65.1,            # their loss ratio, percent
+    lr_2025=58.0,
+)
+
 # Underwriting result by class, 2018 to 2025, KSh bn (ira-kenya-insurance/output/class_market.csv)
 CLASS_RESULTS = [
     ("Motor private", -29.25),

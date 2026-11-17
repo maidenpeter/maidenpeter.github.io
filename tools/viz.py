@@ -58,7 +58,8 @@ def table(head, rows, summary="Show the numbers"):
 def columns(cats, series, label, fmt, tick_fmt=None, ticks=None, height=220, marks=None):
     """Vertical columns on one shared zero baseline; values may be negative (a diverging column chart).
 
-    cats: category labels along the bottom. series: (mark class, series name, values), values aligned
+    cats: category labels along the bottom, or (label, short label) where a narrow chart needs a shorter
+    one (the short label may hold a <br>). A four-digit year shortens to '16 by itself. series: (mark class, series name, values), values aligned
     with cats, None for no bar. A mark class of "sign" colours each bar by its sign (teal up, oxblood
     down); a list of classes sets one per bar (to pick out the bar the story is about).
     marks: {(series index, category index): text} printed at the bar's tip, used sparingly."""
@@ -83,6 +84,8 @@ def columns(cats, series, label, fmt, tick_fmt=None, ticks=None, height=220, mar
         return (hi - v) / span * 100
 
     grid = "".join(f'<span class="vz-tick{" z" if t == 0 else ""}" style="top:{y(t):.2f}%"><b>{tick_fmt(t)}</b></span>' for t in ticks)
+    shorts = [c[1] if isinstance(c, tuple) else esc(chr(39) + c[2:] if len(c) == 4 and c.isdigit() else c) for c in cats]
+    cats = [c[0] if isinstance(c, tuple) else c for c in cats]
     groups = []
     for ci, c in enumerate(cats):
         lanes = []
@@ -99,7 +102,7 @@ def columns(cats, series, label, fmt, tick_fmt=None, ticks=None, height=220, mar
                          f'title="{esc(f"{name}, {c}: {fmt(v)}")}">' + (f"<em>{lab}</em>" if lab else "") + "</i></span>")
         groups.append(f'<span class="vz-g">{"".join(lanes)}</span>')
     # a four-digit year shortens to '16 on a phone, so nine years fit side by side
-    xl = "".join(f'<span><b class="f">{esc(c)}</b><b class="s">{esc(chr(39) + c[2:] if len(c) == 4 and c.isdigit() else c)}</b></span>' for c in cats)
+    xl = "".join(f'<span><b class="f">{esc(c)}</b><b class="s">{s}</b></span>' for c, s in zip(cats, shorts))
     return (f'<div class="vz-colchart" style="--h:{height}px"><div class="vz-plot" role="img" aria-label="{esc(label)}">{grid}'
             f'<div class="vz-gs">{"".join(groups)}</div></div><div class="vz-x" aria-hidden="true">{xl}</div></div>')
 
@@ -107,7 +110,8 @@ def columns(cats, series, label, fmt, tick_fmt=None, ticks=None, height=220, mar
 def dotrows(rows, lo, hi, ticks, tick_fmt, label, band=None, rule=None):
     """One row per entity, dots on a shared horizontal axis.
 
-    rows: (name, note, [(value, mark class, hover text, label or "")]). band: (from, to, text), a shaded
+    rows: (name, note, [(value, mark class, hover text, label or "")]). A lone dot's label sits to its right, so a
+    caller whose largest value carries a label leaves room for it at the top of the scale. band: (from, to, text), a shaded
     reference range drawn in every row. rule: (value, text), a reference line such as a threshold."""
     def x(v):
         return (v - lo) / (hi - lo) * 100

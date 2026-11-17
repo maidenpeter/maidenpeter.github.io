@@ -149,6 +149,8 @@
   .vz-pt b:not(.keep){display:none}
   .vz-quad{display:none}
   .vz-dot b:not(.r){display:none}
+  .vz-bandlab{display:none}
+  .vz-dot b .u{display:none}
   .vz-axis .o,.vz-gx b.o{display:none}
   .vz-grades,.vz-grades thead,.vz-grades tbody{display:block}
   .vz-grades tr{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:2px;margin-bottom:2px}

@@ -55,7 +55,7 @@ def ifrs17_duration():
     rows = [(nm, "", [(v, "neu", f"{nm}: mean time to payment {v} years", f"{v} yrs")]) for nm, v in IV["dur"]]
     return figure(
         "How long each line waits to be paid",
-        dotrows(rows, 1, 3, [1, 1.5, 2, 2.5, 3], lambda v: f"{v:g}",
+        dotrows(rows, 1, 4, [1, 1.5, 2, 2.5, 3, 3.5, 4], lambda v: f"{v:g}",
                 "Mean years to payment by line: " + ", ".join(f"{nm} {v}" for nm, v in IV["dur"]) + "."),
         sub="Mean time to payment of the outstanding reserve, years. The longer the wait, the more discounting takes off.",
         table=table(["Line", "Mean years to payment"], [[nm, v] for nm, v in IV["dur"]]),
@@ -83,7 +83,7 @@ def ifrs17_cv():
     rows = [(nm, "", [(v, "neg" if nm == "Product liability" else "neu", f"{nm}: coefficient of variation {v}%", f"{v}%")]) for nm, v in IV["cv"]]
     return figure(
         "How uncertain each line's reserve is",
-        dotrows(rows, 0, 30, [0, 10, 20, 30], lambda v: f"{v:g}%",
+        dotrows(rows, 0, 50, [0, 10, 20, 30, 40, 50], lambda v: f"{v:g}%",
                 "Coefficient of variation of the simulated reserve by line: " + ", ".join(f"{nm} {v}%" for nm, v in IV["cv"]) + "."),
         sub="Coefficient of variation of the bootstrapped reserve: standard deviation over mean.",
         key=key([("neg dot", "The line the risk adjustment pushes up"), ("neu dot", "The other five")]),
