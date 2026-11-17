@@ -32,7 +32,7 @@ The analysis pages live in their own repositories and are linked from here, neve
 | Repository | What it holds | Pages |
 |---|---|---|
 | [ira-kenya-data](https://github.com/maidenpeter/ira-kenya-data) | Extraction, the company crosswalk, panels, quality flags and 42,246 validation checks | [Insurer Explorer](https://maidenpeter.github.io/ira-kenya-data/explorer/kenya-insurer-explorer.html) |
-| [ira-kenya-insurance](https://github.com/maidenpeter/ira-kenya-insurance) | Class profitability, rate adequacy and market structure | [Loss Map](https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-insurance-loss-map.html), [Market Structure](https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-insurance-market-structure.html) |
+| [ira-kenya-insurance](https://github.com/maidenpeter/ira-kenya-insurance) | Class profitability, rate adequacy, market structure and reinsurance flows | [Loss Map](https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-insurance-loss-map.html), [Market Structure](https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-insurance-market-structure.html), [Reinsurance Flows](https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-insurance-reinsurance-flows.html) |
 | [ira-kenya-reinsurance](https://github.com/maidenpeter/ira-kenya-reinsurance) | The Cedant Scorecard, its back-test and its weight sensitivity | [Cedant Scorecard](https://maidenpeter.github.io/ira-kenya-reinsurance/page/kenya-cedant-scorecard.html) |
 
 ## Ask the data
@@ -64,11 +64,11 @@ Static HTML, no framework. `tools/build.py` writes every page from one layout, s
 **Navigation.** Written once in `tools/nav.py` and on screen on every page:
 
 - a top bar with the MP seal, the name and the role in the middle, where the reader is on the left ("I Data analysis / Kenya series / Loss map", following the section being read on the home page), and the theme switch and GitHub on the right;
-- a side bar with Back, Home, the two chapters, Ask the data, About and Contact. Data analysis is grouped by industry, and each group folds away: **Insurance** (the five Kenya series pages, numbered 01 to 05), **Automotive** (the dealer revenue audit) and **Aviation** (CargoShield);
-- on Kenya pages, a labelled series strip held under the top bar;
+- a side bar with Back, Home, the two chapters, Ask the data, About and Contact. Data analysis is grouped by industry, and each group folds away: **Insurance** (the Kenya series pages, numbered 01 to 06), **Automotive** (the dealer revenue audit) and **Aviation** (CargoShield);
+- on Kenya pages, a labelled series strip held under the top bar (shorter labels where six full names do not fit, scrolling on phones);
 - on phones, the same links in a bar along the bottom, with each chapter opening as a sheet.
 
-The build writes the navigation's CSS to `assets/nav.css`. `tools/kenya_nav.py` writes the same navigation, a skip link and the series strip into the four Kenya analysis pages, inline, between `mp-nav` markers, so it can be run again whenever `nav.py` changes.
+The build writes the navigation's CSS to `assets/nav.css`. `tools/kenya_nav.py` writes the same navigation, a skip link and the series strip into the Kenya analysis pages, inline, between `mp-nav` markers, so it can be run again whenever `nav.py` changes.
 
 **Screenshots and pop-outs.** Every card that links somewhere carries a screenshot from `assets/shots/`, made by `tools/render_shots.py`. Work with no public link yet opens a pop-out (the `popover` attribute, so no script is needed) with a larger screenshot and the explanation.
 

@@ -11,7 +11,7 @@ Three parts, always on screen, on every page and at every width:
 - The side bar, from 861px: Back, Home, chapter I Data analysis and chapter II Actuarial analysis
   with their pages, About and Contact. On phones the same links sit in a bar along the bottom, and a
   chapter opens as a sheet listing its pages (the popover attribute, with a fallback without it).
-- On Kenya pages, a second, labelled strip held under the top bar: "I Kenya series", its five pages
+- On Kenya pages, a second, labelled strip held under the top bar: "I Kenya series", its pages
   numbered, the current one filled.
 Back returns to the previous page when that page was on this site, and otherwise goes up a level.
 """
@@ -27,12 +27,16 @@ KENYA = {  # the Kenya series pages, in reading order: (path, label in the side 
     "overview": ("/kenya-insurance/", "Kenya series", "Overview"),
     "lossmap": ("/ira-kenya-insurance/page/kenya-insurance-loss-map.html", "Loss map", "Loss map"),
     "structure": ("/ira-kenya-insurance/page/kenya-insurance-market-structure.html", "Market structure", "Market structure"),
+    "flows": ("/ira-kenya-insurance/page/kenya-insurance-reinsurance-flows.html", "Reinsurance flows", "Reinsurance flows"),
     "scorecard": ("/ira-kenya-reinsurance/page/kenya-cedant-scorecard.html", "Cedant scorecard", "Cedant scorecard"),
     "explorer": ("/ira-kenya-data/explorer/kenya-insurer-explorer.html", "Insurer explorer", "Insurer explorer"),
 }
 
+# Shorter labels for the series strip below 1440px wide, where six full names do not fit.
+STRIP_SHORT = {"structure": "Structure", "scorecard": "Scorecard", "flows": "Flows", "explorer": "Explorer"}
+
 # Data analysis is split by industry, each a group that folds away: (key, label, numbered, [(href, label)]).
-# The Kenya series pages are numbered 01 to 05, as on the series strip.
+# The Kenya series pages are numbered, as on the series strip.
 DATA_GROUPS = [
     ("insurance", "Insurance", True, [(h, t) for h, t, _ in KENYA.values()]),
     ("automotive", "Automotive", False, [("/work/dealer-revenue/", "Dealer revenue audit")]),
@@ -208,7 +212,13 @@ def nav_html(path, section=None, base="", up="/", where=None):
 def series_html(current, base=""):
     """The Kenya series strip under the top bar on every Kenya page; current is a KENYA key or None."""
     q = chr(34)
-    links = "".join(f'<li><a href="{base}{h}"{" aria-current=" + q + "page" + q if k == current else ""}><span class="mp-sub-n">{i:02d}</span>{t}</a></li>'
+
+    def label(k, t):   # a short form where the strip is tight; the link keeps the full name for screen readers
+        s = STRIP_SHORT.get(k)
+        return f'<span class="mp-sub-f">{t}</span><span class="mp-sub-s" aria-hidden="true">{s}</span>' if s else t
+
+    links = "".join(f'<li><a href="{base}{h}"{" aria-current=" + q + "page" + q if k == current else ""}'
+                    f'{" aria-label=" + q + t + q if k in STRIP_SHORT else ""}><span class="mp-sub-n">{i:02d}</span>{label(k, t)}</a></li>'
                     for i, (k, (h, _, t)) in enumerate(KENYA.items(), 1))
     return (f'<nav class="mp-sub" aria-label="Kenya series pages"><div class="mp-in">'
             f'<span class="mp-sub-tag"><b>I</b>Kenya series<small>{len(KENYA)} pages</small></span>'
@@ -220,6 +230,8 @@ def series_html(current, base=""):
 NAV_JS = """<script id="mp-nav-js">(function(){var d=document.documentElement,side=document.querySelector('.mp-side');if(!side)return;
 var each=function(sel,f){[].forEach.call(document.querySelectorAll(sel),f)},hide=function(p){try{p.hidePopover()}catch(x){}};
 // a short desktop window starts with the groups that do not hold this page folded, so the side bar fits
+// the series strip opens scrolled to the current page, and fades at each end that has more
+var sl=document.querySelector('.mp-sub-list');if(sl){var sc=sl.querySelector('a[aria-current]');var edge=function(){sl.classList.toggle('mp-more',sl.scrollLeft+sl.clientWidth<sl.scrollWidth-2);sl.classList.toggle('mp-less',sl.scrollLeft>2)};var mid=function(){if(sc)sl.scrollLeft+=sc.getBoundingClientRect().left-sl.getBoundingClientRect().left-(sl.clientWidth-sc.offsetWidth)/2;edge()};mid();addEventListener('load',mid);if(document.fonts)document.fonts.ready.then(mid);sl.addEventListener('scroll',edge,{passive:true});addEventListener('resize',edge)}
 if(matchMedia('(min-width:861px) and (max-height:680px)').matches)each('.mp-side .mp-grp[open]',function(g){if(!g.querySelector('[aria-current]'))g.open=false});
 var b=document.querySelector('.mp-theme');if(b){var l=b.querySelector('.mp-l');
 var cur=function(){return d.getAttribute('data-theme')||'dark'};
@@ -359,6 +371,13 @@ span.mp-wc{color:var(--ink)}
 .mp-sub-list a[aria-current]{background:var(--accent);border-color:var(--accent);color:var(--on-accent,var(--ground))}
 .mp-sub-list a[aria-current] .mp-sub-n{color:inherit;opacity:.8}
 .mp-sub a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mp-sub-s{display:none}
+@media (max-width:1439px){.mp-sub-f{display:none}.mp-sub-s{display:inline}}
+@media (max-width:1100px){.mp-sub-tag small{display:none}}
+/* a strip that scrolls fades at each end that has more */
+.mp-sub-list.mp-more{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 36px),transparent)}
+.mp-sub-list.mp-less{-webkit-mask-image:linear-gradient(90deg,transparent,#000 36px);mask-image:linear-gradient(90deg,transparent,#000 36px)}
+.mp-sub-list.mp-less.mp-more{-webkit-mask-image:linear-gradient(90deg,transparent,#000 36px,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(90deg,transparent,#000 36px,#000 calc(100% - 36px),transparent)}
 
 /* side bar from 861px, under the top bar */
 @media (min-width:861px){
@@ -383,8 +402,8 @@ span.mp-wc{color:var(--ink)}
 }
 /* shorter windows: the side bar tightens step by step so every link stays on screen */
 @media (min-width:861px) and (max-height:900px){.mp-ch-line{display:none}.mp-nav .mp-ch-link{padding-block:6px 5px}.mp-ch{margin:4px 0 2px}}
-@media (min-width:861px) and (max-height:820px){.mp-nav .mp-it{padding-block:3px}.mp-grp-t{padding-block:4px 3px}}
-@media (min-width:861px) and (max-height:720px){.mp-side{padding-block:12px}.mp-nav > a{padding-block:6px}.mp-nav .mp-back{margin-bottom:2px}.mp-nav .mp-it{padding-block:2px}}
+@media (min-width:861px) and (max-height:820px){.mp-nav > a{padding-block:6px}.mp-nav .mp-it{padding-block:2px}.mp-grp-t{padding-block:4px 3px}}
+@media (min-width:861px) and (max-height:720px){.mp-side{padding-block:12px}.mp-nav > a{padding-block:4px}.mp-nav .mp-back{margin-bottom:2px}.mp-nav .mp-it{padding-block:1px}}
 @media (min-width:861px) and (max-height:620px){:root{--mp-top:58px}.mp-seal{width:40px;height:40px}.mp-nm{font-size:21px}.mp-role{font-size:17px}.mp-nav > a{padding-block:4px;font-size:15px}.mp-nav .mp-it{padding-block:1px;font-size:14px}.mp-nav .mp-ch-link{padding-block:4px 3px}}
 @media (min-width:861px) and (max-height:540px){.mp-side{padding-block:8px}.mp-nav > a{padding-block:2px}.mp-nav .mp-it{padding-block:0;font-size:14px}}
 /* the industry groups tighten too; on the shortest windows the other chapter keeps only its own link */

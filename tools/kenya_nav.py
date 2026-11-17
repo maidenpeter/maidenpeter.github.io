@@ -16,6 +16,7 @@ from nav import SITE, KENYA, NAV_CSS, NAV_JS, nav_html, series_html
 
 PAGES = [("lossmap", "Loss map", "ira-kenya-insurance/page/kenya-insurance-loss-map.html", ["ira-kenya-insurance/page/template.html"]),
          ("structure", "Market structure", "ira-kenya-insurance/page/kenya-insurance-market-structure.html", ["ira-kenya-insurance/page/structure_template.html"]),
+         ("flows", "Reinsurance flows", "ira-kenya-insurance/page/kenya-insurance-reinsurance-flows.html", ["ira-kenya-insurance/page/reinsurance_template.html"]),
          ("scorecard", "Cedant scorecard", "ira-kenya-reinsurance/page/kenya-cedant-scorecard.html", ["ira-kenya-reinsurance/page/template.html"]),
          ("explorer", "Insurer explorer", "ira-kenya-data/explorer/kenya-insurer-explorer.html", ["ira-kenya-data/explorer/template.html"])]
 
@@ -31,6 +32,7 @@ _ONE_COL = ".hero,.grid2,.method{grid-template-columns:minmax(0,1fr)}.stamp{text
 SIDE_CSS = {
     "lossmap": f"@media (min-width:861px) and (max-width:1140px){{{_ONE_COL}}}\n",
     "structure": f"@media (min-width:861px) and (max-width:1140px){{{_ONE_COL}}}\n",
+    "flows": f"@media (min-width:861px) and (max-width:1140px){{{_ONE_COL}}}\n",
     "scorecard": ("@media (min-width:861px) and (max-width:1140px){.split{grid-template-columns:1fr}.detail{position:static}"
                   ".summary{grid-template-columns:repeat(2,minmax(0,1fr))}.summary .kpi:first-child{grid-column:1 / -1}"
                   ".grid2,.method{grid-template-columns:1fr}.stamp{text-align:left}}\n"
