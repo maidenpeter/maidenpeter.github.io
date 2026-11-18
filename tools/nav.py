@@ -38,18 +38,26 @@ STRIP_SHORT = {"structure": "Structure", "scorecard": "Scorecard", "flows": "Flo
 # The second analysis: claims settlement, from IRA's quarterly claims statistics. One page for now.
 CLAIMS = {"claims": ("/ira-kenya-insurance/page/kenya-claims-settlement.html", "Claims settlement", "Claims settlement")}
 
+# The M-Pesa analysis series, in its own repositories: (path, label in the side bar, label in the strip).
+MPESA = {"statement": ("/mpesa-statement-to-excel/", "Statement to Excel", "Statement to Excel")}
 
-def group(key, label, items, num=None, short=None):
+
+def group(key, label, items, num=None, short=None, series=False):
     """A group in a chapter that folds away. An industry has no number; an analysis inside one does, and its
-    pages are numbered as on the series strip. short: the analysis's name in the "where" line."""
-    return dict(key=key, label=label, items=items, num=num, short=short or label)
+    pages are numbered as on the series strip. short: the analysis's name in the "where" line. series: a series
+    of analyses, which keeps its numbered list even while it has only one."""
+    return dict(key=key, label=label, items=items, num=num, short=short or label, series=series)
 
 
 # Data analysis by industry. Insurance holds numbered analyses: 1, the Kenya series; 2, claims settlement.
+# Mobile money holds the M-Pesa series, whose first analysis is the statement reader.
 DATA_GROUPS = [
     group("insurance", "Insurance", [
         group("kenya", "Kenya series", [(h, t) for h, t, _ in KENYA.values()], num=1),
         group("claims", "Claims settlement", [(h, t) for h, t, _ in CLAIMS.values()], num=2),
+    ]),
+    group("mobile-money", "Mobile money", [
+        group("mpesa", "M-Pesa series", [(h, t) for h, t, _ in MPESA.values()], num=1, series=True),
     ]),
     group("automotive", "Automotive", [("/work/dealer-revenue/", "Dealer revenue audit")]),
     group("aviation", "Aviation", [("/#cargoshield", "CargoShield")]),
@@ -58,8 +66,8 @@ DATA_GROUPS = [
 # (key, numeral, title, short title for the phone bar, icon, home page anchor, one line of story,
 #  home page sections that mark it while scrolling, [(href, label)] or groups as in DATA_GROUPS)
 CHAPTERS = [
-    ("data", "I", "Data analysis", "Data", "chart", "/#data", "Insurance, automotive and aviation data, checked before it is believed",
-     "data work signals claims ask data-more", DATA_GROUPS),
+    ("data", "I", "Data analysis", "Data", "chart", "/#data", "Insurance, mobile money, automotive and aviation data, checked before it is believed",
+     "data work signals claims ask mpesa-series data-more", DATA_GROUPS),
     ("actuarial", "II", "Actuarial analysis", "Actuarial", "tri", "/#actuarial", "Reserving, IFRS 17 and pricing",
      "actuarial apps actuarial-cases",
      [("/#hil", "Health IBNR Lab"), ("/#ipl", "Persistency Lab"), ("/work/ifrs17-measurement/", "IFRS 17 measurement"),
@@ -78,7 +86,8 @@ HOME_WHERE = {
     "": [("Home", None)],
     "data": [_I], "work": [_I, ("Kenya series", "/#work")], "signals": [_I, ("Reinsurer signals", "/#signals")],
     "claims": [_I, ("Claims settlement", "/#claims")],
-    "ask": [_I, ("Ask the data", "/#ask")], "data-more": [_I, ("Audit and models", "/#data-more")],
+    "ask": [_I, ("Ask the data", "/#ask")], "mpesa-series": [_I, ("M-Pesa series", "/#mpesa-series")],
+    "data-more": [_I, ("Audit and models", "/#data-more")],
     "actuarial": [_II], "apps": [_II, ("Apps and pricing", "/#apps")], "actuarial-cases": [_II, ("Case studies", "/#actuarial-cases")],
     "method": [("How I work", "/#method")], "contact": [("Contact", "/#contact")],
 }
@@ -203,7 +212,7 @@ def nav_html(path, section=None, base="", up="/", where=None):
                 out.append(item(*e))
                 continue
             n = len(flat(e["items"]))
-            if e["num"] and n == 1:
+            if e["num"] and n == 1 and not e["series"]:
                 h, _ = e["items"][0]
                 out.append(f'<a class="mp-it mp-an-link" href="{base}{h}"{" aria-current=" + q + "page" + q if h == path else ""}>'
                            f'<span class="mp-an-n">{e["num"]}</span>{e["label"]}</a>')
@@ -269,7 +278,7 @@ var each=function(sel,f){[].forEach.call(document.querySelectorAll(sel),f)},hide
 // a short desktop window starts with the groups that do not hold this page folded, so the side bar fits
 // the series strip opens scrolled to the current page, and fades at each end that has more
 var sl=document.querySelector('.mp-sub-list');if(sl){var sc=sl.querySelector('a[aria-current]');var edge=function(){sl.classList.toggle('mp-more',sl.scrollLeft+sl.clientWidth<sl.scrollWidth-2);sl.classList.toggle('mp-less',sl.scrollLeft>2)};var mid=function(){if(sc)sl.scrollLeft+=sc.getBoundingClientRect().left-sl.getBoundingClientRect().left-(sl.clientWidth-sc.offsetWidth)/2;edge()};mid();addEventListener('load',mid);if(document.fonts)document.fonts.ready.then(mid);sl.addEventListener('scroll',edge,{passive:true});addEventListener('resize',edge)}
-if(matchMedia('(min-width:861px) and (max-height:680px)').matches)each('.mp-side .mp-grp[open]',function(g){if(!g.querySelector('[aria-current]'))g.open=false});
+if(matchMedia('(min-width:861px) and (max-height:780px)').matches)each('.mp-side .mp-grp[open]',function(g){if(!g.querySelector('[aria-current]'))g.open=false});
 var b=document.querySelector('.mp-theme');if(b){var l=b.querySelector('.mp-l');
 var cur=function(){return d.getAttribute('data-theme')||'dark'};
 var lab=function(){var c=cur();l.textContent=c==='dark'?'Paper theme':'Ink theme';b.setAttribute('aria-label','Switch to '+(c==='dark'?'paper':'ink')+' theme')};
@@ -449,11 +458,11 @@ span.mp-wc{color:var(--ink)}
 @media (min-width:861px) and (max-height:820px){.mp-nav > a{padding-block:4px}.mp-nav .mp-it{padding-block:1px}.mp-grp-t{padding-block:2px}.mp-nav .mp-an-link{padding-block:2px}.mp-nav .mp-back{margin-bottom:3px}}
 @media (min-width:861px) and (max-height:720px){.mp-side{padding-block:12px}.mp-nav > a{padding-block:4px}.mp-nav .mp-back{margin-bottom:2px}.mp-nav .mp-it{padding-block:1px}}
 @media (min-width:861px) and (max-height:620px){:root{--mp-top:58px}.mp-seal{width:40px;height:40px}.mp-nm{font-size:21px}.mp-role{font-size:17px}.mp-nav > a{padding-block:4px;font-size:15px}.mp-nav .mp-it{padding-block:1px;font-size:14px}.mp-nav .mp-ch-link{padding-block:4px 3px}}
-@media (min-width:861px) and (max-height:540px){.mp-side{padding-block:8px}.mp-nav > a{padding-block:2px}.mp-nav .mp-it{padding-block:0;font-size:14px}}
+@media (min-width:861px) and (max-height:540px){.mp-side{padding-block:4px}.mp-nav > a{padding-block:2px}.mp-nav .mp-it{padding-block:0;font-size:14px}}
 /* the industry groups tighten too; on the shortest windows the other chapter keeps only its own link */
 @media (min-width:861px) and (max-height:720px){.mp-grp-t{padding-block:1px}.mp-nav .mp-an-link{padding-block:1px}.mp-grp-in{padding-bottom:1px}.mp-nav .mp-it{padding-block:0}}
 @media (min-width:861px) and (max-height:620px){.mp-grp-t{padding-block:1px;font-size:11.5px}.mp-grp-in{padding-bottom:0}.mp-grp-n{display:none}}
-@media (min-width:861px) and (max-height:680px){.mp-nav:has(.mp-ch-btn.mp-cur) .mp-ch:not(:has(.mp-cur)) :is(.mp-it,.mp-grp){display:none}}
+@media (min-width:861px) and (max-height:780px){.mp-nav:has(.mp-ch-btn.mp-cur) .mp-ch:not(:has(.mp-cur)) :is(.mp-it,.mp-grp){display:none}}
 @media (min-width:861px) and (max-height:600px){.mp-nav > a{padding-block:3px}.mp-grp-t{padding-block:0}}
 @media (min-width:861px) and (max-width:1060px){.mp-theme .mp-l{@SR}.mp-theme{width:40px;padding:0}}
 

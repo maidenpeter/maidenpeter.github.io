@@ -512,19 +512,40 @@ def apps_section(num):
 <div class="links"><a href="{IPL_URL}">Open the app</a></div>
 <p class="small">{APP_WAIT}</p>
 </article>"""
-    mpesa = f"""<article class="card" id="mpesa">
+    return f"""<section id="apps" aria-labelledby="h-apps">
+<div class="sechead">{eb(num, "Apps and pricing")}
+<h2 id="h-apps">Reserving and product questions, as tools you can use</h2>
+<p>Built on synthetic books so every number can be published, with the assumptions on the page and tests behind them.</p></div>
+<div class="grid3">{hil}{ipl}{product_card("AgroShield")}</div>
+</section>"""
+
+
+def mpesa_section(num):
+    """The M-Pesa analysis series. Its first analysis is the statement reader, a live tool in its own repo.
+    No figures on the card: the tool reads the visitor's own statement."""
+    card = f"""<article class="card" id="mpesa">
 {thumb("mpesa", MPESA_URL)}<span class="badge live">Live</span>
-<span class="tag">{MPESA_TAG}</span>
+<span class="tag">Analysis 01, {MPESA_TAG}</span>
 <h3>M-Pesa Statement to Excel</h3>
 <p class="find">{esc(MPESA_LINE)}</p>
 <dl class="meta"><dt>Method</dt><dd>Statement text read with PDF.js, each transaction typed from its details, a running-balance check on every row and the totals compared with the statement's own summary.</dd><dt>Data</dt><dd>{MPESA_DATA}</dd><dt>Built with</dt><dd>JavaScript, PDF.js and ExcelJS.</dd></dl>
 <div class="links"><a href="{MPESA_URL}">Open the tool</a><a href="{MPESA_REPO}">Code: mpesa-statement-to-excel</a></div>
 </article>"""
-    return f"""<section id="apps" aria-labelledby="h-apps">
-<div class="sechead">{eb(num, "Apps and pricing")}
-<h2 id="h-apps">Reserving and product questions, as tools you can use</h2>
-<p>The reserving and product tools are built on synthetic books so every number can be published, with the assumptions on the page and tests behind them. The M-Pesa tool reads your own statement and keeps it in your browser.</p></div>
-<div class="grid3">{hil}{ipl}{product_card("AgroShield")}{mpesa}</div>
+    checks = checks_list([
+        (True, "Running balance.", "Every row's balance must equal the previous balance plus money in minus money out. Rows that do not follow are flagged, with the balance they should have had."),
+        (True, "The statement's own totals.", "Money in and money out are compared with the TOTAL line of the statement's summary table."),
+        (True, "Nothing leaves the browser.", "A content security policy blocks every other server, and the tests record every request the page makes and fail if one leaves it."),
+        (False, "A layout change needs a parser update.", "The parser reads where each value sits on Safaricom's statement. If that layout changes, the balance check shows the misread instead of hiding it."),
+    ])
+    return f"""<section id="mpesa-series" aria-labelledby="h-mpesa-series">
+<div class="sechead">{eb(num, "Mobile money")}
+<h2 id="h-mpesa-series">M-Pesa analysis series</h2>
+<p>M-Pesa statements hold the money records of many Kenyan households and small businesses, and they arrive as PDFs. This series turns them into data that can be checked, starting with the statement itself.</p></div>
+<div class="grid2">{card}
+<div class="panel">
+<span class="tag">How every statement is checked</span>
+{checks}
+</div></div>
 </section>"""
 
 
@@ -564,8 +585,8 @@ PRINCIPLES = [
 
 
 PARTS = {
-    "data": ("I", "Data analysis", "Kenya's insurance market rebuilt from the regulator's returns: the loss map, market structure, reinsurance flows, a cedant scorecard and an insurer explorer. Then whether insurers pay their claims, a dealer group's revenue audit, a cargo airline's risk layer, a drought forecast and a football model.",
-             [("#work", "Kenya series"), ("#signals", "Reinsurer signals"), ("#claims", "Claims settlement"), ("#ask", "Ask the data"), ("#data-more", "Audit and models")]),
+    "data": ("I", "Data analysis", "Kenya's insurance market rebuilt from the regulator's returns: the loss map, market structure, reinsurance flows, a cedant scorecard and an insurer explorer. Then whether insurers pay their claims, the M-Pesa series, a dealer group's revenue audit, a cargo airline's risk layer, a drought forecast and a football model.",
+             [("#work", "Kenya series"), ("#signals", "Reinsurer signals"), ("#claims", "Claims settlement"), ("#ask", "Ask the data"), ("#mpesa-series", "M-Pesa series"), ("#data-more", "Audit and models")]),
     "actuarial": ("II", "Actuarial analysis", "Health IBNR reserving, instalment persistency and parametric crop pricing as working tools, then IFRS 17 measurement and a reserve adequacy test on public US data.",
                   [("#apps", "Apps and pricing"), ("#actuarial-cases", "Case studies")]),
 }
@@ -604,7 +625,7 @@ def home():
 
 {toc}
 
-{part_head("data", "I", "Data analysis", "Start from the source and check it before believing it. Kenya's insurance market rebuilt from the regulator's own returns, a dealer group's ledgers taken apart, a cargo airline's risk layer and two forecasting products.")}
+{part_head("data", "I", "Data analysis", "Start from the source and check it before believing it. Kenya's insurance market rebuilt from the regulator's own returns, M-Pesa statements read and reconciled, a dealer group's ledgers taken apart, a cargo airline's risk layer and two forecasting products.")}
 
 <section id="work" aria-labelledby="h-work">
 <div class="kenya-head">
@@ -624,8 +645,10 @@ def home():
 
 {ask_teaser("I.4")}
 
+{mpesa_section("I.5")}
+
 <section id="data-more" aria-labelledby="h-data-more">
-<div class="sechead">{eb("I.5", "Audit and models")}
+<div class="sechead">{eb("I.6", "Audit and models")}
 <h2 id="h-data-more">The same standard on other data</h2>
 <p>Automotive: a Kenyan client's ledgers, published without client identifiers. Aviation: a risk and cover layer for a cargo airline. And two products that turn data into a forecast someone can act on.</p></div>
 <div class="grid2">{case_card("dealer-revenue")}{product_card("CargoShield")}{product_card("Mapema")}{product_card("Matchday Model")}</div>
