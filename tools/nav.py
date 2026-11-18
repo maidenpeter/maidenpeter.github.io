@@ -50,14 +50,15 @@ def group(key, label, items, num=None, short=None, series=False):
 
 
 # Data analysis by industry. Insurance holds numbered analyses: 1, the Kenya series; 2, claims settlement.
-# Mobile money holds the M-Pesa series, whose first analysis is the statement reader.
+# Mobile money holds 3, the M-Pesa series, whose first analysis is the statement reader. Analyses are
+# numbered across the whole chapter, as on the home page.
 DATA_GROUPS = [
     group("insurance", "Insurance", [
         group("kenya", "Kenya series", [(h, t) for h, t, _ in KENYA.values()], num=1),
         group("claims", "Claims settlement", [(h, t) for h, t, _ in CLAIMS.values()], num=2),
     ]),
     group("mobile-money", "Mobile money", [
-        group("mpesa", "M-Pesa series", [(h, t) for h, t, _ in MPESA.values()], num=1, series=True),
+        group("mpesa", "M-Pesa series", [(h, t) for h, t, _ in MPESA.values()], num=3, series=True),
     ]),
     group("automotive", "Automotive", [("/work/dealer-revenue/", "Dealer revenue audit")]),
     group("aviation", "Aviation", [("/#cargoshield", "CargoShield")]),

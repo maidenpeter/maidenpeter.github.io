@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from figures import REINSURANCE_FLOWS as RF, CLAIMS as CL
 from figures import (KENYA as K, CLASS_RESULTS, BACKTEST, DEALER as D, IFRS17 as I, IFRS17_LINES,
                      BACKTEST_AE, CREDIBILITY, AUCTIONS as A, AUCTION_DECILES, APPS as AP, IPL_URL, HIL_URL, HACKATHONS,
-                     MPESA_URL, MPESA_REPO)
+                     MPESA_URL)
 from nav import nav_html, series_html, NAV_JS, NAV_CSS, THEME_HEAD, ROLE
 from kenya_story import story
 import case_viz
@@ -485,11 +485,14 @@ def eb(num, text):
 # The live apps run on free hosting that puts them to sleep when nobody is using them.
 APP_WAIT = "The app may take a few seconds to load while it starts up."
 APP_OPEN = "Open the app (it may take a few seconds to load)"
-# The M-Pesa card's sentence, quoted by the Ask the data answers about mobile money and PDFs.
+# The M-Pesa card, in the same form as the other data analysis cards. Ask the data quotes these lines.
 MPESA_LINE = ("Reads Safaricom M-Pesa PDF statements into a formatted Excel workbook inside your browser: "
               "nothing is uploaded, and every balance is reconciled to the one before it.")
 MPESA_DATA = "Your own statement, read in your browser. Tested on synthetic statements."
-MPESA_TAG = "Mobile money data, JavaScript"
+MPESA_METHOD = ("Statement text read with PDF.js, each transaction typed from its details, a running-balance check on every row "
+                "and the totals compared with the statement's own summary.")
+MPESA_TOOLS = "JavaScript, PDF.js and ExcelJS; every row and total tested on synthetic statements in Node and in Chrome"
+MPESA_TAG = "Mobile money statements"
 
 
 def apps_section(num):
@@ -521,16 +524,10 @@ def apps_section(num):
 
 
 def mpesa_section(num):
-    """The M-Pesa analysis series. Its first analysis is the statement reader, a live tool in its own repo.
-    No figures on the card: the tool reads the visitor's own statement."""
-    card = f"""<article class="card" id="mpesa">
-{thumb("mpesa", MPESA_URL)}<span class="badge live">Live</span>
-<span class="tag">Analysis 01, {MPESA_TAG}</span>
-<h3>M-Pesa Statement to Excel</h3>
-<p class="find">{esc(MPESA_LINE)}</p>
-<dl class="meta"><dt>Method</dt><dd>Statement text read with PDF.js, each transaction typed from its details, a running-balance check on every row and the totals compared with the statement's own summary.</dd><dt>Data</dt><dd>{MPESA_DATA}</dd><dt>Built with</dt><dd>JavaScript, PDF.js and ExcelJS.</dd></dl>
-<div class="links"><a href="{MPESA_URL}">Open the tool</a><a href="{MPESA_REPO}">Code: mpesa-statement-to-excel</a></div>
-</article>"""
+    """Analysis 3: the M-Pesa series, laid out like analyses 1 and 2. Its first analysis is the statement reader,
+    a live tool in its own repo. No figures on the card: the tool reads the visitor's own statement."""
+    find = esc(MPESA_LINE).replace("every balance is reconciled", "<b>every balance is reconciled</b>")
+    card = work_card(MPESA_TAG, "M-Pesa Statement to Excel", find, MPESA_DATA, MPESA_METHOD, MPESA_URL, MPESA_TOOLS, shot="mpesa")
     checks = checks_list([
         (True, "Running balance.", "Every row's balance must equal the previous balance plus money in minus money out. Rows that do not follow are flagged, with the balance they should have had."),
         (True, "The statement's own totals.", "Money in and money out are compared with the TOTAL line of the statement's summary table."),
@@ -538,7 +535,7 @@ def mpesa_section(num):
         (False, "A layout change needs a parser update.", "The parser reads where each value sits on Safaricom's statement. If that layout changes, the balance check shows the misread instead of hiding it."),
     ])
     return f"""<section id="mpesa-series" aria-labelledby="h-mpesa-series">
-<div class="sechead">{eb(num, "Mobile money")}
+<div class="sechead">{eb(num, "Analysis 3")}
 <h2 id="h-mpesa-series">M-Pesa analysis series</h2>
 <p>M-Pesa statements hold the money records of many Kenyan households and small businesses, and they arrive as PDFs. This series turns them into data that can be checked, starting with the statement itself.</p></div>
 <div class="grid2">{card}
@@ -1113,11 +1110,11 @@ def ask_about():
         [["Instalment Persistency Lab", "Decrement tables in SQL (DuckDB), survival checks in R, an early warning model and a product levers simulator."], IPL_URL, APP_OPEN, "/"],
         [[data_role, "Power BI and Excel dashboards tracking KPIs and operational metrics"], *about_link, "/about/"],
         [[dealer["title"], dealer["method"]], "/work/dealer-revenue/", "Read the case study", "/"],
-        [["M-Pesa Statement to Excel", "JavaScript, PDF.js and ExcelJS."], MPESA_URL, "Open the tool", "/"]])
+        [["M-Pesa Statement to Excel", MPESA_TOOLS], MPESA_URL, "Open the tool", "/"]])
     mpesa = ["M-Pesa Statement to Excel", MPESA_LINE]
     mobile = dict(lead=yes, points=[
         [mpesa, MPESA_URL, "Open the tool", "/"],
-        [["M-Pesa Statement to Excel", MPESA_DATA], "/#mpesa", "The tool on the home page", "/"],
+        [["M-Pesa Statement to Excel", MPESA_DATA], "/#mpesa-series", "The M-Pesa series on the home page", "/"],
         [["AgroShield", agro["line"].split(". ")[-1].rstrip(".") + "."], "/#agroshield", "AgroShield on the home page", "/"]])
     rebuild = next(p for p in PRINCIPLES if p[0] == "Rebuild before analysing")
     pdfs = dict(lead=yes, points=[
