@@ -1,4 +1,5 @@
-"""Put the site navigation (tools/nav.py) into the Kenya analysis pages and their templates.
+"""Put the site navigation (tools/nav.py) into the Kenya analysis pages and their templates, and into
+the M-Pesa tool.
 
     python tools/kenya_nav.py [--repos ..]
 
@@ -7,12 +8,16 @@ as a single file. This writes the side bar, Back, and the Kenya series links int
 into the page built from it (the page is the template with data filled in, so both get the same
 change and the next rebuild keeps it). Run it again whenever tools/nav.py changes: the block sits
 between mp-nav markers and is replaced in place. The first run replaces the older top header.
+
+The M-Pesa tool (its own repository) has a content security policy that allows no inline CSS or
+script, so it gets the same navigation markup between the same markers, with the CSS and script
+written beside it as lib/nav.css and lib/nav.js.
 """
 import argparse, re, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from nav import SITE, KENYA, CLAIMS, NAV_CSS, NAV_JS, nav_html, series_html
+from nav import SITE, KENYA, CLAIMS, MPESA, NAV_CSS, NAV_JS, nav_html, series_html
 
 PAGES = [("lossmap", "Loss map", "ira-kenya-insurance/page/kenya-insurance-loss-map.html", ["ira-kenya-insurance/page/template.html"]),
          ("structure", "Market structure", "ira-kenya-insurance/page/kenya-insurance-market-structure.html", ["ira-kenya-insurance/page/structure_template.html"]),
@@ -92,13 +97,39 @@ def apply(path, key):
     print(f"{path}  ok")
 
 
+MPESA_REPO = "mpesa-statement-to-excel"
+GENERATED = "Written by tools/kenya_nav.py in maidenpeter.github.io from tools/nav.py; edit it there, not here."
+
+
+def mpesa(root):
+    """The M-Pesa tool: the navigation markup into index.html, its CSS and script into lib/ as files."""
+    repo = root / MPESA_REPO
+    if not (repo / "index.html").exists():
+        print(f"skip {MPESA_REPO}: not found under {root}")
+        return
+    page = repo / "index.html"
+    s = page.read_text(encoding="utf-8")
+    html = (HTML_START + '<a class="mp-skip" href="#mp-content">Skip to content</a>\n'
+            + nav_html(MPESA["statement"][0], "data", base=SITE, up="/#mpesa-series") + "\n"
+            + '<span id="mp-content" tabindex="-1"></span>\n' + HTML_END)
+    s = between(s, HTML_START, HTML_END, html)
+    js = re.fullmatch(r'<script id="mp-nav-js">(.*)</script>', NAV_JS, re.S).group(1)
+    files = {page: s, repo / "lib" / "nav.css": f"/* The site navigation. {GENERATED} */\n" + NAV_CSS,
+             repo / "lib" / "nav.js": f"/* The site navigation: theme switch, Back and the side bar. {GENERATED} */\n" + js + "\n"}
+    for path, text in files.items():
+        assert all(ord(c) < 128 for c in text), f"{path}: non-ASCII"
+        path.write_text(text, encoding="utf-8", newline="\n")
+        print(f"{path}  ok")
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--repos", default="..", help="folder holding the three ira-kenya-* repositories")
+    ap.add_argument("--repos", default="..", help="folder holding the ira-kenya-* repositories and the M-Pesa tool")
     root = Path(ap.parse_args().repos)
     for key, _, page, templates in PAGES:
         for rel in templates + [page]:
             apply(root / rel, key)
+    mpesa(root)
 
 
 if __name__ == "__main__":
