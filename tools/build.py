@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from figures import REINSURANCE_FLOWS as RF, CLAIMS as CL
 from figures import (KENYA as K, CLASS_RESULTS, BACKTEST, DEALER as D, IFRS17 as I, IFRS17_LINES,
                      BACKTEST_AE, CREDIBILITY, AUCTIONS as A, AUCTION_DECILES, APPS as AP, IPL_URL, HIL_URL, HACKATHONS,
-                     MPESA_URL)
+                     MPESA_URL, CARGO as CG, CARGO_URL, CARGO_REPO, CARGO_LIVE)
 from nav import nav_html, series_html, NAV_JS, NAV_CSS, THEME_HEAD, ROLE
 from kenya_story import story
 import case_viz
@@ -493,6 +493,8 @@ MPESA_METHOD = ("Statement text read with PDF.js, each transaction typed from it
                 "and the totals compared with the statement's own summary.")
 MPESA_TOOLS = "JavaScript, PDF.js and ExcelJS; every row and total tested on synthetic statements in Node and in Chrome"
 MPESA_TAG = "Mobile money statements"
+MPESA_ASK = ("Ask it about your statement, or look up any transaction by a name, a phone or till number, a receipt code, "
+             "an amount or a date.")
 
 
 def apps_section(num):
@@ -523,10 +525,39 @@ def apps_section(num):
 </section>"""
 
 
+CARGO_TAG = "Air cargo operations, Python and SQL"
+CARGO_METHOD = (f"A SimPy simulation of the terminal floor, KPIs written in DuckDB SQL, {w(CG['defects'])} injected data defects each caught by "
+                f"a SQL rule, a gradient boosting model that flags late freight at arrival (AUC {CG['auc']:.3f} on held-out months) and an "
+                "integer program for the roster.")
+CARGO_TOOLS = "Python, SimPy, DuckDB, scikit-learn, PuLP and Streamlit."
+
+
+def aviation_section(num):
+    """Aviation and marine: the two air cargo projects. Cargo Ops Lab links to its app once CARGO_LIVE is set, and to
+    its public repository until then; CargoShield has no public link yet."""
+    href, link = (CARGO_URL, "Open the app") if CARGO_LIVE else (CARGO_REPO, "Read the code")
+    note = APP_WAIT if CARGO_LIVE else "The code, the screenshots and every result are on GitHub. The app will be linked here when it is live."
+    lab = f"""<article class="card" id="cargo-ops">
+{thumb("cargo-ops", href)}{'<span class="badge live">Live</span>' if CARGO_LIVE else ""}
+<span class="tag">{CARGO_TAG}</span>
+<h3>Cargo Ops Lab</h3>
+<p class="find">A simulated import terminal at a Gulf hub: {n(CG['awbs'])} air waybills over {CG['months']} months. The optimized roster delivers {d1(CG['opt_on_time'], False)}% on time against {d1(CG['legacy_on_time'], False)}% for the legacy roster, on {n(CG['opt_hours'])} staff hours a week instead of {n(CG['legacy_hours'])}. When {CG['wave_share']}% of flights bunch into waves, <b>it falls to {d1(CG['wave_static'], False)}%, and a call-in pool of {CG['pool_size']} staff gets it back to {d1(CG['wave_pool'], False)}%</b>.</p>
+<dl class="meta"><dt>Method</dt><dd>{CARGO_METHOD}</dd><dt>Data</dt><dd>Seeded synthetic terminal. Illustrative only.</dd><dt>Built with</dt><dd>{CARGO_TOOLS}</dd></dl>
+<div class="links"><a href="{href}">{link}</a></div>
+<p class="small">{note}</p>
+</article>"""
+    return f"""<section id="aviation" aria-labelledby="h-aviation">
+<div class="sechead">{eb(num, "Aviation and marine")}
+<h2 id="h-aviation">Air cargo operations and cover</h2>
+<p>An import terminal's floor, simulated and staffed so freight is ready on time, and a cargo airline's risk and cover layer that screens each booking before it is accepted. Both run on synthetic data, so every number can be published.</p></div>
+<div class="grid2">{lab}{product_card("CargoShield")}</div>
+</section>"""
+
+
 def mpesa_section(num):
     """Analysis 3: the M-Pesa series, laid out like analyses 1 and 2. Its first analysis is the statement reader,
     a live tool in its own repo. No figures on the card: the tool reads the visitor's own statement."""
-    find = esc(MPESA_LINE).replace("every balance is reconciled", "<b>every balance is reconciled</b>")
+    find = esc(MPESA_LINE).replace("every balance is reconciled", "<b>every balance is reconciled</b>") + " " + esc(MPESA_ASK)
     card = work_card(MPESA_TAG, "M-Pesa Statement to Excel", find, MPESA_DATA, MPESA_METHOD, MPESA_URL, MPESA_TOOLS, shot="mpesa")
     checks = checks_list([
         (True, "Running balance.", "Every row's balance must equal the previous balance plus money in minus money out. Rows that do not follow are flagged, with the balance they should have had."),
@@ -582,8 +613,8 @@ PRINCIPLES = [
 
 
 PARTS = {
-    "data": ("I", "Data analysis", "Kenya's insurance market rebuilt from the regulator's returns: the loss map, market structure, reinsurance flows, a cedant scorecard and an insurer explorer. Then whether insurers pay their claims, the M-Pesa series, a dealer group's revenue audit, a cargo airline's risk layer, a drought forecast and a football model.",
-             [("#work", "Kenya series"), ("#signals", "Reinsurer signals"), ("#claims", "Claims settlement"), ("#ask", "Ask the data"), ("#mpesa-series", "M-Pesa series"), ("#data-more", "Audit and models")]),
+    "data": ("I", "Data analysis", "Kenya's insurance market rebuilt from the regulator's returns: the loss map, market structure, reinsurance flows, a cedant scorecard and an insurer explorer. Then whether insurers pay their claims, the M-Pesa series, an import cargo terminal and a cargo airline's risk layer, a dealer group's revenue audit, a drought forecast and a football model.",
+             [("#work", "Kenya series"), ("#signals", "Reinsurer signals"), ("#claims", "Claims settlement"), ("#ask", "Ask the data"), ("#mpesa-series", "M-Pesa series"), ("#aviation", "Aviation and marine"), ("#data-more", "Audit and models")]),
     "actuarial": ("II", "Actuarial analysis", "Health IBNR reserving, instalment persistency and parametric crop pricing as working tools, then IFRS 17 measurement and a reserve adequacy test on public US data.",
                   [("#apps", "Apps and pricing"), ("#actuarial-cases", "Case studies")]),
 }
@@ -622,7 +653,7 @@ def home():
 
 {toc}
 
-{part_head("data", "I", "Data analysis", "Start from the source and check it before believing it. Kenya's insurance market rebuilt from the regulator's own returns, M-Pesa statements read and reconciled, a dealer group's ledgers taken apart, a cargo airline's risk layer and two forecasting products.")}
+{part_head("data", "I", "Data analysis", "Start from the source and check it before believing it. Kenya's insurance market rebuilt from the regulator's own returns, M-Pesa statements read and reconciled, a cargo terminal simulated and staffed, a cargo airline's risk layer, a dealer group's ledgers taken apart and two forecasting products.")}
 
 <section id="work" aria-labelledby="h-work">
 <div class="kenya-head">
@@ -644,11 +675,13 @@ def home():
 
 {mpesa_section("I.5")}
 
+{aviation_section("I.6")}
+
 <section id="data-more" aria-labelledby="h-data-more">
-<div class="sechead">{eb("I.6", "Audit and models")}
+<div class="sechead">{eb("I.7", "Audit and models")}
 <h2 id="h-data-more">The same standard on other data</h2>
-<p>Automotive: a Kenyan client's ledgers, published without client identifiers. Aviation: a risk and cover layer for a cargo airline. And two products that turn data into a forecast someone can act on.</p></div>
-<div class="grid2">{case_card("dealer-revenue")}{product_card("CargoShield")}{product_card("Mapema")}{product_card("Matchday Model")}</div>
+<p>Automotive: a Kenyan client's ledgers, published without client identifiers. And two products that turn data into a forecast someone can act on.</p></div>
+<div class="grid3">{case_card("dealer-revenue")}{product_card("Mapema")}{product_card("Matchday Model")}</div>
 </section>
 
 {part_head("actuarial", "II", "Actuarial analysis", "Reserves, persistency and pricing, each built on a synthetic book or public industry triangles so every number can be published, then tested until it breaks.")}
@@ -1110,10 +1143,12 @@ def ask_about():
         [["Instalment Persistency Lab", "Decrement tables in SQL (DuckDB), survival checks in R, an early warning model and a product levers simulator."], IPL_URL, APP_OPEN, "/"],
         [[data_role, "Power BI and Excel dashboards tracking KPIs and operational metrics"], *about_link, "/about/"],
         [[dealer["title"], dealer["method"]], "/work/dealer-revenue/", "Read the case study", "/"],
-        [["M-Pesa Statement to Excel", MPESA_TOOLS], MPESA_URL, "Open the tool", "/"]])
+        [["M-Pesa Statement to Excel", MPESA_TOOLS], MPESA_URL, "Open the tool", "/"],
+        [["Cargo Ops Lab", CARGO_TOOLS], *((CARGO_URL, APP_OPEN) if CARGO_LIVE else (CARGO_REPO, "Read the code")), "/"]])
     mpesa = ["M-Pesa Statement to Excel", MPESA_LINE]
     mobile = dict(lead=yes, points=[
         [mpesa, MPESA_URL, "Open the tool", "/"],
+        [["M-Pesa Statement to Excel", MPESA_ASK], MPESA_URL, "Open the tool", "/"],
         [["M-Pesa Statement to Excel", MPESA_DATA], "/#mpesa-series", "The M-Pesa series on the home page", "/"],
         [["AgroShield", agro["line"].split(". ")[-1].rstrip(".") + "."], "/#agroshield", "AgroShield on the home page", "/"]])
     rebuild = next(p for p in PRINCIPLES if p[0] == "Rebuild before analysing")
@@ -1130,7 +1165,8 @@ def ask_about():
     opened = dict(lead="Live now, with nothing to install:", points=[
         [["Health IBNR Lab", "Health reserving, R and Shiny"], HIL_URL, APP_OPEN, "/"],
         [["Instalment Persistency Lab", "Health product design, SQL, Python and R"], IPL_URL, APP_OPEN, "/"],
-        [["M-Pesa Statement to Excel", MPESA_TAG], MPESA_URL, "Open the tool", "/"]]
+        [["M-Pesa Statement to Excel", MPESA_TAG], MPESA_URL, "Open the tool", "/"],
+        ] + ([[["Cargo Ops Lab", CARGO_TAG], CARGO_URL, APP_OPEN, "/"]] if CARGO_LIVE else [])
         + [[[t], PAGE[k], "Open", "/"] for k, t in [("lossmap", "Kenya Insurance Loss Map"), ("structure", "Kenya Insurance Market Structure"), ("flows", "Kenya Reinsurance Flows"),
                                                     ("scorecard", "Kenya Cedant Scorecard"), ("explorer", "Kenya Insurer Explorer")]]
         + [[[c["title"]], f"/work/{c['slug']}/", "Read", "/"] for c in CASES])

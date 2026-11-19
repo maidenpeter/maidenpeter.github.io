@@ -59,7 +59,8 @@ QUESTIONS = [
     # words too ("has she", "experience"), so their own subject decides: "mpesa experience" comes here, while
     # "IBNR experience" still goes to about-done, which also scores its topic.
     dict(id="about-mpesa", g="about", t="Has she worked with mobile money or M-Pesa data?",
-         slots={}, kw=["m-pesa", "mpesa", "mobile money", "safaricom", "fuliza", "has she", "experience", "worked with"]),
+         slots={}, kw=["m-pesa", "mpesa", "mobile money", "safaricom", "fuliza", "has she", "experience", "worked with",
+                       "my statement", "my transactions", "look up a transaction", "receipt code"]),
     dict(id="about-pdfs", g="about", t="Can she get clean data out of messy PDFs?",
          slots={}, kw=["pdf", "messy", "extract", "scrape", "parse", "clean data", "unstructured", "has she", "can she", "experience"]),
     dict(id="about-tools", g="about", t="Which tools does she use: R, Python, SQL, Excel?",

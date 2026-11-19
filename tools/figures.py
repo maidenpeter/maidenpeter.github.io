@@ -242,6 +242,27 @@ APPS = dict(
     ipl_lapsed_ratio=1.14,
     ipl_stayed_ratio=0.65,
 )
+# Cargo Ops Lab: cargo-ops-lab/data/headline.json, written by its build from the stored results, and the
+# call-in pool size from its config.yml (checked).
+CARGO = dict(
+    awbs=230796,
+    months=18,                # April 2025 to the data cut-off on 30 September 2026
+    opt_on_time=94.6,         # optimized roster, normal timetable
+    legacy_on_time=91.9,
+    opt_hours=1354,           # staff hours a week
+    legacy_hours=1456,
+    wave_share=40,            # percent of flights moved into arrival waves
+    wave_static=85.1,         # the normal-timetable roster when they are
+    wave_pool=93.7,           # the same roster plus the call-in pool
+    pool_size=4,
+    defects=7,                # defects injected into the feed, one SQL rule each
+    auc=0.960,                # gradient boosting, test months
+)
+CARGO_URL = "https://cargo-ops-lab.streamlit.app/"
+CARGO_REPO = "https://github.com/maidenpeter/cargo-ops-lab"
+# Set to True once the app answers at CARGO_URL on Streamlit Community Cloud. Until then the card links to the
+# public repository, and the app stays out of the "live now" answer on /ask/.
+CARGO_LIVE = True
 IPL_URL = "https://instalment-persistency-lab.streamlit.app/"
 HIL_URL = "https://maidenpeter.shinyapps.io/health-ibnr-lab/"  # from the app's rsconnect deployment record
 # M-Pesa Statement to Excel: a static page in its own repo, served by GitHub Pages (no figures on its card).

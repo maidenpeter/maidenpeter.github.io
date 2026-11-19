@@ -51,7 +51,8 @@ def group(key, label, items, num=None, short=None, series=False):
 
 # Data analysis by industry. Insurance holds numbered analyses: 1, the Kenya series; 2, claims settlement.
 # Mobile money holds 3, the M-Pesa series, whose first analysis is the statement reader. Analyses are
-# numbered across the whole chapter, as on the home page.
+# numbered across the whole chapter, as on the home page. Aviation and marine holds the two air cargo
+# projects, each a card on the home page; it comes before automotive, as the home page sections do.
 DATA_GROUPS = [
     group("insurance", "Insurance", [
         group("kenya", "Kenya series", [(h, t) for h, t, _ in KENYA.values()], num=1),
@@ -60,19 +61,25 @@ DATA_GROUPS = [
     group("mobile-money", "Mobile money", [
         group("mpesa", "M-Pesa series", [(h, t) for h, t, _ in MPESA.values()], num=3, series=True),
     ]),
+    group("aviation", "Aviation and marine", [("/#cargo-ops", "Cargo Ops Lab"), ("/#cargoshield", "CargoShield")]),
     group("automotive", "Automotive", [("/work/dealer-revenue/", "Dealer revenue audit")]),
-    group("aviation", "Aviation", [("/#cargoshield", "CargoShield")]),
+]
+
+# Actuarial analysis by discipline: reserving (the Health IBNR Lab and the two case studies), then product design and
+# pricing. The first group opens when the page is in neither, as in Data analysis.
+ACTUARIAL_GROUPS = [
+    group("reserving", "Reserving", [("/#hil", "Health IBNR Lab"), ("/work/ifrs17-measurement/", "IFRS 17 measurement"),
+                                     ("/work/valuation-adequacy/", "Reserve adequacy test")]),
+    group("product", "Product and pricing", [("/#ipl", "Persistency Lab"), ("/#agroshield", "AgroShield pricing")]),
 ]
 
 # (key, numeral, title, short title for the phone bar, icon, home page anchor, one line of story,
 #  home page sections that mark it while scrolling, [(href, label)] or groups as in DATA_GROUPS)
 CHAPTERS = [
-    ("data", "I", "Data analysis", "Data", "chart", "/#data", "Insurance, mobile money, automotive and aviation data, checked before it is believed",
-     "data work signals claims ask mpesa-series data-more", DATA_GROUPS),
+    ("data", "I", "Data analysis", "Data", "chart", "/#data", "Insurance, mobile money, air cargo and automotive data, checked before it is believed",
+     "data work signals claims ask mpesa-series aviation data-more", DATA_GROUPS),
     ("actuarial", "II", "Actuarial analysis", "Actuarial", "tri", "/#actuarial", "Reserving, IFRS 17 and pricing",
-     "actuarial apps actuarial-cases",
-     [("/#hil", "Health IBNR Lab"), ("/#ipl", "Persistency Lab"), ("/work/ifrs17-measurement/", "IFRS 17 measurement"),
-      ("/work/valuation-adequacy/", "Reserve adequacy test"), ("/#agroshield", "AgroShield pricing")]),
+     "actuarial apps actuarial-cases", ACTUARIAL_GROUPS),
 ]
 # (href, label, short label, icon, section, home page sections that mark it)
 HOME = ("/", "Home", "Home", "home", "home", "")
@@ -88,7 +95,7 @@ HOME_WHERE = {
     "data": [_I], "work": [_I, ("Kenya series", "/#work")], "signals": [_I, ("Reinsurer signals", "/#signals")],
     "claims": [_I, ("Claims settlement", "/#claims")],
     "ask": [_I, ("Ask the data", "/#ask")], "mpesa-series": [_I, ("M-Pesa series", "/#mpesa-series")],
-    "data-more": [_I, ("Audit and models", "/#data-more")],
+    "aviation": [_I, ("Aviation and marine", "/#aviation")], "data-more": [_I, ("Audit and models", "/#data-more")],
     "actuarial": [_II], "apps": [_II, ("Apps and pricing", "/#apps")], "actuarial-cases": [_II, ("Case studies", "/#actuarial-cases")],
     "method": [("How I work", "/#method")], "contact": [("Contact", "/#contact")],
 }

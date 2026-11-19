@@ -13,7 +13,7 @@ tools/local_paths.json (kept out of git, because client work stays private):
 
 Exits non-zero if any figure differs from its source at the precision shown.
 """
-import argparse, csv, json, math, os, sys
+import argparse, csv, json, math, os, re, sys
 from collections import defaultdict
 from pathlib import Path
 
@@ -325,6 +325,32 @@ def apps(root):
     return True
 
 
+def cargo_ops(root):
+    """Cargo Ops Lab headline numbers, when its repo sits beside the analysis repos."""
+    lab = root / "cargo-ops-lab"
+    p = lab / "data" / "headline.json"
+    if not p.exists():
+        return False
+    h = json.load(open(p, encoding="utf-8"))
+    cfg = (lab / "config.yml").read_text(encoding="utf-8")
+    C = F.CARGO
+    start, cut = h["window_start"], h["cutoff"]
+    months = (int(cut[:4]) - int(start[:4])) * 12 + int(cut[5:7]) - int(start[5:7]) + 1
+    check("cargo awbs", C["awbs"], h["awbs_total"], 0)
+    check("cargo months", C["months"], months, 0)
+    check("cargo optimized on time", C["opt_on_time"], round(h["opt_on_time"] * 100, 1), 0.05)
+    check("cargo legacy on time", C["legacy_on_time"], round(h["legacy_on_time"] * 100, 1), 0.05)
+    check("cargo optimized hours", C["opt_hours"], round(h["opt_hours_week"]), 0)
+    check("cargo legacy hours", C["legacy_hours"], round(h["legacy_hours_week"]), 0)
+    check("cargo wave share", C["wave_share"], round(h["dis_share"] * 100), 0)
+    check("cargo waves, static roster", C["wave_static"], round(h["dis_static"] * 100, 1), 0.05)
+    check("cargo waves, call-in pool", C["wave_pool"], round(h["dis_flex"] * 100, 1), 0.05)
+    check("cargo pool size", C["pool_size"], int(re.search(r"^\s*pool_size:\s*(\d+)", cfg, re.M).group(1)), 0)
+    check("cargo model auc", C["auc"], round(h["model_auc"], 3), 0.0005)
+    check("cargo defects", C["defects"], len(re.findall(r"^-- name: rule_", (lab / "sql" / "dq_rules.sql").read_text(encoding="utf-8"), re.M)), 0)
+    return True
+
+
 def kenya_story(root):
     """KENYA_STORY: the series behind the charts on /kenya-insurance/."""
     data, ins, rei = root / "ira-kenya-data", root / "ira-kenya-insurance" / "output", root / "ira-kenya-reinsurance" / "output"
@@ -571,6 +597,8 @@ def main():
 
     if not apps(root):
         skipped.append("health ibnr lab")
+    if not cargo_ops(root):
+        skipped.append("cargo ops lab")
     print(f"{OK[0]} figures match their source.")
     if skipped:
         print("Not checked (its source is not on this machine): " + ", ".join(skipped))
