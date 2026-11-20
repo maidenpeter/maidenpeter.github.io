@@ -263,6 +263,15 @@ CARGO_REPO = "https://github.com/maidenpeter/cargo-ops-lab"
 # Set to True once the app answers at CARGO_URL on Streamlit Community Cloud. Until then the card links to the
 # public repository, and the app stays out of the "live now" answer on /ask/.
 CARGO_LIVE = True
+# Kenya Reserve Check: kenya-reserve-check/data/insurers.json, one entry for each listed group whose latest report
+# was read; an entry with "excluded" is a table that does not hold together (checked). No insurer is named on the
+# home page, so its card carries only these two counts.
+RESERVE = dict(
+    groups=6,                 # insurance groups listed on the Nairobi Securities Exchange, every one read
+    used=2,                   # whose table holds together and ties to the liability in their notes
+)
+RESERVE_URL = "https://kenya-reserve-check.streamlit.app/"
+RESERVE_REPO = "https://github.com/maidenpeter/kenya-reserve-check"
 IPL_URL = "https://instalment-persistency-lab.streamlit.app/"
 HIL_URL = "https://maidenpeter.shinyapps.io/health-ibnr-lab/"  # from the app's rsconnect deployment record
 # M-Pesa Statement to Excel: a static page in its own repo, served by GitHub Pages (no figures on its card).

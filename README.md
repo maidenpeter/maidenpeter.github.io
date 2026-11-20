@@ -16,7 +16,7 @@ Insurance and reinsurance analysis built from public data. The site leads with K
 
 | Page | What it is |
 |---|---|
-| [`/`](https://maidenpeter.github.io/) | A chain ladder worked out in the page, then **Part I, Data analysis** (analysis 1, the Kenya series, and what a reinsurer would act on; analysis 2, claims settlement; Ask the data; the M-Pesa series, starting with the statement reader; aviation and marine, with Cargo Ops Lab and CargoShield; the dealer audit and two forecasting products) and **Part II, Actuarial analysis** (the reserving and persistency apps, AgroShield pricing, the IFRS 17 and reserve adequacy case studies) |
+| [`/`](https://maidenpeter.github.io/) | A chain ladder worked out in the page, then **Part I, Data analysis** (analysis 1, the Kenya series, and what a reinsurer would act on; analysis 2, claims settlement; Ask the data; the M-Pesa series, starting with the statement reader; aviation and marine, with Cargo Ops Lab and CargoShield; the dealer audit and two forecasting products) and **Part II, Actuarial analysis** (reserving: the Health IBNR Lab, Kenya Reserve Check and the IFRS 17 and reserve adequacy case studies; then product and pricing: the persistency app and AgroShield) |
 | [`/kenya-insurance/`](https://maidenpeter.github.io/kenya-insurance/) | Front page of the Kenya insurance series |
 | [`/ask/`](https://maidenpeter.github.io/ask/) | Ask the data: questions about the market, any insurer, the scorecard and reserving, answered in the browser |
 | [`/work/dealer-revenue/`](https://maidenpeter.github.io/work/dealer-revenue/) | Case study: a Kenyan dealer group's revenue counted twice (anonymised) |

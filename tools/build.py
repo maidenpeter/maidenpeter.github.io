@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from figures import REINSURANCE_FLOWS as RF, CLAIMS as CL
 from figures import (KENYA as K, CLASS_RESULTS, BACKTEST, DEALER as D, IFRS17 as I, IFRS17_LINES,
                      BACKTEST_AE, CREDIBILITY, AUCTIONS as A, AUCTION_DECILES, APPS as AP, IPL_URL, HIL_URL, HACKATHONS,
-                     MPESA_URL, CARGO as CG, CARGO_URL, CARGO_REPO, CARGO_LIVE)
+                     MPESA_URL, CARGO as CG, CARGO_URL, CARGO_REPO, CARGO_LIVE, RESERVE as RS, RESERVE_URL)
 from nav import nav_html, series_html, NAV_JS, NAV_CSS, THEME_HEAD, ROLE
 from kenya_story import story
 import case_viz
@@ -220,8 +220,8 @@ def product_card(name):
 
 CASE_SHOT = {"dealer-revenue": "dealer", "ifrs17-measurement": "ifrs17", "valuation-adequacy": "valuation"}
 CASE_PART = {"dealer-revenue": ("data", "/#data-more", "I", "Data analysis"),
-             "ifrs17-measurement": ("actuarial", "/#actuarial-cases", "II", "Actuarial analysis"),
-             "valuation-adequacy": ("actuarial", "/#actuarial-cases", "II", "Actuarial analysis")}
+             "ifrs17-measurement": ("actuarial", "/#reserving", "II", "Actuarial analysis"),
+             "valuation-adequacy": ("actuarial", "/#reserving", "II", "Actuarial analysis")}
 
 
 def case_card(slug):
@@ -497,7 +497,8 @@ MPESA_ASK = ("Ask it about your statement, or look up any transaction by a name,
              "an amount or a date.")
 
 
-def apps_section(num):
+def app_cards():
+    """The Health IBNR Lab and Instalment Persistency Lab cards."""
     a = AP
     hil = f"""<article class="card" id="hil">
 {thumb("hil", HIL_URL)}<span class="badge live">Live</span>
@@ -517,11 +518,50 @@ def apps_section(num):
 <div class="links"><a href="{IPL_URL}">Open the app</a></div>
 <p class="small">{APP_WAIT}</p>
 </article>"""
-    return f"""<section id="apps" aria-labelledby="h-apps">
-<div class="sechead">{eb(num, "Apps and pricing")}
-<h2 id="h-apps">Reserving and product questions, as tools you can use</h2>
+    return hil, ipl
+
+
+# Kenya Reserve Check. No insurer is named on the home page, so the card's finding is about the tables themselves.
+RESERVE_TAG = "Reserving on published accounts, Python"
+RESERVE_LINE = ("Chain ladder and Bornhuetter-Ferguson on the claims development tables Kenya's listed insurers publish under "
+                "IFRS 17, set against the reserves they booked.")
+RESERVE_METHOD = ("Each table rebuilt as a triangle and tied to the liability in its notes; volume-weighted chain ladder, with a tail "
+                  "from the oldest year where a table prints payments; Bornhuetter-Ferguson with premium from the regulator's returns; "
+                  "first estimates set against the latest.")
+RESERVE_DATA = "The groups' latest audited reports, each table with its page and SHA-256. A screening view, not a reserve opinion."
+RESERVE_TOOLS = "Python, pandas, Plotly and Streamlit, with the methods worked by hand in its tests."
+
+
+def reserve_card():
+    return f"""<article class="card" id="reserve-check">
+{thumb("reserve-check", RESERVE_URL)}<span class="badge live">Live</span>
+<span class="tag">{RESERVE_TAG}</span>
+<h3>Kenya Reserve Check</h3>
+<p class="find">{RESERVE_LINE} The first finding is about the tables: <b>of the {w(RS['groups'])} insurance groups listed on the Nairobi Securities Exchange, {w(RS['used'])} print one that holds together</b> and ties to the liability in their own notes.</p>
+<dl class="meta"><dt>Method</dt><dd>{RESERVE_METHOD}</dd><dt>Data</dt><dd>{RESERVE_DATA}</dd><dt>Built with</dt><dd>{RESERVE_TOOLS}</dd></dl>
+<div class="links"><a href="{RESERVE_URL}">Open the app</a></div>
+<p class="small">{APP_WAIT}</p>
+</article>"""
+
+
+def reserving_section(num):
+    """Reserving, in the side bar's order: the two reserving apps, then the two case studies."""
+    hil, _ = app_cards()
+    return f"""<section id="reserving" aria-labelledby="h-reserving">
+<div class="sechead">{eb(num, "Reserving")}
+<h2 id="h-reserving">Reserves measured, then tested</h2>
+<p>A synthetic health book, the tables Kenya's listed insurers publish, and two public US data sets with the long claims and price histories the methods need.</p></div>
+<div class="grid2">{hil}{reserve_card()}{case_card("ifrs17-measurement")}{case_card("valuation-adequacy")}</div>
+</section>"""
+
+
+def pricing_section(num):
+    _, ipl = app_cards()
+    return f"""<section id="pricing" aria-labelledby="h-pricing">
+<div class="sechead">{eb(num, "Product and pricing")}
+<h2 id="h-pricing">Who keeps paying, and what cover should cost</h2>
 <p>Built on synthetic books so every number can be published, with the assumptions on the page and tests behind them.</p></div>
-<div class="grid3">{hil}{ipl}{product_card("AgroShield")}</div>
+<div class="grid2">{ipl}{product_card("AgroShield")}</div>
 </section>"""
 
 
@@ -615,8 +655,8 @@ PRINCIPLES = [
 PARTS = {
     "data": ("I", "Data analysis", "Kenya's insurance market rebuilt from the regulator's returns: the loss map, market structure, reinsurance flows, a cedant scorecard and an insurer explorer. Then whether insurers pay their claims, the M-Pesa series, an import cargo terminal and a cargo airline's risk layer, a dealer group's revenue audit, a drought forecast and a football model.",
              [("#work", "Kenya series"), ("#signals", "Reinsurer signals"), ("#claims", "Claims settlement"), ("#ask", "Ask the data"), ("#mpesa-series", "M-Pesa series"), ("#aviation", "Aviation and marine"), ("#data-more", "Audit and models")]),
-    "actuarial": ("II", "Actuarial analysis", "Health IBNR reserving, instalment persistency and parametric crop pricing as working tools, then IFRS 17 measurement and a reserve adequacy test on public US data.",
-                  [("#apps", "Apps and pricing"), ("#actuarial-cases", "Case studies")]),
+    "actuarial": ("II", "Actuarial analysis", "Reserving first: a health IBNR lab, a check on the reserves Kenya's listed insurers booked, then IFRS 17 measurement and a reserve adequacy test on public US data. Then instalment persistency and parametric crop pricing.",
+                  [("#reserving", "Reserving"), ("#pricing", "Product and pricing")]),
 }
 
 
@@ -684,23 +724,17 @@ def home():
 <div class="grid3">{case_card("dealer-revenue")}{product_card("Mapema")}{product_card("Matchday Model")}</div>
 </section>
 
-{part_head("actuarial", "II", "Actuarial analysis", "Reserves, persistency and pricing, each built on a synthetic book or public industry triangles so every number can be published, then tested until it breaks.")}
+{part_head("actuarial", "II", "Actuarial analysis", "Reserves, persistency and pricing, each built on a synthetic book, public industry triangles or the tables insurers publish, so every number can be published, then tested until it breaks.")}
 
-{apps_section("II.1")}
+{reserving_section("II.1")}
 
-<section id="actuarial-cases" aria-labelledby="h-actuarial-cases">
-<div class="sechead">{eb("II.2", "Case studies")}
-<h2 id="h-actuarial-cases">Reserves measured, then tested</h2>
-<p>Two public US data sets with the long claims and price histories the methods need.</p></div>
-<div class="grid2">{case_card("ifrs17-measurement")}{case_card("valuation-adequacy")}</div>
-</section>
+{pricing_section("II.2")}
 
 <section id="method" aria-labelledby="h-method">
 <div class="sechead"><span class="eyebrow">How I work</span>
 <h2 id="h-method">A total that balances is the first thing I check</h2>
 <p>The habit from actuarial training that stuck: distrust a clean number until it survives being split apart.</p></div>
 <ul class="principles">{principles}</ul>
-<div class="next"><span class="tag">Next</span><p>A reserving tool in Streamlit: chain ladder and Bornhuetter-Ferguson on the claims development tables Kenyan insurers publish under IFRS 17, with the reserve each method implies set against what was booked. It will be linked here when it is live.</p></div>
 </section>
 
 {contact_block()}
@@ -763,10 +797,8 @@ def kenya_series():
 
 <section aria-labelledby="h-next">
 <div class="sechead"><span class="eyebrow">Coming next</span><h2 id="h-next">What the series adds next</h2></div>
-<div class="grid2">
-<div class="next"><span class="tag">Reserving</span><p>Chain ladder and Bornhuetter-Ferguson on the claims development tables insurers publish under IFRS 17, with the implied reserve set against what was booked. A Streamlit tool, linked here when live.</p></div>
 <div class="next"><span class="tag">IFRS 17</span><p>What the 2024 switch to IFRS 17 changed in reported results, insurer by insurer.</p></div>
-</div>
+<p class="note">Already live: <a href="{RESERVE_URL}">Kenya Reserve Check</a> carries forward the claims development tables Kenya's listed insurers publish under IFRS 17, with premium for Bornhuetter-Ferguson from this panel.</p>
 </section>
 
 <section class="small" aria-label="Source">
@@ -1118,11 +1150,13 @@ def ask_about():
         "ibnr": dict(lead=yes, points=[
             [[reserving, "Group-level IBNR reserve calculations across multiple entities"], *about_link, "/about/"],
             [[reserving, "Reserve adequacy testing on the reserving methodology itself"], *about_link, "/about/"],
-            [hil, HIL_URL, APP_OPEN, "/"]]),
+            [hil, HIL_URL, APP_OPEN, "/"],
+            [["Kenya Reserve Check", RESERVE_LINE], RESERVE_URL, APP_OPEN, "/"]]),
         "ifrs17": dict(lead=yes, points=[
             [[reserving, "IFRS 17 reporting support"], *about_link, "/about/"],
             [[ifrs["title"], ifrs["method"]], "/work/ifrs17-measurement/", "Read the case study", "/"],
-            [hil, HIL_URL, APP_OPEN, "/"]]),
+            [hil, HIL_URL, APP_OPEN, "/"],
+            [["Kenya Reserve Check", RESERVE_LINE], RESERVE_URL, APP_OPEN, "/"]]),
         "pricing": dict(lead=yes, points=[
             [[actuarial, "Product and claims analysis to support pricing decisions"], *about_link, "/about/"],
             [[f"Worked example on public data: Buhlmann-Straub credibility across {CREDIBILITY['insurers']} US private motor insurers."], *about_link, "/about/"],
@@ -1141,6 +1175,7 @@ def ask_about():
         [["What the work is built with", "Python (pandas, numpy, chainladder, pytest), Excel, Power BI, pdftotext for regulator PDFs, Git and GitHub Actions."], *about_link, "/about/"],
         [["Health IBNR Lab", "R, Shiny, bslib and ChainLadder."], HIL_URL, APP_OPEN, "/"],
         [["Instalment Persistency Lab", "Decrement tables in SQL (DuckDB), survival checks in R, an early warning model and a product levers simulator."], IPL_URL, APP_OPEN, "/"],
+        [["Kenya Reserve Check", RESERVE_TOOLS], RESERVE_URL, APP_OPEN, "/"],
         [[data_role, "Power BI and Excel dashboards tracking KPIs and operational metrics"], *about_link, "/about/"],
         [[dealer["title"], dealer["method"]], "/work/dealer-revenue/", "Read the case study", "/"],
         [["M-Pesa Statement to Excel", MPESA_TOOLS], MPESA_URL, "Open the tool", "/"],
@@ -1165,6 +1200,7 @@ def ask_about():
     opened = dict(lead="Live now, with nothing to install:", points=[
         [["Health IBNR Lab", "Health reserving, R and Shiny"], HIL_URL, APP_OPEN, "/"],
         [["Instalment Persistency Lab", "Health product design, SQL, Python and R"], IPL_URL, APP_OPEN, "/"],
+        [["Kenya Reserve Check", RESERVE_TAG], RESERVE_URL, APP_OPEN, "/"],
         [["M-Pesa Statement to Excel", MPESA_TAG], MPESA_URL, "Open the tool", "/"],
         ] + ([[["Cargo Ops Lab", CARGO_TAG], CARGO_URL, APP_OPEN, "/"]] if CARGO_LIVE else [])
         + [[[t], PAGE[k], "Open", "/"] for k, t in [("lossmap", "Kenya Insurance Loss Map"), ("structure", "Kenya Insurance Market Structure"), ("flows", "Kenya Reinsurance Flows"),

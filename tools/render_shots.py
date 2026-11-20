@@ -5,7 +5,7 @@
 Pages on this site and in the three Kenya repositories are served locally the way GitHub Pages
 serves them, opened in Chrome on the ink theme with the side bar hidden, and captured at the
 chart that best shows what the page does. The two apps are taken from the screenshots in their
-own project folders, and the M-Pesa tool and Cargo Ops Lab from the README screenshots in their repositories.
+own project folders, and the M-Pesa tool, Cargo Ops Lab and Kenya Reserve Check from the README screenshots in their repositories.
 Everything is written to assets/shots/<id>.webp at 960 x 600.
 Needs Playwright, Chrome and Pillow.
 """
@@ -43,6 +43,9 @@ REPO_FILES = [
     ("mpesa", "mpesa-statement-to-excel/docs/screenshot.png", (0, 440, 1280, 1240)),
     # Cargo Ops Lab: its Disruption page with 40% of flights in waves, at the sliders and the four policies
     ("cargo-ops", "cargo-ops-lab/assets/screenshots/disruption_waves_1280.webp", (0, 620, 1280, 1420)),
+    # Kenya Reserve Check: its One insurer page from "The table as printed", below the insurer's name, which
+    # stays off the home page
+    ("reserve-check", "kenya-reserve-check/assets/screenshots/insurer_1280.webp", (0, 480, 1280, 1280)),
 ]
 
 

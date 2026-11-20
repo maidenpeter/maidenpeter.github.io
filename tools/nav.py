@@ -65,10 +65,11 @@ DATA_GROUPS = [
     group("automotive", "Automotive", [("/work/dealer-revenue/", "Dealer revenue audit")]),
 ]
 
-# Actuarial analysis by discipline: reserving (the Health IBNR Lab and the two case studies), then product design and
-# pricing. The first group opens when the page is in neither, as in Data analysis.
+# Actuarial analysis by discipline, as on the home page: reserving (the two reserving apps and the two case studies),
+# then product design and pricing. The first group opens when the page is in neither, as in Data analysis.
 ACTUARIAL_GROUPS = [
-    group("reserving", "Reserving", [("/#hil", "Health IBNR Lab"), ("/work/ifrs17-measurement/", "IFRS 17 measurement"),
+    group("reserving", "Reserving", [("/#hil", "Health IBNR Lab"), ("/#reserve-check", "Kenya Reserve Check"),
+                                     ("/work/ifrs17-measurement/", "IFRS 17 measurement"),
                                      ("/work/valuation-adequacy/", "Reserve adequacy test")]),
     group("product", "Product and pricing", [("/#ipl", "Persistency Lab"), ("/#agroshield", "AgroShield pricing")]),
 ]
@@ -79,7 +80,7 @@ CHAPTERS = [
     ("data", "I", "Data analysis", "Data", "chart", "/#data", "Insurance, mobile money, air cargo and automotive data, checked before it is believed",
      "data work signals claims ask mpesa-series aviation data-more", DATA_GROUPS),
     ("actuarial", "II", "Actuarial analysis", "Actuarial", "tri", "/#actuarial", "Reserving, IFRS 17 and pricing",
-     "actuarial apps actuarial-cases", ACTUARIAL_GROUPS),
+     "actuarial reserving pricing", ACTUARIAL_GROUPS),
 ]
 # (href, label, short label, icon, section, home page sections that mark it)
 HOME = ("/", "Home", "Home", "home", "home", "")
@@ -96,7 +97,7 @@ HOME_WHERE = {
     "claims": [_I, ("Claims settlement", "/#claims")],
     "ask": [_I, ("Ask the data", "/#ask")], "mpesa-series": [_I, ("M-Pesa series", "/#mpesa-series")],
     "aviation": [_I, ("Aviation and marine", "/#aviation")], "data-more": [_I, ("Audit and models", "/#data-more")],
-    "actuarial": [_II], "apps": [_II, ("Apps and pricing", "/#apps")], "actuarial-cases": [_II, ("Case studies", "/#actuarial-cases")],
+    "actuarial": [_II], "reserving": [_II, ("Reserving", "/#reserving")], "pricing": [_II, ("Product and pricing", "/#pricing")],
     "method": [("How I work", "/#method")], "contact": [("Contact", "/#contact")],
 }
 

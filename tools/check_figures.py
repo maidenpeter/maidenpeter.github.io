@@ -351,6 +351,17 @@ def cargo_ops(root):
     return True
 
 
+def reserve_check(root):
+    """Kenya Reserve Check: how many listed groups' reports were read, and how many tables are used."""
+    p = root / "kenya-reserve-check" / "data" / "insurers.json"
+    if not p.exists():
+        return False
+    entries = json.load(open(p, encoding="utf-8"))["insurers"]
+    check("reserve check groups read", F.RESERVE["groups"], len(entries), 0)
+    check("reserve check tables used", F.RESERVE["used"], sum(1 for e in entries if "excluded" not in e), 0)
+    return True
+
+
 def kenya_story(root):
     """KENYA_STORY: the series behind the charts on /kenya-insurance/."""
     data, ins, rei = root / "ira-kenya-data", root / "ira-kenya-insurance" / "output", root / "ira-kenya-reinsurance" / "output"
@@ -599,6 +610,8 @@ def main():
         skipped.append("health ibnr lab")
     if not cargo_ops(root):
         skipped.append("cargo ops lab")
+    if not reserve_check(root):
+        skipped.append("kenya reserve check")
     print(f"{OK[0]} figures match their source.")
     if skipped:
         print("Not checked (its source is not on this machine): " + ", ".join(skipped))
