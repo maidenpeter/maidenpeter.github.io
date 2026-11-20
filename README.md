@@ -64,7 +64,7 @@ Static HTML, no framework. `tools/build.py` writes every page from one layout, s
 **Navigation.** Written once in `tools/nav.py` and on screen on every page:
 
 - a top bar with the MP seal, the name and the role in the middle, where the reader is on the left ("I Data analysis / Kenya series / Loss map", following the section being read on the home page), and the theme switch and GitHub on the right;
-- a side bar with Back, Home, the two chapters, Ask the data, About and Contact. Data analysis is grouped by industry, and each group folds away: **Insurance**, which holds numbered analyses (**1 Kenya series**, its pages numbered 01 to 06, and **2 Claims settlement**), **Mobile money** (**3 M-Pesa series**, its first analysis the statement reader), **Automotive** (the dealer revenue audit) and **Aviation** (CargoShield);
+- a side bar with Back, Home, the two chapters, Ask the data, About and Contact. Data analysis is grouped by industry, and each group folds away: **Insurance**, which holds numbered analyses (**1 Kenya series**, its pages numbered 01 to 06, and **2 Claims settlement**), **Finances** (**3 M-Pesa series**, its first analysis the statement reader), **Aviation and marine** (Cargo Ops Lab and CargoShield) and **Automotive** (the dealer revenue audit). Actuarial analysis is grouped the same way: **Reserving** and **Product and pricing**. Every label keeps to one line, group, page and analysis numeral start on one indent, and a folded group shows how many pages it holds;
 - on Kenya pages, a labelled series strip held under the top bar (shorter labels where six full names do not fit, scrolling on phones);
 - on phones, the same links in a bar along the bottom, with each chapter opening as a sheet.
 

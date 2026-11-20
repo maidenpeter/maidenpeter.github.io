@@ -50,7 +50,7 @@ def group(key, label, items, num=None, short=None, series=False):
 
 
 # Data analysis by industry. Insurance holds numbered analyses: 1, the Kenya series; 2, claims settlement.
-# Mobile money holds 3, the M-Pesa series, whose first analysis is the statement reader. Analyses are
+# Finances holds 3, the M-Pesa series, whose first analysis is the statement reader. Analyses are
 # numbered across the whole chapter, as on the home page. Aviation and marine holds the two air cargo
 # projects, each a card on the home page; it comes before automotive, as the home page sections do.
 DATA_GROUPS = [
@@ -58,7 +58,7 @@ DATA_GROUPS = [
         group("kenya", "Kenya series", [(h, t) for h, t, _ in KENYA.values()], num=1),
         group("claims", "Claims settlement", [(h, t) for h, t, _ in CLAIMS.values()], num=2),
     ]),
-    group("mobile-money", "Mobile money", [
+    group("finances", "Finances", [
         group("mpesa", "M-Pesa series", [(h, t) for h, t, _ in MPESA.values()], num=3, series=True),
     ]),
     group("aviation", "Aviation and marine", [("/#cargo-ops", "Cargo Ops Lab"), ("/#cargoshield", "CargoShield")]),
@@ -77,7 +77,7 @@ ACTUARIAL_GROUPS = [
 # (key, numeral, title, short title for the phone bar, icon, home page anchor, one line of story,
 #  home page sections that mark it while scrolling, [(href, label)] or groups as in DATA_GROUPS)
 CHAPTERS = [
-    ("data", "I", "Data analysis", "Data", "chart", "/#data", "Insurance, mobile money, air cargo and automotive data, checked before it is believed",
+    ("data", "I", "Data analysis", "Data", "chart", "/#data", "Insurance, finances, air cargo and automotive data, checked before it is believed",
      "data work signals claims ask mpesa-series aviation data-more", DATA_GROUPS),
     ("actuarial", "II", "Actuarial analysis", "Actuarial", "tri", "/#actuarial", "Reserving, IFRS 17 and pricing",
      "actuarial reserving pricing", ACTUARIAL_GROUPS),
@@ -387,7 +387,7 @@ span.mp-wc{color:var(--ink)}
 /* chapters: a numeral, a title in engraved capitals, one line of story, then its pages */
 .mp-nav .mp-ch-link{display:grid;grid-template-columns:26px minmax(0,1fr);column-gap:8px;align-items:baseline;padding:8px 10px 7px}
 .mp-num{grid-row:span 2;font-family:var(--display);font-size:21px;line-height:1;color:var(--accent);text-align:center}
-.mp-ch-t{font-family:var(--label);font-size:13.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink)}
+.mp-ch-t{font-family:var(--label);font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink)}
 .mp-ch-line{grid-column:2;font-family:var(--serif);font-style:italic;font-size:14.5px;line-height:1.3;color:var(--muted);margin-top:2px}
 .mp-nav .mp-ch-link:hover .mp-ch-t,.mp-nav .mp-ch-link[aria-current] .mp-ch-t,.mp-nav .mp-ch-link.mp-here .mp-ch-t{color:var(--accent)}
 .mp-nav .mp-it{margin-left:22px;padding:5px 10px 5px 14px;font-size:15.5px;line-height:1.3;border-left:1px solid var(--rule);border-radius:0}
@@ -395,24 +395,26 @@ span.mp-wc{color:var(--ink)}
 .mp-nav .mp-it[aria-current]{color:var(--ink);border-left:2px solid var(--accent);padding-left:13px;background:var(--accent-soft)}
 /* industry groups in a chapter: a label that folds its pages away */
 .mp-grp{margin:1px 0 1px 22px}
-.mp-grp-t{list-style:none;display:flex;align-items:center;gap:8px;padding:6px 8px 5px 2px;font-family:var(--label);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);cursor:pointer;border-radius:2px}
+.mp-grp-t{list-style:none;display:flex;align-items:center;gap:8px;padding:6px 2px 5px 2px;font-family:var(--label);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);cursor:pointer;border-radius:2px}
 .mp-grp-t::-webkit-details-marker{display:none}
-.mp-grp-t::before{content:"";flex:none;width:6px;height:6px;margin:0 3px 2px 1px;border-right:1.5px solid var(--accent);border-bottom:1.5px solid var(--accent);transform:rotate(-45deg);transition:transform .15s}
+.mp-grp-t::before{content:"";flex:none;width:6px;height:6px;margin:0 4px 2px 1px;border-right:1.5px solid var(--accent);border-bottom:1.5px solid var(--accent);transform:rotate(-45deg);transition:transform .15s}
 .mp-grp[open] > .mp-grp-t::before{transform:rotate(45deg);margin-bottom:4px}
 .mp-grp-t:hover{color:var(--ink)}
 .mp-grp-t:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .mp-grp-n{margin-left:auto;font-family:var(--ui);font-size:12.5px;letter-spacing:0;color:var(--muted)}
+/* a count says what a folded group holds; an open group shows its pages instead */
+.mp-grp[open] > .mp-grp-t > .mp-grp-n{display:none}
 .mp-grp-in{display:flex;flex-direction:column;padding-bottom:4px}
-.mp-nav .mp-grp .mp-it{margin-left:0}
-.mp-it-n{display:inline-block;min-width:22px;font-family:var(--label);font-size:12px;letter-spacing:.04em;color:var(--muted);font-variant-numeric:tabular-nums}
+.mp-nav .mp-grp .mp-it{margin-left:7px}
+.mp-it-n{display:inline-block;min-width:20px;font-family:var(--label);font-size:12px;letter-spacing:.04em;color:var(--muted);font-variant-numeric:tabular-nums}
 .mp-nav .mp-it[aria-current] .mp-it-n{color:var(--accent)}
 /* analyses inside an industry: a numeral and a name in plain type, their pages indented under them */
 .mp-grp .mp-grp{margin-left:0}
 .mp-an > .mp-grp-t,.mp-nav .mp-an-link{font-family:var(--ui);font-size:15.5px;letter-spacing:0;text-transform:none;color:var(--ink);line-height:1.3}
 .mp-an-n{flex:none;min-width:14px;font-family:var(--display);font-size:18px;line-height:1;color:var(--accent);text-align:center}
-.mp-nav .mp-an .mp-it{margin-left:14px}
-.mp-nav .mp-an-link{gap:8px;padding:6px 8px 5px 20px;border-left:0}
-.mp-nav .mp-an-link[aria-current]{border-left:2px solid var(--accent);padding-left:18px}
+.mp-nav .mp-an .mp-it{margin-left:29px;padding-right:6px}
+.mp-nav .mp-an-link{gap:8px;padding:6px 8px 5px 15px;border-left:0}
+.mp-nav .mp-an-link[aria-current]{border-left:2px solid var(--accent);padding-left:13px}
 @media (prefers-reduced-motion:reduce){.mp-grp-t::before{transition:none}}
 .mp-skip{position:absolute;left:-9999px;top:8px;z-index:40;padding:8px 14px;background:var(--accent);color:var(--on-accent,var(--ground));font-family:var(--ui);font-size:15px;text-decoration:none}
 .mp-skip:focus{left:12px}
@@ -445,7 +447,7 @@ span.mp-wc{color:var(--ink)}
 @media (min-width:861px){
   :root{--mp-side:240px}
   body{padding-left:var(--mp-side)}
-  .mp-side{position:fixed;top:var(--mp-top);left:0;bottom:0;z-index:30;width:var(--mp-side);padding:18px;overflow-y:auto;scrollbar-width:thin;background-color:var(--ground);background-image:var(--grain,none);border-right:3px double var(--rule-strong)}
+  .mp-side{position:fixed;top:var(--mp-top);left:0;bottom:0;z-index:30;width:var(--mp-side);padding:18px 8px 18px 18px;overflow-y:auto;scrollbar-width:thin;scrollbar-gutter:stable;background-color:var(--ground);background-image:var(--grain,none);border-right:3px double var(--rule-strong)}
   .mp-nav{flex-direction:column;gap:2px}
   .mp-nav > a{gap:13px;padding:8px 10px}
   .mp-nav > a[aria-current]::before,.mp-nav > a.mp-here::before,.mp-nav .mp-ch-link[aria-current]::before,.mp-nav .mp-ch-link.mp-here::before{left:-18px;top:6px;bottom:6px;width:3px}
@@ -454,9 +456,10 @@ span.mp-wc{color:var(--ink)}
   .mp-ch-btn{display:none!important}
   .mp-items{display:flex;flex-direction:column;position:static;inset:auto;margin:0;padding:0;border:0;background:none;color:inherit;width:auto;height:auto;overflow:visible}
 }
+@media (min-width:861px) and (max-width:1199px){.mp-ch-t{font-size:11.5px;letter-spacing:.04em}.mp-grp-n{display:none}.mp-nav .mp-it{padding-right:6px}.mp-nav .mp-an .mp-it{font-size:15px;padding-right:2px}.mp-it-n{min-width:18px}}
 @media (min-width:1200px){
   :root{--mp-side:264px;--mp-top:72px}
-  .mp-side{padding:22px}
+  .mp-side{padding:22px 12px 22px 22px}
   .mp-seal{width:52px;height:52px}
   .mp-nm{font-size:25px}
   .mp-role{font-size:20px}
@@ -470,7 +473,7 @@ span.mp-wc{color:var(--ink)}
 @media (min-width:861px) and (max-height:540px){.mp-side{padding-block:4px}.mp-nav > a{padding-block:2px}.mp-nav .mp-it{padding-block:0;font-size:14px}}
 /* the industry groups tighten too; on the shortest windows the other chapter keeps only its own link */
 @media (min-width:861px) and (max-height:720px){.mp-grp-t{padding-block:1px}.mp-nav .mp-an-link{padding-block:1px}.mp-grp-in{padding-bottom:1px}.mp-nav .mp-it{padding-block:0}}
-@media (min-width:861px) and (max-height:620px){.mp-grp-t{padding-block:1px;font-size:11.5px}.mp-grp-in{padding-bottom:0}.mp-grp-n{display:none}}
+@media (min-width:861px) and (max-height:620px){.mp-grp-t{padding-block:1px;font-size:10.5px}.mp-grp-in{padding-bottom:0}.mp-grp-n{display:none}}
 @media (min-width:861px) and (max-height:780px){.mp-nav:has(.mp-ch-btn.mp-cur) .mp-ch:not(:has(.mp-cur)) :is(.mp-it,.mp-grp){display:none}}
 @media (min-width:861px) and (max-height:600px){.mp-nav > a{padding-block:3px}.mp-grp-t{padding-block:0}}
 @media (min-width:861px) and (max-width:1060px){.mp-theme .mp-l{@SR}.mp-theme{width:40px;padding:0}}
