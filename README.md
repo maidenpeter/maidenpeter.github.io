@@ -1,16 +1,80 @@
-# Marion Peter | Data & Actuarial Engineer
+<p align="center">
+  <img src="assets/readme/seal.svg" width="84" alt="">
+</p>
 
-**[maidenpeter.github.io](https://maidenpeter.github.io)**
+<h1 align="center">Marion Peter</h1>
 
-[![checks](https://github.com/maidenpeter/maidenpeter.github.io/actions/workflows/checks.yml/badge.svg)](https://github.com/maidenpeter/maidenpeter.github.io/actions/workflows/checks.yml)
+<p align="center">
+  <b>Data & Actuarial Engineer. Insurance and reinsurance analysis built from public data,<br>
+  where every number on a page can be traced back to the file it came from.</b>
+</p>
+
+<p align="center">
+  <a href="https://maidenpeter.github.io/"><b>Open the site</b></a>
+  &nbsp;|&nbsp; <a href="#the-work">The work</a>
+  &nbsp;|&nbsp; <a href="#pages">Pages</a>
+  &nbsp;|&nbsp; <a href="#ask-the-data">Ask the data</a>
+  &nbsp;|&nbsp; <a href="#how-it-is-built">How it is built</a>
+  &nbsp;|&nbsp; <a href="#checks">Checks</a>
+  &nbsp;|&nbsp; <a href="#why-i-built-this">Why I built this</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/maidenpeter/maidenpeter.github.io/actions/workflows/checks.yml"><img src="https://github.com/maidenpeter/maidenpeter.github.io/actions/workflows/checks.yml/badge.svg" alt="checks"></a>
+</p>
+
+<p align="center"><sub>The source of <a href="https://maidenpeter.github.io/">maidenpeter.github.io</a>. Static HTML, no framework, rebuilt and checked on every push.</sub></p>
+
+<p align="center">
+  <a href="https://maidenpeter.github.io/"><img src="assets/readme/hero.webp" width="920" alt="The site's home page: the navigation by chapter and industry, the headline, and a chain ladder worked out in the page on ten years of US paid claims"></a>
+</p>
+
+## In one minute
 
 Insurance and reinsurance analysis built from public data. The site leads with Kenya's general insurance market, rebuilt from the Insurance Regulatory Authority's quarterly returns and checked 42,246 times, then sets out reserving, IFRS 17 and pricing work on public US data.
 
-> Every number on the site comes from `tools/figures.py` or the Ask the data figures file, and a script recomputes each one from the file it came from. Nothing is typed into a page by hand.
+> [!NOTE]
+> Every number on the site comes from `tools/figures.py` or the Ask the data figures file, and a script recomputes each
+> one from the file it came from. Nothing is typed into a page by hand.
 
-**Contents:** [Pages](#pages) | [The Kenya series](#the-kenya-insurance-series) | [Ask the data](#ask-the-data) | [How it is built](#how-it-is-built) | [Commands](#commands) | [Checks](#checks) | [Custom domain](#custom-domain)
+## The work
 
----
+Click a picture to open the page or app. The home page holds the same cards, in two chapters.
+
+**Part I, Data analysis**
+
+<table>
+  <tr>
+    <td width="33%" valign="top"><a href="https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-insurance-loss-map.html"><img src="assets/shots/lossmap.webp" alt="Kenya Insurance Loss Map"></a><br><b>Kenya Insurance Loss Map</b><br><sub>Where Kenya's general insurers lose money, class by class, and what premiums would have to do.</sub></td>
+    <td width="33%" valign="top"><a href="https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-insurance-market-structure.html"><img src="assets/shots/structure.webp" alt="Kenya Insurance Market Structure"></a><br><b>Market Structure</b><br><sub>Who holds the market, how concentrated it is, and what fragmentation costs.</sub></td>
+    <td width="33%" valign="top"><a href="https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-insurance-reinsurance-flows.html"><img src="assets/shots/flows.webp" alt="Kenya Reinsurance Flows"></a><br><b>Reinsurance Flows</b><br><sub>How much risk insurers pass on, by class and company, and how the local reinsurers fare.</sub></td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top"><a href="https://maidenpeter.github.io/ira-kenya-reinsurance/page/kenya-cedant-scorecard.html"><img src="assets/shots/scorecard.webp" alt="Kenya Cedant Scorecard"></a><br><b>Cedant Scorecard</b><br><sub>Every insurer graded A to E each year the way a reinsurer screens a cedant, back-tested.</sub></td>
+    <td width="33%" valign="top"><a href="https://maidenpeter.github.io/ira-kenya-data/explorer/kenya-insurer-explorer.html"><img src="assets/shots/explorer.webp" alt="Kenya Insurer Explorer"></a><br><b>Insurer Explorer</b><br><sub>Any insurer, any year: ratios, single quarters, class mix, balance sheet and every quality flag.</sub></td>
+    <td width="33%" valign="top"><a href="https://maidenpeter.github.io/ira-kenya-insurance/page/kenya-claims-settlement.html"><img src="assets/shots/claims.webp" alt="Kenya Claims Settlement"></a><br><b>Claims Settlement</b><br><sub>Who pays claims, how fast, and the insurers the regulator stepped into.</sub></td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top"><a href="https://maidenpeter.github.io/mpesa-statement-to-excel/"><img src="assets/shots/mpesa.webp" alt="M-Pesa Statement to Excel"></a><br><b>M-Pesa Statement to Excel</b><br><sub>M-Pesa PDF statements into a checked Excel workbook, in the browser, with nothing uploaded.</sub></td>
+    <td width="33%" valign="top"><a href="https://cargo-ops-lab.streamlit.app/"><img src="assets/shots/cargo-ops.webp" alt="Cargo Ops Lab"></a><br><b>Cargo Ops Lab</b><br><sub>A simulated import cargo terminal: late freight, early warning and staffing the floor.</sub></td>
+    <td width="33%" valign="top"><a href="https://maidenpeter.github.io/work/dealer-revenue/"><img src="assets/shots/dealer.webp" alt="Dealer revenue audit"></a><br><b>Dealer revenue audit</b><br><sub>A Kenyan dealer group's revenue counted twice. An anonymised case study.</sub></td>
+  </tr>
+</table>
+
+**Part II, Actuarial analysis**
+
+<table>
+  <tr>
+    <td width="33%" valign="top"><a href="https://maidenpeter.shinyapps.io/health-ibnr-lab/"><img src="assets/shots/hil.webp" alt="Health IBNR Lab"></a><br><b>Health IBNR Lab</b><br><sub>Reserving a synthetic medical book, and what a payment slowdown does to the chain ladder.</sub></td>
+    <td width="33%" valign="top"><a href="https://kenya-reserve-check.streamlit.app/"><img src="assets/shots/reserve-check.webp" alt="Kenya Reserve Check"></a><br><b>Kenya Reserve Check</b><br><sub>Chain ladder and Bornhuetter-Ferguson on the IFRS 17 tables Kenyan insurers publish.</sub></td>
+    <td width="33%" valign="top"><a href="https://maidenpeter.github.io/work/ifrs17-measurement/"><img src="assets/shots/ifrs17.webp" alt="IFRS 17 measurement"></a><br><b>IFRS 17 measurement</b><br><sub>Discounting and the risk adjustment on US industry triangles.</sub></td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top"><a href="https://maidenpeter.github.io/work/reserve-adequacy/"><img src="assets/shots/adequacy.webp" alt="Reserve adequacy test"></a><br><b>Reserve adequacy test</b><br><sub>Kenya's general insurers, from the regulator's quarterly claims statistics.</sub></td>
+    <td width="33%" valign="top"><a href="https://instalment-persistency-lab.streamlit.app/"><img src="assets/shots/ipl.webp" alt="Instalment Persistency Lab"></a><br><b>Instalment Persistency Lab</b><br><sub>Pay-as-you-go health cover: who keeps paying, and what lapses cost.</sub></td>
+    <td width="33%" valign="top"></td>
+  </tr>
+</table>
 
 ## Pages
 
@@ -70,7 +134,7 @@ Static HTML, no framework. `tools/build.py` writes every page from one layout, s
 
 The build writes the navigation's CSS to `assets/nav.css`. `tools/kenya_nav.py` writes the same navigation, a skip link and (on the Kenya series pages) the series strip into the Kenya analysis pages, inline, between `mp-nav` markers, so it can be run again whenever `nav.py` changes.
 
-**Screenshots and pop-outs.** Every card that links somewhere carries a screenshot from `assets/shots/`, made by `tools/render_shots.py`. Work with no public link yet opens a pop-out (the `popover` attribute, so no script is needed) with a larger screenshot and the explanation.
+**Screenshots and pop-outs.** Every card that links somewhere carries a screenshot from `assets/shots/`, made by `tools/render_shots.py`. Work with no public link yet opens a pop-out (the `popover` attribute, so no script is needed) with a larger screenshot and the explanation. The pictures in this README are those same screenshots, plus the seal and the home page in `assets/readme/`.
 
 **The triangle.** The home page runs a volume-weighted chain ladder on the six NAIC Schedule P paid triangles in `tools/cas_triangles.json`, the same data as the IFRS 17 case study. The build computes it in Python, so the page reads correctly without JavaScript, and the page then recomputes it and fills the projected corner one calendar year at a time.
 
@@ -114,3 +178,26 @@ python tools/kenya_nav.py --repos ..       # the navigation inside the Kenya ana
 ## Custom domain
 
 The site will move to `marionpeter.nuruops.com`; the steps are in [docs/custom-domain.md](docs/custom-domain.md). Until then it is served from `maidenpeter.github.io`.
+
+## Why I built this
+
+From 2022 to 2025 I worked in data, actuarial and reserving roles at an insurance group in Kenya and Mauritius.
+Employer data stays with the employer, so none of that work can be shown. This site runs the same skills on public data
+instead: the regulator's returns for Kenya's market, insurers' published accounts for reserving, and US industry data
+where a method needs a long history.
+
+The work I like best starts by checking whether the data can be trusted, and the site is built the same way. Every
+number comes from a figures file that a script recomputes from its source, the pages come out of one build, and every
+push is checked for broken links, stray characters and pages that no longer match the build. A reader should be able
+to follow any figure on the site back to where it came from.
+
+---
+
+<p align="center">
+  <sub>The analysis lives in <a href="https://github.com/maidenpeter/ira-kenya-data">ira-kenya-data</a>,
+  <a href="https://github.com/maidenpeter/ira-kenya-insurance">ira-kenya-insurance</a>,
+  <a href="https://github.com/maidenpeter/ira-kenya-reinsurance">ira-kenya-reinsurance</a>,
+  <a href="https://github.com/maidenpeter/mpesa-statement-to-excel">mpesa-statement-to-excel</a>,
+  <a href="https://github.com/maidenpeter/kenya-reserve-check">kenya-reserve-check</a> and
+  <a href="https://github.com/maidenpeter/cargo-ops-lab">cargo-ops-lab</a>.</sub>
+</p>
