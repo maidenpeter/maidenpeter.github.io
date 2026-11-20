@@ -21,7 +21,7 @@ Insurance and reinsurance analysis built from public data. The site leads with K
 | [`/ask/`](https://maidenpeter.github.io/ask/) | Ask the data: questions about the market, any insurer, the scorecard and reserving, answered in the browser |
 | [`/work/dealer-revenue/`](https://maidenpeter.github.io/work/dealer-revenue/) | Case study: a Kenyan dealer group's revenue counted twice (anonymised) |
 | [`/work/ifrs17-measurement/`](https://maidenpeter.github.io/work/ifrs17-measurement/) | Case study: IFRS 17 discounting and risk adjustment on US industry triangles |
-| [`/work/valuation-adequacy/`](https://maidenpeter.github.io/work/valuation-adequacy/) | Case study: a reserve adequacy test on 476,882 car auctions |
+| [`/work/reserve-adequacy/`](https://maidenpeter.github.io/work/reserve-adequacy/) | Case study: a reserve adequacy test on Kenya's general insurers, from the regulator's quarterly claims statistics (the old `/work/valuation-adequacy/` redirects here) |
 | [`/about/`](https://maidenpeter.github.io/about/) | CV, with a career timeline |
 | `404.html`, `sitemap.xml`, `robots.txt` | The usual |
 

@@ -8,7 +8,7 @@ The earlier case studies are checked too when their output files are listed in
 tools/local_paths.json (kept out of git, because client work stays private):
 
     {"ifrs17": ".../ifrs17_site.json", "reserving": ".../reserving.json",
-     "pricing": ".../pricing.json", "auctions": ".../findings.json",
+     "pricing": ".../pricing.json",
      "dealer": ".../headline_results.json", "dealer_check": ".../python_comparison.csv"}
 
 Exits non-zero if any figure differs from its source at the precision shown.
@@ -211,47 +211,36 @@ def pricing(path):
     check("credibility small_vs_market", C["small_vs_market"], 100 * (s["market"] - s["cred"]) / s["market"], 0.05)
 
 
-def auctions(path):
-    d = json.load(open(path, encoding="utf-8"))
-    A = F.AUCTIONS
-    ag, cs, mo = d["aggregate"], d["condition_scales"], d["money"]
-    bands = d["by_condition_band"]
-    check("auctions rows_total", A["rows_total"], d["rows_total"], 0)
-    check("auctions rows", A["rows"], d["rows_analysed"], 0)
-    check("auctions short_scale", A["short_scale"], cs["rows_short_scale"], 0)
-    check("auctions long_scale", A["long_scale"], cs["rows_long_scale"], 0)
-    check("auctions appraised_bn", A["appraised_bn"], ag["total_mmr"] / 1e9, 0.005)
-    check("auctions median_gap", A["median_gap"], ag["median_gap"], 0)
-    check("auctions below", A["below"], ag["pct_below_estimate"], 0.05)
-    check("auctions net_pct", A["net_pct"], ag["net_gap_pct"], 0.005)
-    check("auctions net_m", A["net_m"], -ag["net_gap"] / 1e6, 0.05)
-    check("auctions gross_m", A["gross_m"], mo["gross_misvaluation"] / 1e6, 0.05)
-    check("auctions cancel", A["cancel"], mo["pct_cancelling_out"], 0.5)
-    check("auctions mae", A["mae"], ag["mean_absolute_error"], 0.5)
-    check("auctions mae_pct", A["mae_pct"], ag["mae_pct_of_mmr"], 0.05)
-    check("auctions worst_band_pct", A["worst_band_pct"], 100 * bands[0]["total_gap"] / bands[0]["total_mmr"], 0.05)
-    check("auctions best_band_pct", A["best_band_pct"], 100 * bands[-1]["total_gap"] / bands[-1]["total_mmr"], 0.05)
-    dec = list(d["robustness"]["deciles"].values())
-    for i, (a, b) in enumerate(zip(F.AUCTION_DECILES, dec)):
-        check(f"auctions decile {i + 1}", a, b, 0.005)
-    check("auctions decile_low", A["decile_low"], dec[0], 0.05)
-    check("auctions decile_high", A["decile_high"], dec[-1], 0.05)
-    check("auctions excl_rows", A["excl_rows"], d["robustness"]["rows_dropped_with_top_sellers"], 0)
-    med = {r["grade"]: r["median_price"] for r in cs["median_price_by_grade"]}
-    for g in (5, 49, 17):
-        check(f"auctions median price, grade {g}", A[f"median_g{g}"], med.get(g), 0)
-    check("auctions short scale top grade", A["short_max"], max(g for g in med if g <= 5), 0)
-    check("auctions long scale top grade", A["long_max"], max(med), 0)
-    check("auctions largest sellers left out", A["top_sellers"],
-          next((int(k.split("_")[-2]) for k in d["robustness"] if k.startswith("holds_excluding_top_")), None), 0)
-    # the decile claims the page prints: the upper deciles sit near +3%, and the dips between them are under 0.1 points
-    up = F.AUCTION_DECILES[5:]
-    check("auctions upper deciles near", 3, round(sum(up) / len(up)), 0)
-    dips = [a - b for a, b in zip(F.AUCTION_DECILES, F.AUCTION_DECILES[1:]) if b < a]
-    check("auctions decile dips", 2, len(dips), 0)
-    check("auctions largest decile dip under 0.1", 0, 0 if max(dips) < 0.1 else None, 0)
-    # excl_low and excl_high (-8.9 and +3.4, the end bands without the 20 largest sellers) are not in
-    # findings.json; they were recomputed with valuation_adequacy.prepare() on the full file.
+def adequacy(root):
+    """The Kenya reserve adequacy test: tools/adequacy.json against a fresh run of tools/adequacy.py."""
+    if not ((root / "ira-kenya-data" / "data" / "processed" / "claims_panel.csv").exists()
+            and (root / "kenya-reserve-check" / "data" / "extracted" / "liberty" / "triangle.csv").exists()):
+        return False
+    import adequacy as AQ
+    got = json.loads(json.dumps(AQ.everything(root)))
+
+    def walk(name, shown, actual):
+        if isinstance(shown, dict):
+            if set(shown) != set(actual or {}):
+                FAIL.append(f"{name}: keys differ")
+                return
+            for k in shown:
+                walk(f"{name}.{k}", shown[k], actual[k])
+        elif isinstance(shown, list):
+            if not isinstance(actual, list) or len(shown) != len(actual):
+                FAIL.append(f"{name}: length differs")
+                return
+            for i, (a, b) in enumerate(zip(shown, actual)):
+                walk(f"{name}[{i}]", a, b)
+        elif isinstance(shown, str):
+            if shown == actual:
+                OK[0] += 1
+            else:
+                FAIL.append(f"{name}: site shows {shown}, source gives {actual}")
+        else:
+            check(name, shown, actual, 0)
+    walk("adequacy", F.ADEQUACY, got)
+    return True
 
 
 def dealer(path, check_path):
@@ -597,14 +586,14 @@ def main():
     if local.exists():
         p = json.load(open(local, encoding="utf-8"))
         for key, fn, args in [("ifrs17", ifrs17, ("ifrs17",)), ("ifrs17 charts", ifrs17_viz, ("ifrs17",)), ("reserving", reserving, ("reserving",)),
-                              ("pricing", pricing, ("pricing",)), ("auctions", auctions, ("auctions",)),
+                              ("pricing", pricing, ("pricing",)),
                               ("dealer", dealer, ("dealer", "dealer_check"))]:
             if all(k in p and Path(p[k]).exists() for k in args):
                 fn(*[p[k] for k in args])
             else:
                 skipped.append(key)
     else:
-        skipped += ["ifrs17", "ifrs17 charts", "reserving", "pricing", "auctions", "dealer"]
+        skipped += ["ifrs17", "ifrs17 charts", "reserving", "pricing", "dealer"]
 
     if not apps(root):
         skipped.append("health ibnr lab")
@@ -612,6 +601,8 @@ def main():
         skipped.append("cargo ops lab")
     if not reserve_check(root):
         skipped.append("kenya reserve check")
+    if not adequacy(root):
+        skipped.append("reserve adequacy")
     print(f"{OK[0]} figures match their source.")
     if skipped:
         print("Not checked (its source is not on this machine): " + ", ".join(skipped))

@@ -187,38 +187,13 @@ BACKTEST_AE = dict(private_motor=0.867, all_lines=0.882, over_reserved=5, lines=
 # Credibility pricing (pricing.json)
 CREDIBILITY = dict(k_m=418, insurers=74, small_gain=11.0, small_vs_market=4.6)
 
-# ------------------------------------------------------- Valuation adequacy
-# Source: findings.json from analysis-repo/src/valuation_adequacy.py on the full file.
-AUCTIONS = dict(
-    rows_total=558837,
-    rows=476882,
-    short_scale=70101,
-    long_scale=476916,
-    appraised_bn=6.66,
-    median_gap=0,
-    below=50.0,
-    net_pct=-0.59,
-    net_m=39.3,
-    gross_m=176.5,
-    cancel=78,
-    mae=1039,
-    mae_pct=11.9,
-    worst_band_pct=-12.7,
-    best_band_pct=2.3,
-    decile_low=-12.2,
-    decile_high=3.3,
-    excl_rows=166636,
-    excl_low=-8.9,
-    excl_high=3.4,
-    # the two grading scales in one condition column, and the median price at three grades (US$)
-    short_max=5,
-    long_max=49,
-    median_g5=22100,
-    median_g49=20600,
-    median_g17=2600,
-    top_sellers=20,          # sellers left out in the robustness check
-)
-AUCTION_DECILES = [-12.16, -3.22, 0.18, 2.37, 2.88, 2.86, 3.05, 3.14, 3.08, 3.34]
+# ------------------------------------------------------- Reserve adequacy
+# The Kenya reserve adequacy test: tools/adequacy.json, written by tools/adequacy.py --write from IRA's claims
+# statistics (ira-kenya-data/data/processed/claims_panel.csv) and Liberty Kenya's table in kenya-reserve-check.
+# check_figures.py recomputes the whole file.
+import json as _json
+from pathlib import Path as _Path
+ADEQUACY = _json.load(open(_Path(__file__).with_name("adequacy.json"), encoding="utf-8"))
 
 # ------------------------------------------------------------- Hero triangle
 # tools/cas_triangles.json holds the six paid triangles the IFRS 17 case study uses.

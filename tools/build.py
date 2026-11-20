@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from figures import REINSURANCE_FLOWS as RF, CLAIMS as CL
 from figures import (KENYA as K, CLASS_RESULTS, BACKTEST, DEALER as D, IFRS17 as I, IFRS17_LINES,
-                     BACKTEST_AE, CREDIBILITY, AUCTIONS as A, AUCTION_DECILES, APPS as AP, IPL_URL, HIL_URL, HACKATHONS,
+                     BACKTEST_AE, CREDIBILITY, ADEQUACY as Q, APPS as AP, IPL_URL, HIL_URL, HACKATHONS,
                      MPESA_URL, CARGO as CG, CARGO_URL, CARGO_REPO, CARGO_LIVE, RESERVE as RS, RESERVE_URL)
 from nav import nav_html, series_html, NAV_JS, NAV_CSS, THEME_HEAD, ROLE
 from kenya_story import story
@@ -218,10 +218,10 @@ def product_card(name):
 </article>"""
 
 
-CASE_SHOT = {"dealer-revenue": "dealer", "ifrs17-measurement": "ifrs17", "valuation-adequacy": "valuation"}
+CASE_SHOT = {"dealer-revenue": "dealer", "ifrs17-measurement": "ifrs17", "reserve-adequacy": "adequacy"}
 CASE_PART = {"dealer-revenue": ("data", "/#data-more", "I", "Data analysis"),
              "ifrs17-measurement": ("actuarial", "/#reserving", "II", "Actuarial analysis"),
-             "valuation-adequacy": ("actuarial", "/#reserving", "II", "Actuarial analysis")}
+             "reserve-adequacy": ("actuarial", "/#reserving", "II", "Actuarial analysis")}
 
 
 def case_card(slug):
@@ -488,7 +488,7 @@ APP_OPEN = "Open the app (it may take a few seconds to load)"
 # The M-Pesa card, in the same form as the other data analysis cards. Ask the data quotes these lines.
 MPESA_LINE = ("Reads Safaricom M-Pesa PDF statements into a formatted Excel workbook inside your browser: "
               "nothing is uploaded, and every balance is reconciled to the one before it.")
-MPESA_DATA = "Your own statement, read in your browser. Tested on synthetic statements."
+MPESA_DATA = "Your own statement, read in your browser, or a made-up sample statement to try it first. Tested on synthetic statements."
 MPESA_METHOD = ("Statement text read with PDF.js, each transaction typed from its details, a running-balance check on every row "
                 "and the totals compared with the statement's own summary.")
 MPESA_TOOLS = "JavaScript, PDF.js and ExcelJS; every row and total tested on synthetic statements in Node and in Chrome"
@@ -550,8 +550,8 @@ def reserving_section(num):
     return f"""<section id="reserving" aria-labelledby="h-reserving">
 <div class="sechead">{eb(num, "Reserving")}
 <h2 id="h-reserving">Reserves measured, then tested</h2>
-<p>A synthetic health book, the tables Kenya's listed insurers publish, and two public US data sets with the long claims and price histories the methods need.</p></div>
-<div class="grid2">{hil}{reserve_card()}{case_card("ifrs17-measurement")}{case_card("valuation-adequacy")}</div>
+<p>A synthetic health book, the tables Kenya's listed insurers publish, the regulator's claims statistics for every Kenyan general insurer, and the long US industry triangles IFRS 17 measurement needs.</p></div>
+<div class="grid2">{hil}{reserve_card()}{case_card("ifrs17-measurement")}{case_card("reserve-adequacy")}</div>
 </section>"""
 
 
@@ -629,11 +629,11 @@ CASES = [
          data=f"CAS Loss Reserving Database: NAIC Schedule P paid triangles for {w(I['lines'])} US lines, accident years 1988 to 1997.",
          method=f"Chain ladder to the payment pattern, discounting, and a risk adjustment from {n(I['sims'])} over-dispersed Poisson bootstrap simulations, checked against the point estimate first.",
          desc=f"US${I['undisc_bn']}bn of claims reserves remeasured under IFRS 17: discounting, a bootstrapped risk adjustment, and the one line the standard makes larger."),
-    dict(slug="valuation-adequacy", tag="US vehicle auctions, valuation adequacy",
-         title="An estimate that is unbiased in total and biased in every condition band",
-         data=f"{n(A['rows'])} US wholesale auctions with the market's pre-sale estimate and the price paid, 2014 to 2015 (Kaggle).",
-         method="Run as a reserve adequacy test: profile every field, check the aggregate, then segment by condition and try to break the result with value, mileage and seller checks.",
-         desc=f"A reserve adequacy test on {n(A['rows'])} car auctions: clean in aggregate, biased in every condition band, with {A['cancel']}% of the error cancelling in the total."),
+    dict(slug="reserve-adequacy", tag="Kenyan general insurers, reserve adequacy",
+         title=f"Claims are reserved low and raised later: by {round(min(v['raised_pct'] for v in Q['years'].values()))}% to {round(max(v['raised_pct'] for v in Q['years'].values()))}% a year",
+         data=f"IRA's quarterly claims statistics for {Q['insurers']} general insurers, 2023 to 2025: claims outstanding, reported, paid, declined and closed, in amounts.",
+         method="Run as a reserve adequacy test: the raise in each insurer's claim estimates read from its balances, checked against IRA's printed revisions, then insurer by insurer and year on year.",
+         desc=f"Kenya's general insurers raise the estimates of claims already reported by {round(min(v['raised_pct'] for v in Q['years'].values()))}% to {round(max(v['raised_pct'] for v in Q['years'].values()))}% of the year's opening outstanding, and most do it every year: a reserve adequacy test on the regulator's claims statistics."),
 ]
 
 
@@ -655,7 +655,7 @@ PRINCIPLES = [
 PARTS = {
     "data": ("I", "Data analysis", "Kenya's insurance market rebuilt from the regulator's returns: the loss map, market structure, reinsurance flows, a cedant scorecard and an insurer explorer. Then whether insurers pay their claims, the M-Pesa series, an import cargo terminal and a cargo airline's risk layer, a dealer group's revenue audit, a drought forecast and a football model.",
              [("#work", "Kenya series"), ("#signals", "Reinsurer signals"), ("#claims", "Claims settlement"), ("#ask", "Ask the data"), ("#mpesa-series", "M-Pesa series"), ("#aviation", "Aviation and marine"), ("#data-more", "Audit and models")]),
-    "actuarial": ("II", "Actuarial analysis", "Reserving first: a health IBNR lab, a check on the reserves Kenya's listed insurers booked, then IFRS 17 measurement and a reserve adequacy test on public US data. Then instalment persistency and parametric crop pricing.",
+    "actuarial": ("II", "Actuarial analysis", "Reserving first: a health IBNR lab, a check on the reserves Kenya's listed insurers booked, then IFRS 17 measurement on US industry triangles and a reserve adequacy test on Kenya's claims statistics. Then instalment persistency and parametric crop pricing.",
                   [("#reserving", "Reserving"), ("#pricing", "Product and pricing")]),
 }
 
@@ -978,65 +978,97 @@ def ifrs17_page():
                      "Built with Python and numpy. The same triangles feed the reserve back-test listed on the About page.")
 
 
-def auctions_page():
+def adequacy_page():
     c = CASES[2]
+    Y = Q["years"]
+    y1, y2, y3 = list(Y)
+    r = {y: Y[y]["raised_pct"] for y in Y}
+    lo, hi = min(r.values()), max(r.values())
+    per = [Y[y]["per_100_reported"] for y in Y]
+    lia = [Y[y]["liability_pct"] for y in Y]; non = [Y[y]["non_liability_pct"] for y in Y]
+    med = [Y[y]["median_pct"] for y in Y]
+    ch = Q["chained"]["raised_pct"]
+    pers = list(Q["persistence"].values())
+    data_link = '<a href="https://github.com/maidenpeter/ira-kenya-data">ira-kenya-data</a>'
     s = f"""<section aria-labelledby="h-s1">
-<div class="sechead"><span class="eyebrow">Step one</span><h2 id="h-s1">Profile before you trust: one column, two scales</h2></div>
+<div class="sechead"><span class="eyebrow">Step one</span><h2 id="h-s1">Read the raise from the balances, not from one column</h2></div>
 <div class="prose">
-<p>Condition is the variable that matters most here, and it holds two grading scales stacked in one column with nothing to mark which is which: {n(A['short_scale'])} rows graded 1 to {A['short_max']} and {n(A['long_scale'])} graded on a scale that runs to {A['long_max']}. A grade {A['short_max']} car sells for a median ${n(A['median_g5'])}, a grade {A['long_max']} for ${n(A['median_g49'])} and a grade 17 for ${n(A['median_g17'])}. Treated as one variable, the best cars in the file sort below the worst.</p>
-<p>There is no defensible mapping between the scales, so the short-scale rows are excluded and the exclusion is stated. Inventing a conversion would put an unverifiable assumption under every number that follows.</p>
+<p>IRA prints a column for revisions to claims already reported, but it cannot be added up as printed: one row in {y1} shows a revision of KSh {n(Q['misprint_bn'])}bn, more than ten times the outstanding claims of the whole market. So the raise is read from the balances instead. For each insurer and year: what is outstanding at the end, plus everything paid, declined or closed during the year, less what was outstanding at the start and what was newly reported. What is left over is the amount by which estimates were raised after they were first set.</p>
+<p>Set aside the one misprinted row and IRA's own column agrees with the balances, so it becomes a check rather than the source.</p>
 </div>
+{checks_list([
+    (True, "The balances and the printed column agree.", f"Raised, from the balances: {d1(r[y1], False)}%, {d1(r[y2], False)}% and {d1(r[y3], False)}% of the outstanding at the start of {y1}, {y2} and {y3}. IRA's printed revisions without the misprint: {d1(Y[y1]['printed_pct'], False)}%, {d1(Y[y2]['printed_pct'], False)}% and {d1(Y[y3]['printed_pct'], False)}%."),
+    (True, "Only full years count.", f"An insurer-year is used when all four quarters are printed for both kinds of business and it started the year with KSh 100m or more outstanding: {Q['insurer_years']} insurer-years from {Q['insurers']} insurers."),
+])}
 </section>
 <section aria-labelledby="h-s2">
-<div class="sechead"><span class="eyebrow">Step two</span><h2 id="h-s2">In aggregate the estimate looks excellent</h2></div>
-<div class="grid3">
-<div class="panel"><p class="big">${A['median_gap']}</p><p>median gap between price and estimate.</p></div>
-<div class="panel"><p class="big">{d1(A['below'], False)}%</p><p>of cars sold below their estimate: a coin flip.</p></div>
-<div class="panel"><p class="big">{A['net_pct']}%</p><p>net across the book, US${A['net_m']}m against US${A['appraised_bn']}bn appraised.</p></div>
+<div class="sechead"><span class="eyebrow">Step two</span><h2 id="h-s2">Every year, estimates went up by {round(lo)}% to {round(hi)}% of what was outstanding</h2></div>
+<div class="pair">
+<div class="prose">
+<p>At the start of {y3} the {Y[y3]['n']} insurers carried KSh {Y[y3]['start_bn']}bn of reported claims. During the year their estimates of reported claims were raised by <b>{d1(r[y3], False)}%</b> of that. In {y2} the raise was {d1(r[y2], False)}%, in {y1} {d1(r[y1], False)}%.</p>
+<p>Measured against new claims instead: for every KSh 100 of claims reported in a year, estimates were raised by KSh {round(min(per))} to {round(max(per))} later the same year.</p>
+<p>Both kinds of business do it. Liability claims (claims by third parties, most of them injury from motor accidents) were raised by {d1(lia[0], False)}%, {d1(lia[1], False)}% and {d1(lia[2], False)}% in the three years; the rest (medical, own damage and property) by {d1(non[0], False)}%, {d1(non[1], False)}% and {d1(non[2], False)}%.</p>
 </div>
-<p class="prose">A reviewer would sign this off. The figure that should stop them is the mean absolute error: ${n(A['mae'])} per car, {A['mae_pct']}% of the estimate. Errors that large that average to nothing are going somewhere in an organised way.</p>
+{case_viz.adequacy_years()}
+</div>
 </section>
 <section aria-labelledby="h-s3">
-<div class="sechead"><span class="eyebrow">Step three</span><h2 id="h-s3">Segmented, it overvalues poor cars and undervalues good ones</h2></div>
-<div class="pair">
-<figure class="panel" style="margin:0"><h3>Average gap between price and estimate, by condition decile</h3>
-<p class="small">Percent of the estimate. Negative means the car sold for less, so the estimate was too high.</p>
-{bars([(f"Decile {i + 1}", v) for i, v in enumerate(AUCTION_DECILES)], f"Gap by condition decile, poorest to best, from {d1(AUCTION_DECILES[0])}% to {d1(AUCTION_DECILES[-1])}%", "%")}</figure>
-<div class="prose"><p>The poorest tenth sells {d1(-A['decile_low'], False)}% below its estimate; the best sells {d1(A['decile_high'], False)}% above. Above the middle the curve flattens near +{round(sum(AUCTION_DECILES[5:]) / len(AUCTION_DECILES[5:]))}%, so the bias sits mostly in the bottom third of the scale.</p>
-<p>By condition band, the estimate is {d1(-A['worst_band_pct'], False)}% too high on the poorest cars and {d1(A['best_band_pct'], False)}% too low on the best. Those errors run in opposite directions on comparable sums of money, which is why the total looked clean: <b>US${A['gross_m']}m</b> of gross misvaluation nets to US${A['net_m']}m, and <b>{A['cancel']}%</b> of it cancels.</p>
-{case_viz.auctions_cancel()}</div>
+<div class="sechead"><span class="eyebrow">Step three</span><h2 id="h-s3">Insurer by insurer, the same ones every year</h2></div>
+<div class="prose">
+<p>The market figure is not a few insurers pulling the average. The middle insurer raised its estimates by {d1(med[0], False)}%, {d1(med[1], False)}% and {d1(med[2], False)}% in the three years, and {Y[y1]['up']} of {Y[y1]['n']}, {Y[y2]['up']} of {Y[y2]['n']} and {Y[y3]['up']} of {Y[y3]['n']} insurers raised them by more than 5%.</p>
+<p>Of the {Q['three_years']} insurers in all three years, <b>{Q['up_every_year']} raised by more than 5% in every year</b>; {'only one' if Q['down_every_year'] == 1 else w(Q['down_every_year'])} lowered by more than 5% in every year. An insurer's rate in one year predicts its next: the rank correlation is {pers[0]['spearman']:.2f} from {y1} to {y2} and {pers[1]['spearman']:.2f} from {y2} to {y3}. A pattern that holds insurer by insurer, year after year, is a reserving practice, not noise.</p>
 </div>
+{case_viz.adequacy_insurers()}
 </section>
 <section aria-labelledby="h-s4">
 <div class="sechead"><span class="eyebrow">Step four</span><h2 id="h-s4">Trying to break it</h2></div>
 {checks_list([
-    (True, "Is condition standing in for price?", "Holding appraised value constant, the gradient runs the same way in every value band."),
-    (True, "Is it mileage?", "It holds inside each odometer band too."),
-    (True, "Is it a few outliers?", "Medians and 1 to 99 percentile trimmed means show the same ordering as the means."),
-    (False, "Is it a handful of large sellers?", f"Without the {A['top_sellers']} largest sellers ({n(A['excl_rows'])} rows) the poorest band still sells {d1(-A['excl_low'], False)}% below its estimate and the best {d1(A['excl_high'], False)}% above, but the middle bands reorder slightly, so the gradient is not strictly monotonic there."),
-    (False, "Are the deciles monotonic?", "Not quite: two of the upper deciles dip by less than 0.1 points. The finding is the gap between the bottom and the rest, not a smooth line."),
+    (True, "Is it IRA's misprint?", "No. The balances do not use the revisions column, and the column agrees with them once the one misprinted row is out."),
+    (True, "Is it insurers whose quarters do not join up?", f"{Q['unchained']} insurer-years have a quarter that does not start where the one before ended. Leaving them out, the raise is higher: {d1(ch[y1], False)}%, {d1(ch[y2], False)}% and {d1(ch[y3], False)}% on {Q['chained']['insurer_years']} insurer-years."),
+    (True, "Is it one kind of business?", f"Liability {d1(min(lia), False)}% to {d1(max(lia), False)}%, the rest {d1(min(non), False)}% to {d1(max(non), False)}%: both, every year."),
+    (True, "Is it a few large insurers?", f"The middle insurer raised by {d1(min(med), False)}% to {d1(max(med), False)}% a year, and most insurers raised by more than 5% every year."),
+    (False, "Does it mean the reserves are short?", "Not on its own. These tables carry case estimates only. A reserve also holds IBNR, and IBNR is where the expected raises belong."),
 ])}
 </section>
 <section aria-labelledby="h-s5">
-<div class="sechead"><span class="eyebrow">So what</span><h2 id="h-s5">Who pays for an error that nets to zero</h2></div>
+<div class="sechead"><span class="eyebrow">So what</span><h2 id="h-s5">A case estimate is a first figure, not the reserve</h2></div>
 <div class="prose">
-<p>An estimate that is unbiased in total but biased by segment costs nothing until the segments are treated differently, and they always are. Settle total-loss claims at this estimate and you overpay on the worst cars and underpay owners of the best, the customers least likely to accept it. Lend against it and advance rates on poor-condition stock rest on a number that is too high on exactly the collateral most likely to default.</p>
-<p>The fix is not a new model. It is to stop testing this one only in aggregate: one adequacy test by condition band, run monthly, would have shown this.</p>
+<p>In Kenya, claims are reserved low when they are reported and raised as they develop. That is safe only if the reserve also holds the raises still to come, as IBNR (strictly, incurred but not enough reported). An insurer that reserves at its case estimates with a thin IBNR is short, because the raises on the claims it holds have not happened yet. One that sizes its IBNR from its own rate of raises is not.</p>
+<p>IRA's claims tables cannot say which insurer does which, because they do not show IBNR. The insurers' own IFRS 17 tables do. The one listed group whose table holds up with an estimate at every age, Liberty Kenya's in <a href="{RESERVE_URL}">Kenya Reserve Check</a>, shows its total estimates, IBNR included, {d1(-Q['liberty_runoff_pct'], False)}% lower now than at the end of each year: there, the reserve set at the year end covered the raises that followed.</p>
+<p>A first test for any other insurer: set its IBNR against a year of its own raises. Where the IBNR is smaller, the reserve rests on estimates the insurer has itself raised, year after year.</p>
 </div>
 </section>"""
     lim = [
-        ("The data is public and it is not Kenyan.", "US wholesale auctions sold between January 2014 and July 2015, most of them from December 2014 to June 2015. The method transfers; the numbers do not."),
-        (f"{n(A['short_scale'])} short-scale rows were excluded.", "They may behave differently, and checking that would need the mapping this analysis declined to invent."),
-        ("Grades are assigned by inspectors.", "Some of what reads as valuation bias could be grading bias; the data has no inspector or site field to separate them."),
-        ("Association, not causation.", "The estimate is biased with respect to condition. This does not show why."),
+        ("Case estimates only.", "IRA's claims tables show the claims reported and their estimates, not IBNR, so on their own they cannot say whether a reserve as a whole is enough."),
+        ("The raises include claims reported during the year.", "They are set against the outstanding at the start of the year to give them a scale; they are not the run-off of that opening figure alone."),
+        ("Three years.", f"IRA has printed amounts only since the end of 2022, so {y1}, {y2} and {y3} are the full years there are."),
+        ("Returns as filed.", "Insurer-years whose quarters do not join up are kept in the main reading and left out in the check above. Insurers with less than KSh 100m outstanding, and the one misprinted row, are left out."),
+        ("No insurer is named.", f"The point is the practice across the market. Every insurer's figures are in IRA's tables and in the claims panel in {data_link}."),
     ]
     return case_page(c, c["tag"],
-                     f"{n(A['rows'])} US wholesale car auctions, each with the market's pre-sale estimate (the Manheim Market Report value) and the price paid. Across the book the estimate is off by {-A['net_pct']}%. Split by condition it is {d1(-A['worst_band_pct'], False)}% too high on the poorest cars and {d1(A['best_band_pct'], False)}% too low on the best, and {A['cancel']}% of the gross error cancels before it reaches the total.",
-                     [("Rows analysed", n(A['rows'])), ("Period", "Jan 2014 to Jul 2015"), ("Appraised", f"US${A['appraised_bn']}bn"), ("Tools", "Python, pandas")],
-                     f"Kaggle Vehicle Sales Data: {n(A['rows_total'])} US wholesale auction records with make, model, year, odometer, seller, a condition grade, the pre-sale estimate and the selling price. {n(A['rows'])} rows analysed after excluding the incompatible grading scale and incomplete records.",
-                     "The estimate treated as a reserve and the selling price as the settled amount. Every field profiled first, then aggregate bias, error by condition, condition within value and mileage bands, and gross overvaluation set against gross undervaluation.",
+                     f"Every quarter IRA prints each Kenyan insurer's claims movement: what was outstanding at the start, what was reported, paid, declined or closed, and what is outstanding at the end. Read from those balances, general insurers raised the estimates of claims already reported by {d1(r[y1], False)}% of the year's opening outstanding in {y1}, {d1(r[y2], False)}% in {y2} and {d1(r[y3], False)}% in {y3}, and most of them did it every year.",
+                     [("General insurers", str(Q["insurers"])), ("Years", f"{y1} to {y3}"), (f"Outstanding, start of {y3}", f"KSh {Y[y3]['start_bn']}bn"), ("Tools", "Python")],
+                     f"IRA's quarterly claims settlement statistics, {y1} to {y3}: for every general insurer, liability and non-liability business, the amount of claims outstanding at the start of each quarter, reported, paid, declined, closed without payment and outstanding at the end, in KSh thousands. Read and checked in {data_link}.",
+                     "A reserve adequacy test on case estimates. Over a year the closing balance is the opening one, plus the claims reported and the raises to their estimates, less what was paid, declined or closed, so the raises can be read from the balances. Each insurer's raise is set against what it had outstanding at the start of the year, checked against IRA's printed revisions, then compared insurer by insurer and year on year.",
                      s, lim,
-                     "Built with Python and pandas, with six tests on the method. The data is Kaggle's and is not redistributed.")
+                     "Built with Python. tools/adequacy.py in this site's repository recomputes every figure from the claims panel, and the site's checks fail if a figure here differs.")
+
+
+MOVED = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Moved | Marion Peter</title>
+<link rel="canonical" href="{base}{to}">
+<meta http-equiv="refresh" content="0; url={to}">
+</head>
+<body>
+<p>This case study has been replaced. <a href="{to}">Go to the reserve adequacy test</a>.</p>
+</body>
+</html>
+"""
 
 
 def career_timeline(roles, edu, placings):
@@ -1351,12 +1383,14 @@ def main():
         "ask/index.html": ask_page(),
         "work/dealer-revenue/index.html": dealer_page(),
         "work/ifrs17-measurement/index.html": ifrs17_page(),
-        "work/valuation-adequacy/index.html": auctions_page(),
+        "work/reserve-adequacy/index.html": adequacy_page(),
         "404.html": not_found(),
     }
     for rel, text in pages.items():
         write(rel, text)
     paths = ["/" + r.replace("index.html", "") for r in pages if r != "404.html"]
+    # the US valuation case study it replaced: a redirect, kept out of the sitemap, so old links still land
+    write("work/valuation-adequacy/index.html", MOVED.format(base=BASE, to="/work/reserve-adequacy/"))
     write("assets/nav.css", NAV_CSS)
     write("sitemap.xml", sitemap(paths))
     write("robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {BASE}/sitemap.xml\n")

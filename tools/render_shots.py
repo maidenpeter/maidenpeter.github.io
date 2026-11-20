@@ -30,7 +30,7 @@ PAGES = [
     ("scorecard", "/ira-kenya-reinsurance/page/kenya-cedant-scorecard.html", 0),
     ("explorer", "/ira-kenya-data/explorer/kenya-insurer-explorer.html", 200),
     ("ifrs17", "/work/ifrs17-measurement/", "figure.panel"),
-    ("valuation", "/work/valuation-adequacy/", "section[aria-labelledby=h-s3]"),
+    ("adequacy", "/work/reserve-adequacy/", "section[aria-labelledby=h-s2]"),
     ("dealer", "/work/dealer-revenue/", "figure.panel"),
 ]
 FILES = [

@@ -70,7 +70,7 @@ DATA_GROUPS = [
 ACTUARIAL_GROUPS = [
     group("reserving", "Reserving", [("/#hil", "Health IBNR Lab"), ("/#reserve-check", "Kenya Reserve Check"),
                                      ("/work/ifrs17-measurement/", "IFRS 17 measurement"),
-                                     ("/work/valuation-adequacy/", "Reserve adequacy test")]),
+                                     ("/work/reserve-adequacy/", "Reserve adequacy test")]),
     group("product", "Product and pricing", [("/#ipl", "Persistency Lab"), ("/#agroshield", "AgroShield pricing")]),
 ]
 

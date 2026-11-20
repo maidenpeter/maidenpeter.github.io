@@ -13,7 +13,7 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parent.parent
 PAGES = ["/", "/kenya-insurance/", "/about/", "/work/dealer-revenue/", "/work/ifrs17-measurement/",
-         "/work/valuation-adequacy/", "/no-such-page/",
+         "/work/reserve-adequacy/", "/no-such-page/",
          # Ask the data: empty, with an answer about one insurer, and with an answer about the market
          "/ask/", "/ask/#q=ins-class-year&ins=cic_general&cls=medical&yr=2024", "/ask/#q=class-range&y1=2018&y2=2025"]
 

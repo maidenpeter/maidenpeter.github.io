@@ -1,9 +1,9 @@
-"""Charts for the three case studies (dealer revenue, IFRS 17 measurement, valuation adequacy).
+"""Charts for the three case studies (dealer revenue, IFRS 17 measurement, reserve adequacy).
 
 Each function returns one chart panel; tools/build.py places it in the page. Numbers come from
-tools/figures.py (DEALER, IFRS17, IFRS17_VIZ, AUCTIONS), which check_figures.py checks against source.
+tools/figures.py (DEALER, IFRS17, IFRS17_VIZ, ADEQUACY), which check_figures.py checks against source.
 """
-from figures import DEALER as D, IFRS17 as I, IFRS17_VIZ as IV, AUCTIONS as A
+from figures import DEALER as D, IFRS17 as I, IFRS17_VIZ as IV, ADEQUACY as Q
 from viz import figure, key, table, columns, dotrows, split
 
 
@@ -90,15 +90,43 @@ def ifrs17_cv():
         table=table(["Line", "Coefficient of variation"], [[nm, f"{v}%"] for nm, v in IV["cv"]]))
 
 
-# ------------------------------------------------------------------ valuation adequacy
-def auctions_cancel():
-    gross, net = A["gross_m"], A["net_m"]
-    gone = round(gross - net, 1)
+# ------------------------------------------------------------------ reserve adequacy
+SOURCE = "Source: IRA quarterly claims settlement statistics, read and checked in ira-kenya-data."
+
+
+def adequacy_years():
+    Y = Q["years"]; ys = list(Y)
+    a = [Y[y]["raised_pct"] for y in ys]; b = [Y[y]["printed_pct"] for y in ys]
     return figure(
-        "Errors that cancel out between condition bands",
-        split([("neg", "Net error", net, f"US${net}m"), ("ctx", "Cancels out", gone, f"US${gone}m")],
-              f"US${gross}m of gross misvaluation across condition bands: US${net}m left net, US${gone}m cancels out between bands valued too high and too low."),
-        sub=f"US$ millions. The misvaluation in each condition band, added up without signs: US${gross}m.",
-        key=key([("neg", f"Net error left after offsets: US${net}m"), ("ctx", f"Offsets between bands valued too high and too low: US${gone}m, {A['cancel']}%")]),
-        table=table(["Part", "US$m"], [["Gross misvaluation", gross], ["Cancels out", gone], ["Net", net]]),
-        note=f"A net error of {A['net_pct']}% looks like accuracy. It is cancellation: the mean absolute error is still US${A['mae']:,} per car, {A['mae_pct']}% of the estimate.")
+        "How far the estimates of reported claims were raised",
+        columns(ys, [("neg", "Read from the balances", a), ("ctx", "IRA's printed revisions", b)],
+                "Raises as a percent of the claims outstanding at the start of the year: "
+                + ", ".join(f"{y} {x:.1f}% from the balances and {z:.1f}% in IRA's printed column" for y, x, z in zip(ys, a, b)) + ".",
+                lambda v: f"{v:.1f}%", tick_fmt=lambda v: f"{v:g}%", height=210,
+                marks={(0, i): f"{v:.0f}%" for i, v in enumerate(a)}),
+        sub="Percent of the claims outstanding at the start of each year, general insurers with KSh 100m or more outstanding.",
+        key=key([("neg", "Read from the balances"), ("ctx", "IRA's printed revisions column, its one misprinted row left out")]),
+        table=table(["Year", "Insurers", "Outstanding at the start", "Raised, from the balances", "Printed revisions", "Per KSh 100 reported"],
+                    [[y, Y[y]["n"], f"KSh {Y[y]['start_bn']}bn", f"{Y[y]['raised_pct']}%", f"{Y[y]['printed_pct']}%", f"KSh {Y[y]['per_100_reported']:.0f}"] for y in ys]),
+        note=SOURCE)
+
+
+def adequacy_insurers(lo=-100, hi=250):
+    years = list(Q["years"])
+    cls = lambda v: "neg" if v > 5 else ("pos" if v < -5 else "ctx")
+    rows = []
+    for vals in reversed(Q["insurers3"]):        # the highest average at the top
+        k = sum(1 for v in vals if v > 5)
+        dots = [(min(max(v, lo), hi), cls(v), f"{y}: {v:+.1f}%", f"{v:.0f}%" if v > hi else "") for y, v in zip(years, vals)]
+        rows.append((f"{k} of 3", "", dots))
+    over = [v for vals in Q["insurers3"] for v in vals if v > hi]
+    return figure(
+        "Each insurer, three years",
+        dotrows(rows, lo, hi, [-100, -50, 0, 50, 100, 150, 200, 250], lambda v: "0" if v == 0 else f"{v:+g}%",
+                f"Raises for each of the {Q['three_years']} insurers in all three years: {Q['up_every_year']} raised by more than 5% every year, "
+                f"{Q['down_every_year']} lowered by more than 5% every year.", band=(-5, 5, "within 5%")),
+        sub="Raises as a percent of each insurer's claims outstanding at the start of the year, one dot for each of 2023, 2024 and 2025. "
+            "One row per insurer, unnamed, the highest average at the top. On the left, the years it raised by more than 5%.",
+        key=key([("neg dot", "Raised by more than 5%"), ("ctx dot", "Within 5%"), ("pos dot", "Lowered by more than 5%")]),
+        table=table(["Insurer", *years], [[str(i), *[f"{v:+.1f}%" for v in vals]] for i, vals in enumerate(reversed(Q["insurers3"]), 1)]),
+        note=(f"{len(over)} value above the scale ({', '.join(f'{v:.0f}%' for v in over)}) is drawn at its edge and labelled. " if over else "") + SOURCE)
